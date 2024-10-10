@@ -14,7 +14,7 @@ CSI 680 Project - A TEAM
 ### SET UP
 1. **CLONE THIS REPO**
 ```bash
-   git clone https://github.com/yourusername/MS_What_IF.git
+   git clone https://github.com/TK94975/MS_What_IF.git
 ```
 2. **Install Global dependencies**
 ```bash
