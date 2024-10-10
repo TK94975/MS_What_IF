@@ -50,4 +50,4 @@ Go to root folder of the application i.e. `MS_What_IF/` and run the following co
 ```bash
     npm run dev
 ```
-It should open up your browser and display the users table with some dummy users.
+It should open up your browser and display a demo page. Additionally go to `http://localhost:3000/users` and check if you see a users table with some dummy users if server/mysql is working properly.
