@@ -16,17 +16,22 @@ CSI 680 Project - A TEAM
 ```bash
    git clone https://github.com/yourusername/MS_What_IF.git
 ```
-2. **Install Server dependencies**
+2. **Install Global dependencies**
+```bash
+   cd MS_What_IF
+   npm install
+```
+3. **Install Server dependencies**
 ```bash
    cd MS_What_IF/server
    npm install
 ```
-3. **Install Client dependencies**
+4. **Install Client dependencies**
 ```bash
    cd ../client
    npm install
 ```
-4. **Create Environment Variables**
+5. **Create Environment Variables**
 Create a file called `.env` in the directory `MS_What_IF/server` and add the following lines (edit it so your database password and username are the same as when you installed MySQL)
 ```bash
     DB_HOST=localhost
@@ -35,12 +40,12 @@ Create a file called `.env` in the directory `MS_What_IF/server` and add the fol
     DB_NAME=what_if_ms
     PORT=5000
 ```
-5. **Create the Database**
+6. **Create the Database**
 ```bash
     cd ../server
     node initDB.js
 ```
-6. **Run the Application**
+7. **Run the Application**
 Go to root folder of the application i.e. `MS_What_IF/` and run the following command:
 ```bash
     npm run dev
