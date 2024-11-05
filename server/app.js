@@ -11,6 +11,8 @@ const db = require('./config/db'); // Import the database connection
 
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
+const coursesRouter = require('./routes/courses');
+const coursePrerequisitesRouter = require('./routes/courses');
 
 const app = express();
 app.use(cors()); // Enable CORS
@@ -24,5 +26,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Use routes
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-
+app.use('/courses', coursesRouter);
+app.use('/course_prerequisites', coursePrerequisitesRouter);
 module.exports = app;

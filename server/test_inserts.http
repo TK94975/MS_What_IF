@@ -1,0 +1,11 @@
+### Add a New Course
+POST http://localhost:5000/courses
+Content-Type: application/json
+
+{
+  "department": "CSI",
+  "number": 101,
+  "title": "Introduction to Computer Science",
+  "description": "An introductory course to computer science.",
+  "credits": 3
+}

@@ -36,7 +36,7 @@ require('dotenv').config();
     console.log('Database and users table created (if they did not exist already).');
 
     // Insert two dummy users without password hashing
-    const insertUsers = `
+    /*const insertUsers = `
     INSERT INTO users (username, email, password, first_name, last_name, role)
     VALUES (?, ?, ?, ?, ?, ?), (?, ?, ?, ?, ?, ?);
     `;
@@ -46,7 +46,39 @@ require('dotenv').config();
       'teimur', 'teimur@albany.com', 'password456', 'Teimur', 'Khan', 'user',
     ]);
 
-    console.log('Inserted two dummy users into the users table.');
+    console.log('Inserted two dummy users into the users table.');*/
+
+
+    // **Create the courses table**
+    const createCoursesTable = `
+    CREATE TABLE IF NOT EXISTS courses (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      department VARCHAR(20) NOT NULL,
+      number INT NOT NULL,
+      title VARCHAR(100) NOT NULL,
+      description TEXT,
+      credits INT NOT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    );`;
+
+    await connection.query(createCoursesTable);
+
+    console.log('Courses table created (if it did not exist already).');
+
+    const createPreReqTable = `
+    CREATE TABLE IF NOT EXISTS course_prerequisites (
+      course_id INT NOT NULL,
+      prereq_course_id INT NOT NULL,
+      grade VARCHAR(5),
+      PRIMARY KEY (course_id, prereq_course_id),
+      FOREIGN KEY (course_id) REFERENCES courses(id),
+      FOREIGN KEY (prereq_course_id) REFERENCES courses(id)
+    );`;
+
+    await connection.query(createPreReqTable);
+
+    console.log('Pre Requisites table created (if it did not exist already).');
 
     // Close the connection
     await connection.end();
