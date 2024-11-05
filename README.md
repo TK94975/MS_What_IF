@@ -51,3 +51,11 @@ Go to root folder of the application i.e. `MS_What_IF/` and run the following co
     npm run dev
 ```
 It should open up your browser and display a demo page. Additionally go to `http://localhost:3000/users` and check if you see a users table with some dummy users if server/mysql is working properly.
+
+8. **Import cousework data**
+To import data first start the server, then import data from excel file `Mserver/csi_course.csv` to MySQL database using `server/importCourses.js` using the following commands:
+```bash
+    npm run dev
+    cd server
+    node importCourses.js
+```

@@ -26,22 +26,13 @@ require('dotenv').config();
     fs.createReadStream(csvFilePath)
       .pipe(csv())
       .on('data', (row) => {
-        // Assuming CSV columns are in the following order:
-        // 1. department
-        // 2. number
-        // 3. title
-        // 4. credits
-        // 5. description
-        // 6. prereq1 (e.g., 'CSI506')
-        // 7. prereq2 (e.g., 'CSI521')
-
         const department = row['ddd'];
         const number = row['number'];
         const title = row['title'];
         const credits = row['credits'];
         const description = row['description'];
-        const prereq1 = row['prereq1']; // Adjust the key if your CSV header is different
-        const prereq2 = row['prereq2']; // Adjust the key if your CSV header is different
+        const prereq1 = row['prereq1']; 
+        const prereq2 = row['prereq2'];
 
         const prereqs = [prereq1, prereq2].filter(Boolean);
 
