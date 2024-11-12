@@ -6,6 +6,8 @@ import {React, useState, useEffect} from "react";
 
 import ProfileBox from './ProfileBox';
 import MajorConcentrationSelector from './MajorConcentrationSelector';
+import SignIn from './SignIn';
+import SignUp from './SignUp';
 
 
 const Header = props => {
@@ -14,8 +16,7 @@ const Header = props => {
         <div className='container'>
             <div className='row'>
                 <div className='col'>
-                    <h6>SUNY University at Albany</h6>
-                    <ProfileBox name={"Dawson Geist"} email={"dgeist@albany.edu"}/>
+                    <SignIn/> <SignUp/>
                 </div>
                 <div className='col'>
                     <MajorConcentrationSelector/>
