@@ -2,16 +2,24 @@ import React, { useState } from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
 
 function SignIn() {
+  const [validated, setValidated] = useState(false);
   const [show, setShow] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const handleShow = () => setShow(true);
   const handleClose = () => setShow(false);
-  const handleSubmit = () => {
+  const handleSubmit = (event) => {
+    const form = event.currentTarget;
+    if (form.checkValidity() === false) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    setValidated(true);
     console.log(email);
     console.log(password);
-  }
+  };
+
   return (
     <div>
       {/* Sign In Link */}
@@ -33,7 +41,11 @@ function SignIn() {
                 placeholder="Enter email" 
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                />
+                required
+              />
+              <Form.Control.Feedback type="invalid">
+                Please provide your email 
+              </Form.Control.Feedback>
             </Form.Group>
 
             <Form.Group className="mb-3" controlId="formPassword">
@@ -43,7 +55,11 @@ function SignIn() {
                 placeholder="Enter Password" 
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                />
+                required
+              />
+              <Form.Control.Feedback type="invalid">
+                Please provide your password
+              </Form.Control.Feedback>
             </Form.Group>
 
             <Button variant="primary" type="submit">

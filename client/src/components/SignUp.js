@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Modal, Button, Form, Container, Col, Row } from 'react-bootstrap';
 
 function SignUp() {
+  const [validated, setValidated] = useState(false);
   const [show, setShow] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -11,20 +12,29 @@ function SignUp() {
   const [warning, setWarning] = useState("");
 
   const handleShow = () => setShow(true);
-  const handleClose = () => setShow(false);
-  const handleSubmit = () => {
+  const handleClose = () => {
+    setShow(false);
+    setEmail("");
+    setPassword("");
+    setCheckPassword("");
+    setLastName("");
+    setFirstName("");
+  }
+
+  const handleSubmit = (event) => {
     if (password != checkPassword) {
         setWarning("Passwords dont match");
     }
-    else {
-        setWarning("");
-        console.log(email);
-        console.log(password);
-        console.log(firstName);
-        console.log(lastName);
-    }
-    
+    const form = event.currentTarget;
+    if (form.checkValidity() === false) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+      setValidated(true);
+      console.log(email);
+      console.log(password);
   }
+
   return (
     <div>
       {/* Sign In Link */}
@@ -49,6 +59,7 @@ function SignUp() {
                                 placeholder="Enter email" 
                                 value={email}
                                 onChange={(e)=> setEmail(e.target.value)}
+                                required
                                 />
                             </Form.Group>
 
@@ -58,7 +69,8 @@ function SignUp() {
                                 type="password" 
                                 placeholder="Enter Password"
                                 value={password}
-                                onChange={(e)=> setPassword(e.target.value)} 
+                                onChange={(e)=> setPassword(e.target.value)}
+                                required 
                                 />
                             </Form.Group>
 
@@ -68,7 +80,8 @@ function SignUp() {
                                 type="password" 
                                 placeholder="Re-enter Password"
                                 value={checkPassword}
-                                onChange={(e)=> setCheckPassword(e.target.value)}  
+                                onChange={(e)=> setCheckPassword(e.target.value)}
+                                required  
                                 />
                             </Form.Group>
                             {warning}
@@ -84,7 +97,8 @@ function SignUp() {
                                 type="firstName" 
                                 placeholder="Enter First Name"
                                 value={firstName}
-                                onChange={(e)=> setFirstName(e.target.value)}   
+                                onChange={(e)=> setFirstName(e.target.value)}
+                                required   
                                 />
                             </Form.Group>
 
@@ -94,13 +108,12 @@ function SignUp() {
                                 type="LastName" 
                                 placeholder="Enter Last Name"
                                 value={lastName}
-                                onChange={(e)=> setLastName(e.target.value)}    
+                                onChange={(e)=> setLastName(e.target.value)}
+                                required    
                                 />
                             </Form.Group>
                         </Col>
                     </Row>
-
-
                 </Container>
             </Form>  
         </Modal.Body>
