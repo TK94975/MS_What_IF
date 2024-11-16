@@ -14,7 +14,9 @@ const SignIn = ({onSignInSuccess}) => {
     event.preventDefault();
     try {
       const response = await axios.post('http://localhost:5000/users/signin', { email, password });
-      console.log('Sign-in successful:', response.data);
+      console.log('Sign-in successful:', response.data[0]);
+      localStorage.setItem('userID', response.data[0].id);
+      localStorage.setItem('userEmail', response.data[0].email);
       onSignInSuccess();
 
     } catch (error) {

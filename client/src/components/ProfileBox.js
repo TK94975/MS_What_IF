@@ -5,26 +5,28 @@ import '../styles.css';
 //Packages 
 import {React, useState, useEffect} from "react";
 
-const ProfileBox = props => {
-    const [email, setEmail] = useState(props.email)
-    if (props.email !== null) {
-        return (
-            <Container>
-                <Row>
-                    <Col>
-                        <p>{`Email: ${email}`}</p>
-                    </Col>
-                </Row>
-            </Container>
-        )
+const ProfileBox = ({isUserSignedIn}) => {
+    const [email, setEmail] = useState('');
+    if (isUserSignedIn) {
+        console.log('profile logged in');
+        if (email === ''){
+            setEmail(localStorage.getItem('userEmail'));
+        }
     }
-    else {
-        return (
-            <div className='container'>
-                <a href={'http://localhost:3000/signin'}>Sign in</a>
-            </div>
-        )
-    }
+    //} else {
+    //    console.log('profile not logged in')
+    //}
+
+    return (
+        <Container>
+            <Row>
+                <Col>
+                    <h6>University at Albany, SUNY</h6>
+                    <p>{`Email: ${email}`}</p>
+                </Col>
+            </Row>
+        </Container>
+    )
 }
 
 export default ProfileBox
