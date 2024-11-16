@@ -5,7 +5,7 @@ import '../styles.css';
 //Packages 
 import {React, useState} from "react";
 
-const MajorConcentrationSelector = props => {
+const MajorConcentrationSelector = ({onSignInSuccess, signUpMajor, signUpCon}) => {
     const [majors, setMajors] = useState([
     ["cs", "Computer Science"],
     ["ece", "Electrical and Computer Engineering"],
@@ -28,10 +28,12 @@ const MajorConcentrationSelector = props => {
     const handleMajorChange = (e) => {
         setSelectedMajor(e.target.value);
         setSelectedConcentration('');
+        signUpMajor(e.target.value);
     };
 
     const handleConcentrationChange = (e) => {
         setSelectedConcentration(e.target.value);
+        signUpCon(e.target.value);
     };
 
     return (
