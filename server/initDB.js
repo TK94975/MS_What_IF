@@ -24,7 +24,7 @@ require('dotenv').config();
       email VARCHAR(100) NOT NULL UNIQUE,
       password VARCHAR(255) NOT NULL,
       major ENUM('cs', 'ece'),
-      concentration ENUM('ai', 'systems', 'theory', 'none'),
+      concentration ENUM('ai', 'systems', 'theory', 'old', 'none'),
       role ENUM('user', 'admin') DEFAULT 'user',
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP

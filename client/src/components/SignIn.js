@@ -3,12 +3,16 @@ import { Modal, Button, Form } from 'react-bootstrap';
 import axios from 'axios';
 
 const SignIn = ({onSignInSuccess}) => {
+  // Hiding and showing modal
   const [show, setShow] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-
   const handleShow = () => setShow(true);
   const handleClose = () => setShow(false);
+  // Local user data
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  // Account creation warning
+  const [warning, setWarning] = useState("");
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
@@ -16,10 +20,16 @@ const SignIn = ({onSignInSuccess}) => {
       console.log('Sign-in successful:', response.data[0]);
       sessionStorage.setItem('userID', response.data[0].id);
       sessionStorage.setItem('userEmail', response.data[0].email);
+      sessionStorage.setItem('userMajor', response.data[0].major);
+      sessionStorage.setItem('userConcentration', response.data[0].concentration)
       onSignInSuccess();
 
     } catch (error) {
-      console.error('Sign-in failed:', error);
+      if(error.status === 401){
+        setWarning("User not found")
+      } else {
+        setWarning("Error signing in")
+      }
     }
   };
 
@@ -64,9 +74,15 @@ const SignIn = ({onSignInSuccess}) => {
               </Form.Control.Feedback>
             </Form.Group>
 
+            <Form.Group>
+              <p className="text-danger">{warning}</p>
+            </Form.Group>
+
+
             <Button variant="primary" type="submit">
               Sign In
             </Button>
+            
           </Form>
         </Modal.Body>
       </Modal>

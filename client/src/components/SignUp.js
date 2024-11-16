@@ -32,13 +32,19 @@ const SignUp = ({
       return;
     }
     try {
+      const major = signInMajor;
+      const concentration = signInCon;
       const response = await axios.post("http://localhost:5000/users/signup", {
         email,
         password,
+        major,
+        concentration,
       });
       if (response.status === 201) {
-        sessionStorage.setItem("userID", response.data[0].id);
-        sessionStorage.setItem("userEmail", response.data[0].email);
+        sessionStorage.setItem('userID', response.data[0].id);
+        sessionStorage.setItem('userEmail', response.data[0].email);
+        sessionStorage.setItem('userMajor', response.data[0].major);
+        sessionStorage.setItem('userConcentration', response.data[0].concentration)
         onSignInSuccess();
         setShow(false);
       }
@@ -121,7 +127,7 @@ const SignUp = ({
                       required
                     />
                   </Form.Group>
-                  <p className="text-danger">{warning}</p>
+                  
 
                   <Form.Group className="mb-3" controlId="formMajor">
                     <Form.Label>Major</Form.Label>
@@ -150,6 +156,10 @@ const SignUp = ({
                         </option>
                       ))}
                     </Form.Select>
+                  </Form.Group>
+
+                  <Form.Group>
+                    <p className="text-danger">{warning}</p>
                   </Form.Group>
 
                   <Button variant="primary" type="submit">

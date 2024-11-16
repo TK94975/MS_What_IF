@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Container, Row, Col } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.css";
 import "../styles.css";
@@ -9,48 +9,65 @@ import SignIn from "./SignIn";
 import SignUp from "./SignUp";
 
 const Header = ({ isUserSignedIn, onSignInSuccess }) => {
-// State is shared between signup and major concentration components
-// so the main state is stored here
-  const [selectedMajor, setSelectedMajor] = useState("cs");
-  const [selectedConcentration, setSelectedConcentration] = useState("");
-  const handleMajorChange = (major) => {
-    setSelectedMajor(major);
-    setSelectedConcentration(""); // Reset concentration when major changes
-  };
-  const handleConcentrationChange = (concentration) => {
-    setSelectedConcentration(concentration);
-  };
+    // State shared by signup and majorconcentrationselector
+    const defaultConcentrations = {
+        cs: "ai",
+        ece: "none",
+    };
+    const [selectedMajor, setSelectedMajor] = useState("cs");
+    const [selectedConcentration, setSelectedConcentration] = useState(defaultConcentrations['cs']);
+    const handleMajorChange = (major) => {
+        setSelectedMajor(major);
+        setSelectedConcentration(defaultConcentrations[major] || "none");
+    };
+    const handleConcentrationChange = (concentration) => {
+        setSelectedConcentration(concentration);
+    };
 
-  return (
+    // Update state after sign in to make sure
+    // majorconcentrationselector shows the right values
+    useEffect(() => {
+    if (isUserSignedIn) {
+        const userMajor = sessionStorage.getItem("userMajor");
+        const userConcentration = sessionStorage.getItem("userConcentration");
+        setSelectedMajor(userMajor);
+        setSelectedConcentration(userConcentration);
+    }
+    }, [isUserSignedIn]);
+
+    return (
     <header>
-      <Container>
+        <Container>
         <Row>
-          <Col>
+            <Col>
             {isUserSignedIn ? (
-              <ProfileBox isUserSignedIn={isUserSignedIn} />
+                <ProfileBox isUserSignedIn={isUserSignedIn} />
             ) : (
-              <>
+                <>
                 <SignIn onSignInSuccess={onSignInSuccess} />
                 <SignUp
-                  onSignInSuccess={onSignInSuccess}
-                  signInMajor={selectedMajor}
-                  signInCon={selectedConcentration}
-                  onMajorChange={handleMajorChange}
-                  onConcentrationChange={handleConcentrationChange}
+                    onSignInSuccess={onSignInSuccess}
+                    signInMajor={selectedMajor}
+                    signInCon={selectedConcentration}
+                    onMajorChange={handleMajorChange}
+                    onConcentrationChange={handleConcentrationChange}
                 />
-              </>
+                </>
             )}
-          </Col>
-          <Col>
+            </Col>
+            <Col>
             <MajorConcentrationSelector
-              signUpMajor={handleMajorChange}
-              signUpCon={handleConcentrationChange}
+                onSignInSuccess={onSignInSuccess}
+                signInMajor={selectedMajor}
+                signInCon={selectedConcentration}
+                onMajorChange={handleMajorChange}
+                onConcentrationChange={handleConcentrationChange}
             />
-          </Col>
+            </Col>
         </Row>
-      </Container>
+        </Container>
     </header>
-  );
+    );
 };
 
 export default Header;
