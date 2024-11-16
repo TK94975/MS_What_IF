@@ -15,20 +15,21 @@ router.get('/', async (req, res, next) => {
   }
 });
 
-// POST /users - Insert a new user
-router.post('/', async (req, res, next) => {
+// POST /users - Insert a new user (not admin)
+router.post('/signup', async (req, res, next) => {
   try {
-    const { username, email, password, first_name, last_name, role } = req.body;
+    const {email, password} = req.body;
+    const user = 'user';
 
     // Input validation
-    if (!username || !email || !password) {
+    if (!email || !password) {
       return res.status(400).json({ error: 'Username, email, and password are required.' });
     }
 
     // Check if the username or email already exists
     const [existingUser] = await db.query(
-      'SELECT id FROM users WHERE username = ? OR email = ?',
-      [username, email]
+      'SELECT id FROM users WHERE email = ?',
+      [email]
     );
 
     if (existingUser.length > 0) {
@@ -37,8 +38,8 @@ router.post('/', async (req, res, next) => {
 
     // Insert the new user into the database without password hashing
     const [result] = await db.query(
-      'INSERT INTO users (username, email, password, first_name, last_name, role) VALUES (?, ?, ?, ?, ?, ?)',
-      [username, email, password, first_name || null, last_name || null, role || 'user']
+      'INSERT INTO users (username, email, password, role) VALUES (?,?,?,?)',
+      [email, email, password, user]
     );
 
     // Respond with the newly created user ID
@@ -48,5 +49,22 @@ router.post('/', async (req, res, next) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+router.post('/signin', async (req, res, next) => {
+  const email = req.body.email;
+  const password = req.body.password;
+
+  const [existingUser] = await db.query(
+    'SELECT * FROM users WHERE email = ? AND password = ?',
+    [email, password]
+  );
+
+  if (existingUser.length === 0) {
+    return res.status(401).json({error: 'User not found'});
+  }
+
+  return res.status(200).json([existingUser[0]]);
+
+})
 
 module.exports = router;

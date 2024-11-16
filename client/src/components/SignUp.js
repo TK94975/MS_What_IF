@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
 import { Modal, Button, Form, Container, Col, Row } from 'react-bootstrap';
+import axios from 'axios';
 
-function SignUp() {
-  const [validated, setValidated] = useState(false);
+const SignUp = ({onSignInSuccess}) => {
   const [show, setShow] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [checkPassword, setCheckPassword] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
   const [warning, setWarning] = useState("");
 
   const handleShow = () => setShow(true);
@@ -17,22 +15,23 @@ function SignUp() {
     setEmail("");
     setPassword("");
     setCheckPassword("");
-    setLastName("");
-    setFirstName("");
   }
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     if (password != checkPassword) {
         setWarning("Passwords dont match");
-    }
-    const form = event.currentTarget;
-    if (form.checkValidity() === false) {
-        event.preventDefault();
-        event.stopPropagation();
+        return
+    } else {
+      try {
+        const response = await axios.post('http://localhost:5000/users/signup', { email, password });
+        console.log('Sign-up successful:', response.status);
+        onSignInSuccess();
+
+      } catch (error) {
+        console.error('Sign-in failed:', error);
       }
-      setValidated(true);
-      console.log(email);
-      console.log(password);
+    }
+
   }
 
   return (
@@ -84,34 +83,11 @@ function SignUp() {
                                 required  
                                 />
                             </Form.Group>
-                            {warning}
+                            <p>{warning}</p>
 
                             <Button variant="primary" type="submit">
                             Sign Up
                             </Button>
-                        </Col>
-                        <Col>
-                            <Form.Group className="mb-3" controlId="formFirstName">
-                                <Form.Label>First Name</Form.Label>
-                                <Form.Control 
-                                type="firstName" 
-                                placeholder="Enter First Name"
-                                value={firstName}
-                                onChange={(e)=> setFirstName(e.target.value)}
-                                required   
-                                />
-                            </Form.Group>
-
-                            <Form.Group className="mb-3" controlId="formLastName">
-                                <Form.Label>Last Name</Form.Label>
-                                <Form.Control 
-                                type="LastName" 
-                                placeholder="Enter Last Name"
-                                value={lastName}
-                                onChange={(e)=> setLastName(e.target.value)}
-                                required    
-                                />
-                            </Form.Group>
                         </Col>
                     </Row>
                 </Container>

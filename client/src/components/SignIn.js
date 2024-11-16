@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
+import axios from 'axios';
 
-function SignIn() {
+const SignIn = ({onSignInSuccess}) => {
   const [validated, setValidated] = useState(false);
   const [show, setShow] = useState(false);
   const [email, setEmail] = useState("");
@@ -9,15 +10,16 @@ function SignIn() {
 
   const handleShow = () => setShow(true);
   const handleClose = () => setShow(false);
-  const handleSubmit = (event) => {
-    const form = event.currentTarget;
-    if (form.checkValidity() === false) {
-      event.preventDefault();
-      event.stopPropagation();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    try {
+      const response = await axios.post('http://localhost:5000/users/signin', { email, password });
+      console.log('Sign-in successful:', response.data);
+      onSignInSuccess();
+
+    } catch (error) {
+      console.error('Sign-in failed:', error);
     }
-    setValidated(true);
-    console.log(email);
-    console.log(password);
   };
 
   return (

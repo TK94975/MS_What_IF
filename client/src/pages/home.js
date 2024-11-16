@@ -7,6 +7,7 @@ import React from "react";
 import LeftSideBar from "../components/LeftSideBar";
 import ScheduleContainer from '../components/ScheduleContainer';
 import Header from '../components/Header';
+import { useState } from 'react';
 
 /*
     --------------- TITLE ------------------
@@ -15,10 +16,16 @@ import Header from '../components/Header';
     [ Bar      ][                     ][ Bar      ]
 */
 const Home = () => {
+    const [isUserSignedIn, setIsUserSignedIn] = useState(false);
+
+    const handleSignInSuccess = () => {
+      setIsUserSignedIn(true);
+    };
+
     return (
         <div id='HOME-PD' className='container'>
             <div id='HOME-TitleRow' className='row'>
-                <Header/>
+            <Header isUserSignedIn={isUserSignedIn} onSignInSuccess={handleSignInSuccess} />
             </div>
             <div id='HOME-BodyRow' className='row'>
                 <div id='HOME-LSB-PD' className='col'>

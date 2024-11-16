@@ -9,21 +9,18 @@ import MajorConcentrationSelector from './MajorConcentrationSelector';
 import SignIn from './SignIn';
 import SignUp from './SignUp';
 
-
-const Header = props => {
-
+const Header = ({ isUserSignedIn, onSignInSuccess }) => {
     return (
-        <div className='container'>
-            <div className='row'>
-                <div className='col'>
-                    <SignIn/> <SignUp/>
-                </div>
-                <div className='col'>
-                    <MajorConcentrationSelector/>
-                </div>
-            </div>
-        </div>
-    )
-}
+      <header>
+        {/* Conditional rendering based on the user's sign-in state */}
+        {isUserSignedIn ? (
+          <p>Welcome, User!</p>
+        ) : (
+          // Pass the callback to SignIn
+          [<SignIn onSignInSuccess={onSignInSuccess} />, <SignUp onSignInSuccess={onSignInSuccess}/>]
+        )}
+      </header>
+    );
+  };
 
 export default Header

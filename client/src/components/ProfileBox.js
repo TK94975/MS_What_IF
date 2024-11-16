@@ -1,32 +1,21 @@
 //CSS
 import 'bootstrap/dist/css/bootstrap.css'; // Import Bootstrap CSS
+import { Container, Col, Row } from 'react-bootstrap';
 import '../styles.css';
 //Packages 
 import {React, useState, useEffect} from "react";
 
 const ProfileBox = props => {
-    const [user, setUser] = useState(props.name)
     const [email, setEmail] = useState(props.email)
-    if (props.user !== null) {
+    if (props.email !== null) {
         return (
-            <div className='container'>
-                <div className='row'>
-                    <div className='col'>
-                        <div className='container d-flex flex-column'>
-                            <div className='row'>
-                                <div className='col'>
-                                    <p>{`Name: ${user}`}</p>
-                                </div>
-                            </div>
-                            <div className='row'>
-                                <div className='col d-flex'>
-                                    <p>{`Email: ${email}`}</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <Container>
+                <Row>
+                    <Col>
+                        <p>{`Email: ${email}`}</p>
+                    </Col>
+                </Row>
+            </Container>
         )
     }
     else {
