@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../config/db'); // Database connection
+const bcrypt = require('bcrypt');
 
 // GET /users - Fetch all users
 router.get('/', async (req, res, next) => {
@@ -36,15 +37,17 @@ router.post('/signup', async (req, res, next) => {
       return res.status(409).json({ error: 'Username or email already exists.' });
     }
 
-    // Insert the new user into the database without password hashing
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Insert the new user into the database with password hashing
     const [result] = await db.query(
       'INSERT INTO users (email, password, major, concentration, role) VALUES (?,?,?,?,?)',
-      [email, password, major, concentration, user]
+      [email, hashedPassword, major, concentration, user]
     );
 
     const [newUser] = await db.query(
-      'SELECT * FROM users WHERE email = ? AND password = ?',
-      [email, password]
+      'SELECT * FROM users WHERE email = ?',
+      [email]
     );
 
     // Respond with the newly created user ID
@@ -60,12 +63,17 @@ router.post('/signin', async (req, res, next) => {
   const password = req.body.password;
 
   const [existingUser] = await db.query(
-    'SELECT * FROM users WHERE email = ? AND password = ?',
+    'SELECT * FROM users WHERE email = ?',
     [email, password]
   );
 
   if (existingUser.length === 0) {
     return res.status(401).json({error: 'User not found'});
+  }
+
+  const isMatch = await bcrypt.compare(password, existingUser[0].password);
+  if (!isMatch) {
+    return res.status(401).json({ error: 'Invalid password' });
   }
 
   return res.status(200).json([existingUser[0]]);

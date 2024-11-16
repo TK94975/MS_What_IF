@@ -45,7 +45,8 @@ const SignUp = ({
         sessionStorage.setItem('userEmail', response.data[0].email);
         sessionStorage.setItem('userMajor', response.data[0].major);
         sessionStorage.setItem('userConcentration', response.data[0].concentration)
-        onSignInSuccess();
+        sessionStorage.setItem('userLoggedIn?', 'true');
+        onSignInSuccess(true);
         setShow(false);
       }
     } catch (error) {

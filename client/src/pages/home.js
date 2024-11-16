@@ -7,7 +7,7 @@ import React from "react";
 import LeftSideBar from "../components/LeftSideBar";
 import ScheduleContainer from '../components/ScheduleContainer';
 import Header from '../components/Header';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 /*
     --------------- TITLE ------------------
@@ -18,9 +18,15 @@ import { useState } from 'react';
 const Home = () => {
     const [isUserSignedIn, setIsUserSignedIn] = useState(false);
 
-    const handleSignInSuccess = () => {
-      setIsUserSignedIn(true);
+    const handleSignInSuccess = (bool) => {
+      setIsUserSignedIn(bool);
     };
+
+    useEffect(() => {
+        if (sessionStorage.getItem("userLoggedIn?") === 'true') {
+            setIsUserSignedIn(true);
+        }
+    }, []);
 
     return (
         <div id='HOME-PD' className='container'>

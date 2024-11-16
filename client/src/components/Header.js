@@ -41,7 +41,7 @@ const Header = ({ isUserSignedIn, onSignInSuccess }) => {
         <Row>
             <Col>
             {isUserSignedIn ? (
-                <ProfileBox isUserSignedIn={isUserSignedIn} />
+                <ProfileBox isUserSignedIn={isUserSignedIn} onSignInSuccess={onSignInSuccess} />
             ) : (
                 <>
                 <SignIn onSignInSuccess={onSignInSuccess} />

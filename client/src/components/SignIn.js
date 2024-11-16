@@ -17,19 +17,20 @@ const SignIn = ({onSignInSuccess}) => {
     event.preventDefault();
     try {
       const response = await axios.post('http://localhost:5000/users/signin', { email, password });
-      console.log('Sign-in successful:', response.data[0]);
       sessionStorage.setItem('userID', response.data[0].id);
       sessionStorage.setItem('userEmail', response.data[0].email);
       sessionStorage.setItem('userMajor', response.data[0].major);
       sessionStorage.setItem('userConcentration', response.data[0].concentration)
-      onSignInSuccess();
+      sessionStorage.setItem('userLoggedIn?', 'true');
+      onSignInSuccess(true);
 
     } catch (error) {
-      if(error.status === 401){
-        setWarning("User not found")
-      } else {
-        setWarning("Error signing in")
-      }
+        if(error.status === 401){
+          setWarning(error.response.data.error);
+        } else {
+          setWarning("Error signing in");
+        }
+        console.log(error);
     }
   };
 
