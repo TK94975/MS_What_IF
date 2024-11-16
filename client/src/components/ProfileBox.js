@@ -10,7 +10,7 @@ const ProfileBox = ({isUserSignedIn}) => {
     if (isUserSignedIn) {
         console.log('profile logged in');
         if (email === ''){
-            setEmail(localStorage.getItem('userEmail'));
+            setEmail(sessionStorage.getItem('userEmail'));
         }
     }
     //} else {

@@ -15,8 +15,8 @@ const SignIn = ({onSignInSuccess}) => {
     try {
       const response = await axios.post('http://localhost:5000/users/signin', { email, password });
       console.log('Sign-in successful:', response.data[0]);
-      localStorage.setItem('userID', response.data[0].id);
-      localStorage.setItem('userEmail', response.data[0].email);
+      sessionStorage.setItem('userID', response.data[0].id);
+      sessionStorage.setItem('userEmail', response.data[0].email);
       onSignInSuccess();
 
     } catch (error) {
@@ -26,10 +26,9 @@ const SignIn = ({onSignInSuccess}) => {
 
   return (
     <div>
-      {/* Sign In Link */}
-      <a href="#" onClick={handleShow}>
+      <Button variant="link" onClick={handleShow}>
         Sign In
-      </a>
+      </Button>
 
       {/* Modal for Sign In */}
       <Modal show={show} onHide={handleClose} centered>

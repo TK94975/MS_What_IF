@@ -3,43 +3,82 @@ import { Modal, Button, Form, Container, Col, Row } from 'react-bootstrap';
 import axios from 'axios';
 
 const SignUp = ({onSignInSuccess}) => {
+  // Show or hide modal
   const [show, setShow] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [checkPassword, setCheckPassword] = useState("");
-  const [warning, setWarning] = useState("");
-
-  const handleShow = () => setShow(true);
+  const handleShow = () => {
+    setShow(true);
+    setWarning('');
+  }
   const handleClose = () => {
     setShow(false);
     setEmail("");
     setPassword("");
     setCheckPassword("");
   }
+  // Login info
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [checkPassword, setCheckPassword] = useState("");
+  // Error message if necessary
+  const [warning, setWarning] = useState("");
+  // Major and concentration code
+  const [majors, setMajors] = useState([
+    ["cs", "Computer Science"],
+    ["ece", "Electrical and Computer Engineering"],
+    ]);
+    const [concentrations, setConcentrations] = useState({
+    cs: [
+        ['ai', 'Artificial Intelligence'],
+        ['systems', 'Computer Systems'],
+        ['theory', 'Theoretical CS'],
+        ['old', 'Pre-2024']
+    ],
+    ece: [
+        ['none', 'None']
+    ],
+    });
+  const [selectedMajor, setSelectedMajor] = useState('cs');
+  const [selectedConcentration, setSelectedConcentration] = useState('');
+  const handleMajorChange = (e) => {
+    const major = e.target.value;
+    setSelectedMajor(major);
+    setSelectedConcentration(concentrations[major][0][0]);
+  };
+  const handleConcentrationChange = (e) => {
+    setSelectedConcentration(e.target.value);
+  };
 
   const handleSubmit = async (event) => {
+    event.preventDefault();
     if (password != checkPassword) {
         setWarning("Passwords dont match");
         return
     } else {
       try {
         const response = await axios.post('http://localhost:5000/users/signup', { email, password });
-        console.log('Sign-up successful:', response.status);
-        onSignInSuccess();
-
+        if (response.status === 201){
+          console.log('Sign-up successful:', response.status);
+          sessionStorage.setItem('userID', response.data[0].id);
+          sessionStorage.setItem('userEmail', response.data[0].email);
+          onSignInSuccess();
+          setShow(false);
+        }
       } catch (error) {
-        console.error('Sign-in failed:', error);
+        if (error.status === 409){
+          setWarning("User already exists");
+        }
+        else {
+          setWarning("Error creating account");
+        }
       }
     }
-
   }
 
   return (
     <div>
-      {/* Sign In Link */}
-      <a href="#" onClick={handleShow}>
+      <Button variant="link" onClick={handleShow}>
         Sign Up
-      </a>
+      </Button>
 
       {/* Modal for Sign In */}
       <Modal show={show} onHide={handleClose} centered>
@@ -85,10 +124,39 @@ const SignUp = ({onSignInSuccess}) => {
                             </Form.Group>
                             <p>{warning}</p>
 
+                            <Form.Group className="mb-3" controlId="formMajor">
+                              <Form.Label>Major</Form.Label>
+                              <Form.Select
+                              value={selectedMajor}
+                              onChange={handleMajorChange}
+                              >
+                              {majors.map((major) => (
+                              <option key={major[0]} value={major[0]}>
+                              {major[1]}
+                              </option>
+                              ))}
+                              </Form.Select>
+                            </Form.Group>
+                            
+                            <Form.Group className="mb-3" controlId="formConcentration">
+                              <Form.Label>Concentration</Form.Label>
+                              <Form.Select
+                              value={selectedConcentration}
+                              onChange={handleConcentrationChange}
+                              >
+                              {concentrations[selectedMajor]?.map((concentration) => (
+                              <option key={concentration[0]} value={concentration[0]}>
+                              {concentration[1]}
+                              </option>
+                              ))}
+                              </Form.Select>
+                            </Form.Group>
+
                             <Button variant="primary" type="submit">
                             Sign Up
                             </Button>
                         </Col>
+
                     </Row>
                 </Container>
             </Form>  

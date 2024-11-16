@@ -11,9 +11,6 @@ import SignIn from './SignIn';
 import SignUp from './SignUp';
 
 const Header = ({ isUserSignedIn, onSignInSuccess }) => {
-    if (isUserSignedIn){
-        console.log("sdfsdf");
-    }
     return (
       <header>
         <Container>
@@ -23,7 +20,7 @@ const Header = ({ isUserSignedIn, onSignInSuccess }) => {
                     {isUserSignedIn ? (
                     <ProfileBox isUserSignedIn={isUserSignedIn}/>
                     ) : (
-                    [<SignIn onSignInSuccess={onSignInSuccess} />, <SignUp onSignInSuccess={onSignInSuccess}/>]
+                    [<SignIn onSignInSuccess={onSignInSuccess} key={1} />, <SignUp onSignInSuccess={onSignInSuccess} key={2}/>]
                     )}
                 </Col>
                 <Col>

@@ -25,7 +25,7 @@ const Home = () => {
     return (
         <div id='HOME-PD' className='container'>
             <div id='HOME-TitleRow' className='row'>
-            <Header isUserSignedIn={isUserSignedIn} onSignInSuccess={handleSignInSuccess} />
+                <Header isUserSignedIn={isUserSignedIn} onSignInSuccess={handleSignInSuccess} />
             </div>
             <div id='HOME-BodyRow' className='row'>
                 <div id='HOME-LSB-PD' className='col'>

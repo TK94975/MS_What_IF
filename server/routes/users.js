@@ -42,8 +42,13 @@ router.post('/signup', async (req, res, next) => {
       [email, email, password, user]
     );
 
+    const [newUser] = await db.query(
+      'SELECT * FROM users WHERE email = ? AND password = ?',
+      [email, password]
+    );
+
     // Respond with the newly created user ID
-    res.status(201).json({ message: 'User created successfully.', userId: result.insertId });
+    res.status(201).json([newUser[0]]);
   } catch (err) {
     console.error('Error inserting user:', err);
     res.status(500).json({ error: 'Internal server error' });
