@@ -1,6 +1,6 @@
 //CSS
 import 'bootstrap/dist/css/bootstrap.css'; // Import Bootstrap CSS
-import { Container, Col, Row } from 'react-bootstrap';
+import { Container, Col, Row, Form } from 'react-bootstrap';
 import '../styles.css';
 //Packages 
 import {React, useState, useEffect} from "react";
@@ -19,12 +19,14 @@ const ProfileBox = ({isUserSignedIn}) => {
 
     return (
         <Container>
-            <Row>
                 <Col>
-                    <h6>University at Albany, SUNY</h6>
-                    <p>{`Email: ${email}`}</p>
+                <Row>
+                    <Form.Label>University at Albany, SUNY</Form.Label>
+                </Row>
+                <Row>
+                </Row>
+                    <Form.Label>{`Email: ${email}`}</Form.Label>
                 </Col>
-            </Row>
         </Container>
     )
 }

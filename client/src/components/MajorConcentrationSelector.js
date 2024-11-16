@@ -1,9 +1,9 @@
 //CSS
 import 'bootstrap/dist/css/bootstrap.css'; // Import Bootstrap CSS
-import { Container, Row, Col } from 'react-bootstrap';
+import { Container, Row, Col, Form } from 'react-bootstrap';
 import '../styles.css';
 //Packages 
-import {React, useState, useEffect} from "react";
+import {React, useState} from "react";
 
 const MajorConcentrationSelector = props => {
     const [majors, setMajors] = useState([
@@ -37,46 +37,39 @@ const MajorConcentrationSelector = props => {
     return (
         <Container>
         <Row>
-            <Col xs={4}>
-            <label htmlFor="majors">Major:</label>
-            </Col>
-            <Col xs={8}>
-            <select
-                name="majors"
-                id="majors"
-                value={selectedMajor}
-                onChange={handleMajorChange}
-            >
-                {majors.map((major) => (
-                <option key={major[0]} value={major[0]}>
+            <Form.Group as={Row}>
+                <Form.Label column sm={3}>Major</Form.Label>
+                <Col sm={9}>
+                    <Form.Select
+                    value={selectedMajor}
+                    onChange={handleMajorChange}
+                    >
+                    {majors.map((major) => (
+                    <option key={major[0]} value={major[0]}>
                     {major[1]}
-                </option>
-                ))}
-            </select>
-            </Col>
+                    </option>
+                    ))}
+                    </Form.Select>
+                </Col>
+            </Form.Group>
+
         </Row>
         <Row>
-            <Col xs={4}>
-            <label htmlFor="concentrations">Concentration:</label>
-            </Col>
-            <Col xs={8}>
-            <select
-                name="concentrations"
-                id="concentrations"
-                value={selectedConcentration}
-                onChange={handleConcentrationChange}
-                disabled={!concentrations[selectedMajor]?.length}
-            >
-                <option value="" disabled>
-                Select a concentration
-                </option>
-                {concentrations[selectedMajor]?.map((concentration) => (
-                <option key={concentration[0]} value={concentration[0]}>
+            <Form.Group as={Row}>
+                <Form.Label column sm={3}>Concentration</Form.Label>
+                <Col sm={9}>
+                    <Form.Select
+                    value={selectedConcentration}
+                    onChange={handleConcentrationChange}
+                    >
+                    {concentrations[selectedMajor]?.map((concentration) => (
+                    <option key={concentration[0]} value={concentration[0]}>
                     {concentration[1]}
-                </option>
-                ))}
-            </select>
-            </Col>
+                    </option>
+                    ))}
+                    </Form.Select>
+                </Col>
+            </Form.Group>
         </Row>
         </Container>
     );

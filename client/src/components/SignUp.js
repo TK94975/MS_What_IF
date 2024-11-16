@@ -50,7 +50,7 @@ const SignUp = ({onSignInSuccess}) => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    if (password != checkPassword) {
+    if (password !== checkPassword) {
         setWarning("Passwords dont match");
         return
     } else {

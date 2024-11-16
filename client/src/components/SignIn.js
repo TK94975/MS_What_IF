@@ -3,7 +3,6 @@ import { Modal, Button, Form } from 'react-bootstrap';
 import axios from 'axios';
 
 const SignIn = ({onSignInSuccess}) => {
-  const [validated, setValidated] = useState(false);
   const [show, setShow] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
