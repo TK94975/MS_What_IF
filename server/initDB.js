@@ -23,8 +23,8 @@ require('dotenv').config();
       id INT AUTO_INCREMENT PRIMARY KEY,
       email VARCHAR(100) NOT NULL UNIQUE,
       password VARCHAR(255) NOT NULL,
-      major ENUM('cs', 'ece'),
-      concentration ENUM('ai', 'systems', 'theory', 'old', 'none'),
+      major ENUM('CSI', 'ECE'),
+      concentration ENUM('Core','Artificial Intelligence and Machine Learning', 'Systems', 'Theoretical Computer Science', 'Old Computer Science','Signal Processing and Communications','Electronic Circuits and Systems','Control and Computer Systems', 'none'),
       role ENUM('user', 'admin') DEFAULT 'user',
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -52,7 +52,7 @@ require('dotenv').config();
     const createCoursesTable = `
     CREATE TABLE IF NOT EXISTS courses (
       id INT AUTO_INCREMENT PRIMARY KEY,
-      department VARCHAR(20) NOT NULL,
+      department ENUM('CSI', 'ECE','PHY','MATH'),
       number INT NOT NULL,
       title VARCHAR(100) NOT NULL,
       description TEXT,
@@ -69,7 +69,7 @@ require('dotenv').config();
     CREATE TABLE IF NOT EXISTS course_prerequisites (
       course_id INT NOT NULL,
       prereq_course_id INT NOT NULL,
-      grade VARCHAR(5),
+      grade ENUM('A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'D', 'F', 'E') NOT NULL,
       PRIMARY KEY (course_id, prereq_course_id),
       FOREIGN KEY (course_id) REFERENCES courses(id),
       FOREIGN KEY (prereq_course_id) REFERENCES courses(id)
@@ -78,6 +78,48 @@ require('dotenv').config();
     await connection.query(createPreReqTable);
 
     console.log('Pre Requisites table created (if it did not exist already).');
+
+    const createUserCoursesTable = `
+    CREATE TABLE IF NOT EXISTS user_courses (
+      course_id INT NOT NULL,
+      semester ENUM('Spring', 'Summer', 'Fall', 'Winter') NOT NULL,
+      year INT NOT NULL,
+      grade ENUM('A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'D', 'F', 'E') NOT NULL,
+      PRIMARY KEY (course_id, semester, year),
+      FOREIGN KEY (course_id) REFERENCES courses(id)
+    );`;
+
+    await connection.query(createUserCoursesTable);
+
+    console.log('User courses table created (if it did not exist already).');
+
+    const createCourseOfferingsTable = `
+    CREATE TABLE IF NOT EXISTS course_offerings (
+      course_id INT NOT NULL,
+      semester ENUM('Spring', 'Summer', 'Fall', 'Winter') NOT NULL,
+      year INT NOT NULL,
+      PRIMARY KEY (course_id, semester, year),
+      FOREIGN KEY (course_id) REFERENCES courses(id)
+    );`;
+
+    await connection.query(createCourseOfferingsTable);
+
+    console.log('Course Offerings table created (if it did not exist already).');
+
+
+    const createCourseConcentrationsTable = `
+    CREATE TABLE IF NOT EXISTS course_concentrations (
+      course_id INT NOT NULL,
+      major ENUM('CSI', 'ECE'),
+      concentration ENUM('Core','Artificial Intelligence and Machine Learning', 'Systems', 'Theoretical Computer Science', 'Old Computer Science','Signal Processing and Communications','Electronic Circuits and Systems','Control and Computer Systems', 'none'),
+      isConcentrationCore BINARY,
+      PRIMARY KEY (course_id, major, concentration),
+      FOREIGN KEY (course_id) REFERENCES courses(id)
+    );`;
+
+    await connection.query(createCourseConcentrationsTable);
+
+    console.log('Course Concentrations table created (if it did not exist already).');
 
     // Close the connection
     await connection.end();
