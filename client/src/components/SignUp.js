@@ -60,18 +60,22 @@ const SignUp = ({
 
   // Major and concentration
   const [majors] = useState([
-    ["cs", "Computer Science"],
-    ["ece", "Electrical and Computer Engineering"],
+    ["CSI", "Computer Science"],
+    ["ECE", "Electrical and Computer Engineering"],
   ]);
-  const [concentrations] = useState({
-    cs: [
-      ["ai", "Artificial Intelligence"],
-      ["systems", "Computer Systems"],
-      ["theory", "Theoretical CS"],
-      ["old", "Pre-2024"],
+  const concentrations = {
+    CSI: [
+    ["Artificial Intelligence and Machine Learning", "Artificial Intelligence"],
+    ["Systems", "Computer Systems"],
+    ["Theoretical Computer Science", "Theoretical CS"],
+    ["Old Computer Science", "Pre-2024"],
     ],
-    ece: [["none", "None"]],
-  });
+    ECE: [
+    ["Signal Processing and Communications", "Signal Processing"],
+    ["Electronic Circuits and Systems", "Electronic Circuits"],
+    ["Control and Computer Systems", "Control Systems"],
+    ],
+};
   const handleMajorChange = (e) => {
     const major = e.target.value;
     onMajorChange(major); 
