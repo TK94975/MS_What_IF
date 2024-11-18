@@ -11,18 +11,22 @@ onMajorChange,
 onConcentrationChange,
 }) => {
 const majors = [
-    ["cs", "Computer Science"],
-    ["ece", "Electrical and Computer Engineering"],
+    ["CSI", "Computer Science"],
+    ["ECE", "Electrical and Computer Engineering"],
 ];
 
 const concentrations = {
-    cs: [
-    ["ai", "Artificial Intelligence"],
-    ["systems", "Computer Systems"],
-    ["theory", "Theoretical CS"],
-    ["old", "Pre-2024"],
+    CSI: [
+    ["Artificial Intelligence and Machine Learning", "Artificial Intelligence"],
+    ["Systems", "Computer Systems"],
+    ["Theoretical Computer Science", "Theoretical CS"],
+    ["Old Computer Science", "Pre-2024"],
     ],
-    ece: [["none", "None"]],
+    ECE: [
+    ["Signal Processing and Communications", "Signal Processing"],
+    ["Electronic Circuits and Systems", "Electronic Circuits"],
+    ["Control and Computer Systems", "Control Systems"],
+    ],
 };
 
 const handleMajorChange = (e) => {
@@ -64,7 +68,6 @@ return (
             onChange={handleConcentrationChange}
             disabled={!concentrations[signInMajor]?.length}
             >
-            <option value="">Select a concentration</option>
             {concentrations[signInMajor]?.map((concentration) => (
                 <option key={concentration[0]} value={concentration[0]}>
                 {concentration[1]}

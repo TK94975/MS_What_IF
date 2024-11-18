@@ -11,11 +11,11 @@ import SignUp from "./SignUp";
 const Header = ({ isUserSignedIn, onSignInSuccess }) => {
     // State shared by signup and majorconcentrationselector
     const defaultConcentrations = {
-        cs: "ai",
-        ece: "none",
+        CSI: "Artificial Intelligence and Machine Learning",
+        ECE: "Signal Processing and Communications",
     };
-    const [selectedMajor, setSelectedMajor] = useState("cs");
-    const [selectedConcentration, setSelectedConcentration] = useState(defaultConcentrations['cs']);
+    const [selectedMajor, setSelectedMajor] = useState("CSI");
+    const [selectedConcentration, setSelectedConcentration] = useState(defaultConcentrations['CSI']);
     const handleMajorChange = (major) => {
         setSelectedMajor(major);
         setSelectedConcentration(defaultConcentrations[major] || "none");
