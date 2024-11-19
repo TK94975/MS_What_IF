@@ -5,7 +5,7 @@ import '../styles.css';
 import axios from 'axios';
 //Packages
 import {React, useState, useEffect}from "react";
-import { Accordion, Form, Card, Col, Row, Button, Modal, Toast } from 'react-bootstrap';
+import { Accordion, Form, Card, Col, Row, Button, Modal, Toast, ModalBody } from 'react-bootstrap';
 
 
 // Containers the Title and the dropdown/accordions for each semester
@@ -14,13 +14,19 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
 
     // Enum for grade updating
     const gradeOptions = ["A", "A-", "B+", "B", "B-", "C+", "C", "D", "F", "E"];
+    const semesterOptions = ['Spring','Summer','Fall','Winter'];
+    const yearOptions = [2022,2023,2024,2025,2026,2027];
 
     const [courses, setCourses] = useState([]);
     const [groupedCourses, setGroupedCourses] = useState({});
     const [showDescription, setShowDescription] = useState(false);
     const [courseDescription, setCourseDescription] = useState([]);
     const [changesMade, setChangesMade] = useState(false);
-    const [showSaveToast, setShowSaveToast] = useState(false);
+    const [saveButtonText, setSaveButtonText] = useState('Save Changes');
+    const [showAddClass, setShowAddClass] = useState(false);
+    const [addYear, setAddYear] = useState('');
+    const [addSemester, setAddSemester] = useState('');
+
 
     // Getting courses from backend
     const getUserCourses = async () => {
@@ -76,8 +82,6 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
     }, [courses]);
 
     //Modal for course description
-
-
     const handleShowDescription = async (course_id) => {
         const tempDescription = await axios.post('http://localhost:5000/courses/course_description', {
             course_id,
@@ -104,22 +108,45 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
         });
         setCourses(updatedCourses);
         setChangesMade(true);
+        setSaveButtonText("Save Changes");
     };
 
     // Save changes to the database
     const handleSave = async () =>{
         setChangesMade(false);
+        setSaveButtonText("Saved");
         try{
             console.log("Saving...");
             const response = await axios.post('http://localhost:5000/user_courses/update_user_courses', {
                 courses,
             });
-            
         }
         catch(error){
             console.error("Update failed", error);
             setChangesMade(true);
+            setSaveButtonText("Save Changes");
         }
+    };
+
+    // Adding a semester
+    const handleAddSemesterForm = () =>{
+        setShowAddClass(true);
+    };
+
+    const handleCloseAddSemesterForm= () =>{
+        setShowAddClass(false);
+    };
+
+    const handleSetAddYear = (year) =>{
+        setAddYear(year);
+    };
+
+    const handleSetAddSemester = (semester) => {
+        setAddSemester(semester);
+    };
+
+    const handleAddNewSemester = () => {
+        
     };
     
     return (
@@ -166,18 +193,35 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
                     </Accordion.Item>
                 ))}
             </Accordion>
-            <div style={{ textAlign: 'right', marginTop: '20px' }}>
-                <Button
+
+            {/* Add semester and save change buttons */}
+            <Row className="align-items-center" style={{ marginTop: '20px' }}>
+                <Col style={{ textAlign: 'left' }}>
+                    <Button
+                    onClick={handleAddSemesterForm} 
+                    >
+                        Add Semester
+                    </Button>
+                </Col>
+
+                <Col style={{ textAlign: 'right' }}>
+                    <Button
                     disabled={!changesMade}
                     onClick={handleSave}
                     >
-                    Save Changes
-                </Button>
-            </div>
+                        {saveButtonText}
+                    </Button>
+                </Col>
 
+
+            </Row>
 
             {/*Modal to show course description to user on request */}
-            <Modal show={showDescription} onHide={handleCloseDescription} centered >
+            <Modal 
+            show={showDescription} 
+            onHide={handleCloseDescription} 
+            centered 
+            >
                 <Modal.Header closeButton>
                     <Modal.Title>Course Information</Modal.Title>
                 </Modal.Header>
@@ -195,8 +239,55 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
                 </Modal.Footer>
             </Modal>
 
-            {/*Toast to let the user know if the save worked or not */}
-            
+            {/*Modal for the form to add a class*/}
+            <Modal
+            show={showAddClass}
+            onHide={handleCloseAddSemesterForm}
+            centered
+            >
+                <Modal.Header closeButton> 
+                    <Modal.Title>Add a Semester</Modal.Title>
+                </Modal.Header>
+                    <ModalBody>
+                            <Form>
+                                <Form.Group className="mb-3" controlId="formYear">
+                                    <Form.Label>Year</Form.Label>
+                                    <Form.Select
+                                    value={2024}
+                                    onChange={handleSetAddYear}
+                                    >
+                                    {yearOptions.map((value) => (
+                                        <option key={value} value={value}>
+                                        {value}
+                                        </option>
+                                    ))}
+                                    </Form.Select>
+                                </Form.Group>
+                                <Form.Group className="mb-3" controlId="formYear">
+                                    <Form.Label>Semester</Form.Label>
+                                    <Form.Select
+                                    value={2024}
+                                    onChange={handleSetAddSemester}
+                                    >
+                                    {semesterOptions.map((value) => (
+                                        <option key={value} value={value}>
+                                        {value}
+                                        </option>
+                                    ))}
+                                    </Form.Select>
+                                </Form.Group>
+                            </Form>
+                            <Col style={{ textAlign: 'right' }}>
+                                <Button
+                                onClick={handleAddNewSemester}
+                                >
+                                    Add
+                                </Button>
+                            </Col>
+
+                    </ModalBody>
+                
+            </Modal>
         </div>
     );
 }

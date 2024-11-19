@@ -39,10 +39,14 @@ router.post('/update_user_courses', async (req, res) => {
             [updatedCourses[0].user_id]
         )
         updatedCourses.forEach(element => {
-            db.query(
-                `INSERT INTO user_courses (user_id, course_id, semester, year, grade) VALUES (?,?,?,?,?)`,
-                [element.user_id, element.id, element.semester, element.year, element.grade]
-            )
+            // Dont add year/semester placeholder courses
+            if(element.id){
+                db.query(
+                    `INSERT INTO user_courses (user_id, course_id, semester, year, grade) VALUES (?,?,?,?,?)`,
+                    [element.user_id, element.id, element.semester, element.year, element.grade]
+                )
+            }
+
         });
     }   
     catch(error){
