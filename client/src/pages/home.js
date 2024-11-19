@@ -18,13 +18,15 @@ import { useState, useEffect } from 'react';
 const Home = () => {
     const [isUserSignedIn, setIsUserSignedIn] = useState(false);
 
-    const handleSignInSuccess = (bool) => {
-      setIsUserSignedIn(bool);
+    const handleSignInSuccess = (event) => {
+      setIsUserSignedIn(event);
     };
 
     useEffect(() => {
         if (sessionStorage.getItem("userLoggedIn?") === 'true') {
             setIsUserSignedIn(true);
+        } else{
+            setIsUserSignedIn(false);
         }
     }, []);
 
@@ -38,7 +40,7 @@ const Home = () => {
                     <LeftSideBar/>
                 </div>
                 <div id='HOME-CONTENT-PD' className='col-8'> 
-                    <ScheduleContainer/>
+                    <ScheduleContainer isUserSignedIn={isUserSignedIn} />
                 </div>
                 <div id='HOME-RSB-PD' className='col'>
                     <p>RIGHT SIDE BAR</p>

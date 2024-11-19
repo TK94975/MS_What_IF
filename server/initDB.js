@@ -81,12 +81,14 @@ require('dotenv').config();
 
     const createUserCoursesTable = `
     CREATE TABLE IF NOT EXISTS user_courses (
+      user_id INT NOT NULL,
       course_id INT NOT NULL,
       semester ENUM('Spring', 'Summer', 'Fall', 'Winter') NOT NULL,
       year INT NOT NULL,
       grade ENUM('A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'D', 'F', 'E') NOT NULL,
-      PRIMARY KEY (course_id, semester, year),
-      FOREIGN KEY (course_id) REFERENCES courses(id)
+      PRIMARY KEY (user_id, course_id, semester, year),
+      FOREIGN KEY (course_id) REFERENCES courses(id),
+      FOREIGN KEY (user_id) REFERENCES users(id)
     );`;
 
     await connection.query(createUserCoursesTable);

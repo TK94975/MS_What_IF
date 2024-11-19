@@ -13,7 +13,7 @@ const ProfileBox = ({isUserSignedIn, onSignInSuccess}) => {
         sessionStorage.removeItem('userEmail');
         sessionStorage.removeItem('userMajor');
         sessionStorage.removeItem('userConcentration')
-        sessionStorage.removeItem('userLoggedIn?');
+        sessionStorage.setItem('userLoggedIn?', "false");
         onSignInSuccess(false);
     }
 

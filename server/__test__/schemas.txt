@@ -1,0 +1,6 @@
+course_concentrations(course_id, major, concentration, isConcentrationCore)
+course_offerings(course_id, semester, year)
+course_prerequisites(course_id, prerequ_course_id, grade)
+courses(id, department, number, title, description, credits, created_at, updated_at)
+user_courses(user_id, course_id, semester, year, grade)
+user(id, email, password, major, concentration, role, created_at, updated_at)

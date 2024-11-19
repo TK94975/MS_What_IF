@@ -2,129 +2,108 @@ import 'bootstrap/dist/css/bootstrap.css'; // Import Bootstrap CSS
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import '../styles.css';
+import axios from 'axios';
 //Packages
 import {React, useState, useEffect}from "react";
-import { useSearchParams } from 'react-router-dom';
+import { Accordion, Form, Card, Col, Row } from 'react-bootstrap';
 
-// Spawn random Class Components
-const spawnRandomClasses = props => {
-    let classes = [
-    {
-        id: 'A',
-        title: 'Class A',
-        credits: 3,
-        description: 'Class A is good',
-        prerequisites: ['Y', 'Z']
-    },
-    {
-        id: 'B',
-        title: 'Class B',
-        credits: 3,
-        description: 'Class B is good',
-        prerequisites: ['Y', 'Z']
-    },
-    {
-        id: 'C',
-        title: 'Class C',
-        credits: 3,
-        description: 'Class C is good',
-        prerequisites: ['Y', 'Z']
-    },
-    {
-        id: 'D',
-        title: 'Class D',
-        credits: 3,
-        description: 'Class D is good',
-        prerequisites: ['Y', 'Z']
-    },
-    ]
-    return (
-        <div id='classScroller-PD' className='d-flex flex-row'>
-        {
-            classes.map((data) => {
-                return (
-                    <div id='classEntityContainer' className='container'>
-                        <div className='row'>
-                            <div className='col d-flex justify-content-center'>
-                                <p>{data.title}</p>
-                            </div>
-                            <div className='col d-flex justify-content-center'>
-                                <p>{data.credits}</p>
-                            </div>
-                        </div>
 
-                        <div className='row'>
-                            <div className='col d-flex justify-content-center'>
-                                <p>{data.description}</p>
-                            </div>
-                        </div>
-                    </div>
-                )
-            })
-        }
-        </div>
-    )
-}
 
 // Containers the Title and the dropdown/accordions for each semester
-const spawnRandomYearCards = () => {
-    let years = [1,2,3,4]
-    return (
-        <div className='accordion' id="parentYearAccordian">
-            {
-                years.map((year) => {
-                    const [open, setOpen] = useState(false)
-                    let cardTitle = `Year ${year}`
-                    let cardDataTarget = `#collapseYear${year}`
-                    let cardTarget = `collapseYear${year}`
-                    let cardHeading = `card${year}Heading`
-                    let cardDataDisplay = (open ? 'collapse show' : 'collapse')
-                    return (
-                        <div className="card">
-                            <div className="card-header" id={cardHeading}>
-                                <h5 class="mb-0">
-                                    <a className='cardButton' onClick={(event) => {
-                                        event.preventDefault()
-                                        setOpen(!open)
-                                    }}>
-                                    {cardTitle}
-                                    </a>
-                                </h5>
-                        `   </div>
 
-                            <div id={cardTarget} className={cardDataDisplay}>
-                                <div className="card-body">
-                                {
-                                    spawnRandomClasses()
-                                }
+const ScheduleContainer =  ({isUserSignedIn}) => {
+
+    // Enum for grade updating
+    const gradeOptions = ["A", "A-", "B+", "B", "B-", "C+", "C", "C", "D", "F", "E"];
+    const [courses, setCourses] = useState([]);
+    const [groupedCourses, setGroupedCourses] = useState({});
+    const getUserCourses = async () => {
+        const user_id = sessionStorage.getItem('userID');
+        try {
+            const response = await axios.post('http://localhost:5000/user_courses/get_user_courses', {
+                user_id,
+            });
+            setCourses(response.data.user_courses);
+        } catch (err) {
+            console.error("Error fetching courses:");
+        }
+    };
+
+    const getGroupedCourses = (courses) => {
+        const grouped = {};
+        courses.forEach((course) => {
+            if (!grouped[course.year]) {
+                grouped[course.year] = {};
+            }
+            if (!grouped[course.year][course.semester]) {
+                grouped[course.year][course.semester] = [];
+            }
+            grouped[course.year][course.semester].push(course);
+        });
+        return grouped;
+    };
+
+    useEffect(() => {
+        if(isUserSignedIn){
+            console.log("User logged in: fetching user data")
+            getUserCourses();
+            console.log("Classes", courses);
+            console.log("Num classes", courses.length);
+        } else {
+            console.log("User not logged in: skipping fetch");
+        }        
+    }, [isUserSignedIn]);
+
+    useEffect(() => {
+        if (courses.length > 0) {
+            console.log("Grouping courses...");
+            const grouped = getGroupedCourses(courses);
+            setGroupedCourses(grouped);
+            console.log("Grouped Data:", grouped);
+        }
+    }, [courses]);
+    
+    return (
+        <div>
+            <h1>Schedule</h1>
+            <Accordion alwaysOpen>
+                {Object.keys(groupedCourses).map((year, yearIndex) => (
+                    <Accordion.Item eventKey={yearIndex} key={year}>
+                        <Accordion.Header>{`Year: ${year}`}</Accordion.Header>
+                        <Accordion.Body>
+                            {Object.keys(groupedCourses[year]).map((semester, semesterIndex) => (
+                                <div key={semester}>
+                                    <h5>{semester}</h5>
+                                    <ul>
+                                        {groupedCourses[year][semester].map((course, courseIndex) => (
+                                            <Card key={courseIndex}>
+                                                <Row>
+                                                    <Col xs={2}>{course.department} {course.number}</Col>
+                                                    <Col xs={5}>{course.title}</Col>
+                                                    <Col xs= {2}>
+                                                    <Form.Select
+                                                        value={course.grade || ''}
+                                                    >
+                                                        <option value="" disabled>Select grade</option>
+                                                        {gradeOptions.map((grade) => (
+                                                            <option key={grade} value={grade}>
+                                                                {grade}
+                                                            </option>
+                                                        ))}
+                                                    </Form.Select>
+                                                    </Col>
+                                                </Row>
+                                            </Card>
+                                        ))}
+                                    </ul>
                                 </div>
-                            </div>
-                        </div>
-                    )
-                })
-            }
+                            ))}
+                        </Accordion.Body>
+                    </Accordion.Item>
+                ))}
+            </Accordion>
         </div>
-    )
-}
-
-const ScheduleContainer = props => {
-    return (
-        <div id='ScheduleContainer-PD' className='container'>
-            <div className='row'>
-                <div className='col'>
-                    <div id='sc-title-pc' className='d-flex justify-content-center'>
-                        <p>SCHEDULE</p>
-                    </div>
-                </div>
-            </div>
-            <div id="SC-FEED" className='row'>
-            {
-                spawnRandomYearCards()
-            }
-            </div>
-            <></>
-        </div>
-    )   
+    );
 }
 
 export default ScheduleContainer
