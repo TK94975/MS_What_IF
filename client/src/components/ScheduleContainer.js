@@ -26,6 +26,8 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
     const [showAddClass, setShowAddClass] = useState(false);
     const [addYear, setAddYear] = useState('');
     const [addSemester, setAddSemester] = useState('');
+    const [showRemoveCourseWarning, setShowRemoveCourseWarning] = useState(false);
+    const [selectedCourseRemove, setSelectedCourseRemove] = useState('');
 
 
     // Getting courses from backend
@@ -148,6 +150,25 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
     const handleAddNewSemester = () => {
         
     };
+
+    //Removing a class
+    const handleShowRemoveCourseWarning = (course) =>{
+        setSelectedCourseRemove(course);
+        setShowRemoveCourseWarning(true);
+
+    }
+    const handleCloseRemoveCourseWarning = () =>{
+        setShowRemoveCourseWarning(false);
+        setSelectedCourseRemove('');
+    }
+    const handleRemoveCourse = (badCourse) =>{
+        const updatedCourses = courses.filter((course) => 
+            !(course.id === badCourse.id && course.year === badCourse.year && course.semester === badCourse.semester)
+        );
+        setCourses(updatedCourses);
+        setShowRemoveCourseWarning(false);
+        setChangesMade(true);
+    };
     
     return (
         <div>
@@ -165,12 +186,15 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
                                             <Card key={courseIndex}>
                                                 <Row>
                                                     <Col xs={2}>
-                                                        <Button variant="link" onClick={() => handleShowDescription(course.id)}>
+                                                        <Button 
+                                                        variant="link" 
+                                                        onClick={() => handleShowDescription(course.id)}
+                                                        >
                                                         <Row> {course.department} {course.number}</Row>
                                                         </Button>
                                                     </Col>
-                                                    <Col xs={7}>{course.title}</Col>
-                                                    <Col xs= {2}>
+                                                    <Col xs={6} className="d-flex align-items-center">{course.title} </Col>
+                                                    <Col xs= {2} className="d-flex align-items-center">
                                                     <Form.Select
                                                         value={course.grade || ''}
                                                         onChange={(e) => handleChangeGrade(course, e.target.value)}
@@ -182,6 +206,15 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
                                                             </option>
                                                         ))}
                                                     </Form.Select>
+                                                    </Col>
+                                                    <Col xs={1} className="d-flex align-items-center justify-content-center">
+                                                        <Button
+                                                        variant='danger'
+                                                        size='sm'
+                                                        onClick={()=>handleShowRemoveCourseWarning(course)}
+                                                        >
+                                                        X
+                                                        </Button>
                                                     </Col>
                                                 </Row>
                                             </Card>
@@ -284,9 +317,42 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
                                     Add
                                 </Button>
                             </Col>
-
                     </ModalBody>
-                
+            </Modal>
+
+            {/*Modal to warn the user about removing a class*/}
+            <Modal
+            show={showRemoveCourseWarning}
+            onHide={handleCloseRemoveCourseWarning}
+            centered
+            >
+                <Modal.Header closeButton> 
+                    <Modal.Title>Are you sure?</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Row>
+                        <Col xs={8}>
+                            Remove {selectedCourseRemove.department} {selectedCourseRemove.number}
+                        </Col>
+                        <Col xs={2}>
+                            <Button
+                                onClick={()=>handleRemoveCourse(selectedCourseRemove)}
+                            >
+                                Yes
+                            </Button>
+                        </Col>
+                        <Col xs={2}>
+                            <Button
+                                onClick={handleCloseRemoveCourseWarning}
+                            >
+                                No
+                            </Button>
+                        </Col>
+                    </Row>
+
+
+                </Modal.Body>
+
             </Modal>
         </div>
     );
