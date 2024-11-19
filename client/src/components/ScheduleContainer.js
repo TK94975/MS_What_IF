@@ -5,7 +5,7 @@ import '../styles.css';
 import axios from 'axios';
 //Packages
 import {React, useState, useEffect}from "react";
-import { Accordion, Form, Card, Col, Row, Button, Modal } from 'react-bootstrap';
+import { Accordion, Form, Card, Col, Row, Button, Modal, Toast } from 'react-bootstrap';
 
 
 // Containers the Title and the dropdown/accordions for each semester
@@ -14,8 +14,15 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
 
     // Enum for grade updating
     const gradeOptions = ["A", "A-", "B+", "B", "B-", "C+", "C", "D", "F", "E"];
-    // Getting courses from backend
+
     const [courses, setCourses] = useState([]);
+    const [groupedCourses, setGroupedCourses] = useState({});
+    const [showDescription, setShowDescription] = useState(false);
+    const [courseDescription, setCourseDescription] = useState([]);
+    const [changesMade, setChangesMade] = useState(false);
+    const [showSaveToast, setShowSaveToast] = useState(false);
+
+    // Getting courses from backend
     const getUserCourses = async () => {
         const user_id = sessionStorage.getItem('userID');
         try {
@@ -29,7 +36,6 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
     };
 
     // Grouping courses for display
-    const [groupedCourses, setGroupedCourses] = useState({});
     const getGroupedCourses = (courses) => {
         const grouped = {};
         courses.forEach((course) => {
@@ -55,6 +61,7 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
             console.log("User not logged in: skipping fetch and clearing courses");
             setCourses([]);
             setGroupedCourses({});
+            setChangesMade(false);
         }        
     }, [isUserSignedIn]);
 
@@ -69,8 +76,7 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
     }, [courses]);
 
     //Modal for course description
-    const [showDescription, setShowDescription] = useState(false);
-    const [courseDescription, setCourseDescription] = useState([]);
+
 
     const handleShowDescription = async (course_id) => {
         const tempDescription = await axios.post('http://localhost:5000/courses/course_description', {
@@ -86,11 +92,35 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
         setCourseDescription([]);
     };
 
-    //Updating grades
-    const handleChangeGrade = () => {
-
+    // Lets the user change grades for courses
+    const handleChangeGrade = (course, newGrade) => {
+        // Iterate over courses
+        const updatedCourses = courses.map((element) => {
+            if (element.id === course.id && element.semester === course.semester && element.year === course.year) {
+                // replace element with new element with updated grade
+                return { ...element, grade: newGrade }; 
+            }
+            return element;
+        });
+        setCourses(updatedCourses);
+        setChangesMade(true);
     };
 
+    // Save changes to the database
+    const handleSave = async () =>{
+        setChangesMade(false);
+        try{
+            console.log("Saving...");
+            const response = await axios.post('http://localhost:5000/user_courses/update_user_courses', {
+                courses,
+            });
+            
+        }
+        catch(error){
+            console.error("Update failed", error);
+            setChangesMade(true);
+        }
+    };
     
     return (
         <div>
@@ -112,11 +142,11 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
                                                         <Row> {course.department} {course.number}</Row>
                                                         </Button>
                                                     </Col>
-                                                    <Col xs={5}>{course.title}</Col>
+                                                    <Col xs={7}>{course.title}</Col>
                                                     <Col xs= {2}>
                                                     <Form.Select
                                                         value={course.grade || ''}
-                                                        onChange={handleChangeGrade}
+                                                        onChange={(e) => handleChangeGrade(course, e.target.value)}
                                                     >
                                                         <option value="" disabled>Select grade</option>
                                                         {gradeOptions.map((grade) => (
@@ -136,7 +166,17 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
                     </Accordion.Item>
                 ))}
             </Accordion>
+            <div style={{ textAlign: 'right', marginTop: '20px' }}>
+                <Button
+                    disabled={!changesMade}
+                    onClick={handleSave}
+                    >
+                    Save Changes
+                </Button>
+            </div>
 
+
+            {/*Modal to show course description to user on request */}
             <Modal show={showDescription} onHide={handleCloseDescription} centered >
                 <Modal.Header closeButton>
                     <Modal.Title>Course Information</Modal.Title>
@@ -154,6 +194,8 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
                     </Button>
                 </Modal.Footer>
             </Modal>
+
+            {/*Toast to let the user know if the save worked or not */}
             
         </div>
     );
