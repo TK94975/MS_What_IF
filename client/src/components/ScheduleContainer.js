@@ -148,8 +148,38 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
     };
 
     const handleAddNewSemester = () => {
-
+        if (!addYear || !addSemester) {
+            alert("Please select both a year and a semester.");
+            return;
+        }
+    
+        // Check if the year and semester already exist
+        const semesterExists = courses.some(
+            (course) => course.year === addYear && course.semester === addSemester
+        );
+    
+        if (semesterExists) {
+            alert("This semester already exists in your schedule.");
+            return;
+        }
+    
+        // Add a placeholder entry for the new semester
+        const placeholderEntry = {
+            id: null, // No ID since this isn't tied to an actual course
+            year: addYear,
+            semester: addSemester,
+            department: null,
+            number: null,
+            title: null,
+            grade: null,
+        };
+    
+        setCourses((prevCourses) => [...prevCourses, placeholderEntry]);
+        setAddYear('');
+        setAddSemester('');
+        setShowAddClass(false);
     };
+
     //Removing a class
     const handleShowRemoveCourseWarning = (course) =>{
         setSelectedCourseRemove(course);
@@ -192,20 +222,22 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
                                                         <Row> {course.department} {course.number}</Row>
                                                         </Button>
                                                     </Col>
-                                                    <Col xs={6} className="d-flex align-items-center">{course.title} </Col>
-                                                    <Col xs= {2} className="d-flex align-items-center">
-                                                    <Form.Select
-                                                        value={course.grade || ''}
-                                                        onChange={(e) => handleChangeGrade(course, e.target.value)}
-                                                    >
-                                                        <option value="" disabled>Select grade</option>
-                                                        {gradeOptions.map((grade) => (
-                                                            <option key={grade} value={grade}>
-                                                                {grade}
-                                                            </option>
-                                                        ))}
-                                                    </Form.Select>
-                                                    </Col>
+                                                    <Col xs={6} className="d-flex align-items-center">{course.title || "No courses entered"} </Col>
+                                                    {course.id && (
+                                                        <Col xs= {2} className="d-flex align-items-center">
+                                                        <Form.Select
+                                                            value={course.grade || ''}
+                                                            onChange={(e) => handleChangeGrade(course, e.target.value)}
+                                                        >
+                                                            <option value="" disabled>Select grade</option>
+                                                            {gradeOptions.map((grade) => (
+                                                                <option key={grade} value={grade}>
+                                                                    {grade}
+                                                                </option>
+                                                            ))}
+                                                        </Form.Select>
+                                                        </Col> 
+                                                    )}
                                                     <Col xs={1} className="d-flex align-items-center justify-content-center">
                                                         <Button
                                                         variant='danger'
