@@ -148,9 +148,8 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
     };
 
     const handleAddNewSemester = () => {
-        
-    };
 
+    };
     //Removing a class
     const handleShowRemoveCourseWarning = (course) =>{
         setSelectedCourseRemove(course);
@@ -286,9 +285,10 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
                                 <Form.Group className="mb-3" controlId="formYear">
                                     <Form.Label>Year</Form.Label>
                                     <Form.Select
-                                    value={2024}
-                                    onChange={handleSetAddYear}
+                                    value={addYear}
+                                    onChange={(e) => handleSetAddYear(e.target.value)}
                                     >
+                                    <option value="" disabled>Select a year</option>
                                     {yearOptions.map((value) => (
                                         <option key={value} value={value}>
                                         {value}
@@ -299,9 +299,10 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
                                 <Form.Group className="mb-3" controlId="formYear">
                                     <Form.Label>Semester</Form.Label>
                                     <Form.Select
-                                    value={2024}
-                                    onChange={handleSetAddSemester}
+                                    value={addSemester}
+                                    onChange={(e) => handleSetAddSemester(e.target.value)}
                                     >
+                                    <option value="" disabled>Select a semester</option>
                                     {semesterOptions.map((value) => (
                                         <option key={value} value={value}>
                                         {value}
