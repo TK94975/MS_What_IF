@@ -35,4 +35,27 @@ router.post('/', async (req, res) => {
   }
 });
 
+// POST /courses - Get full course description for a given course ID
+router.post('/course_description', async (req, res) =>{
+  try {
+    const course_id = req.body.course_id;
+    console.log('courseID', course_id);
+    if (!course_id){
+      return res.status(400).json({error: "Need course ID"})
+    }
+    const [description] = await db.query(
+      'SELECT * FROM courses WHERE courses.id = ?', 
+      [course_id]
+    )
+    if (description) {
+      res.status(200).json(description[0])
+    } else {
+      return res.status(400).json({error: "No course with that ID found"});
+    }
+  }
+  catch(error){
+    console.error("Error getting course description", error);
+  }
+})
+
 module.exports = router;

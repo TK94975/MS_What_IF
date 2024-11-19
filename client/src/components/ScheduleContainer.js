@@ -5,8 +5,7 @@ import '../styles.css';
 import axios from 'axios';
 //Packages
 import {React, useState, useEffect}from "react";
-import { Accordion, Form, Card, Col, Row, Button } from 'react-bootstrap';
-
+import { Accordion, Form, Card, Col, Row, Button, Modal } from 'react-bootstrap';
 
 
 // Containers the Title and the dropdown/accordions for each semester
@@ -14,7 +13,7 @@ import { Accordion, Form, Card, Col, Row, Button } from 'react-bootstrap';
 const ScheduleContainer =  ({isUserSignedIn}) => {
 
     // Enum for grade updating
-    const gradeOptions = ["A", "A-", "B+", "B", "B-", "C+", "C", "C", "D", "F", "E"];
+    const gradeOptions = ["A", "A-", "B+", "B", "B-", "C+", "C", "D", "F", "E"];
     // Getting courses from backend
     const [courses, setCourses] = useState([]);
     const getUserCourses = async () => {
@@ -69,7 +68,26 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
         }
     }, [courses]);
 
-    const handleShow = () =>{
+    //Modal for course description
+    const [showDescription, setShowDescription] = useState(false);
+    const [courseDescription, setCourseDescription] = useState([]);
+
+    const handleShowDescription = async (course_id) => {
+        const tempDescription = await axios.post('http://localhost:5000/courses/course_description', {
+            course_id,
+        });
+        setCourseDescription(tempDescription.data);
+        console.log(tempDescription.data);
+        setShowDescription(true); 
+    };
+
+    const handleCloseDescription = () => {
+        setShowDescription(false); 
+        setCourseDescription([]);
+    };
+
+    //Updating grades
+    const handleChangeGrade = () => {
 
     };
 
@@ -90,7 +108,7 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
                                             <Card key={courseIndex}>
                                                 <Row>
                                                     <Col xs={2}>
-                                                        <Button variant="link" onClick={handleShow}>
+                                                        <Button variant="link" onClick={() => handleShowDescription(course.id)}>
                                                         <Row> {course.department} {course.number}</Row>
                                                         </Button>
                                                     </Col>
@@ -98,6 +116,7 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
                                                     <Col xs= {2}>
                                                     <Form.Select
                                                         value={course.grade || ''}
+                                                        onChange={handleChangeGrade}
                                                     >
                                                         <option value="" disabled>Select grade</option>
                                                         {gradeOptions.map((grade) => (
@@ -117,6 +136,25 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
                     </Accordion.Item>
                 ))}
             </Accordion>
+
+            <Modal show={showDescription} onHide={handleCloseDescription} centered >
+                <Modal.Header closeButton>
+                    <Modal.Title>Course Information</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Row><h3>{courseDescription.department} {courseDescription.number}</h3></Row>
+                    <Row><h5>{courseDescription.title}</h5></Row>
+                    <Row><h6>Description</h6></Row>
+                    <Row>{courseDescription.description}</Row>
+                    <Row><h6>Prequisites</h6></Row>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={handleCloseDescription}>
+                        Close
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+            
         </div>
     );
 }
