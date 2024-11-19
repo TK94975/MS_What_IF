@@ -13,7 +13,7 @@ router.post('/get_user_courses', async (req, res, next) => {
 
         // Fetch user courses
         const [user_courses] = await db.query(
-            `SELECT c.department, c.number, c.title, uc.semester, uc.year, uc.grade
+            `SELECT c.id, c.department, c.number, c.title, uc.semester, uc.year, uc.grade
              FROM courses c
              JOIN user_courses uc ON c.id = uc.course_id
              WHERE uc.user_id = ?`,

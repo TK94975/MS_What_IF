@@ -5,7 +5,7 @@ import '../styles.css';
 import axios from 'axios';
 //Packages
 import {React, useState, useEffect}from "react";
-import { Accordion, Form, Card, Col, Row } from 'react-bootstrap';
+import { Accordion, Form, Card, Col, Row, Button } from 'react-bootstrap';
 
 
 
@@ -15,8 +15,8 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
 
     // Enum for grade updating
     const gradeOptions = ["A", "A-", "B+", "B", "B-", "C+", "C", "C", "D", "F", "E"];
+    // Getting courses from backend
     const [courses, setCourses] = useState([]);
-    const [groupedCourses, setGroupedCourses] = useState({});
     const getUserCourses = async () => {
         const user_id = sessionStorage.getItem('userID');
         try {
@@ -29,6 +29,8 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
         }
     };
 
+    // Grouping courses for display
+    const [groupedCourses, setGroupedCourses] = useState({});
     const getGroupedCourses = (courses) => {
         const grouped = {};
         courses.forEach((course) => {
@@ -43,6 +45,7 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
         return grouped;
     };
 
+    // Fetching courses or clearing courses on sign in/out
     useEffect(() => {
         if(isUserSignedIn){
             console.log("User logged in: fetching user data")
@@ -50,10 +53,13 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
             console.log("Classes", courses);
             console.log("Num classes", courses.length);
         } else {
-            console.log("User not logged in: skipping fetch");
+            console.log("User not logged in: skipping fetch and clearing courses");
+            setCourses([]);
+            setGroupedCourses({});
         }        
     }, [isUserSignedIn]);
 
+    // Grouping courses after fetching
     useEffect(() => {
         if (courses.length > 0) {
             console.log("Grouping courses...");
@@ -62,6 +68,11 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
             console.log("Grouped Data:", grouped);
         }
     }, [courses]);
+
+    const handleShow = () =>{
+
+    };
+
     
     return (
         <div>
@@ -78,7 +89,11 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
                                         {groupedCourses[year][semester].map((course, courseIndex) => (
                                             <Card key={courseIndex}>
                                                 <Row>
-                                                    <Col xs={2}>{course.department} {course.number}</Col>
+                                                    <Col xs={2}>
+                                                        <Button variant="link" onClick={handleShow}>
+                                                        <Row> {course.department} {course.number}</Row>
+                                                        </Button>
+                                                    </Col>
                                                     <Col xs={5}>{course.title}</Col>
                                                     <Col xs= {2}>
                                                     <Form.Select
