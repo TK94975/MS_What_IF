@@ -26,7 +26,7 @@ const Home = () => {
                 </div>
                 <div id='HOME-BodyRow' className='row'>
                     <div id='HOME-LSB-PD' className='col'>
-                        <LeftSideBar/>
+                        {/* <LeftSideBar/>*/}
                     </div>
                     <div id='HOME-CONTENT-PD' className='col-8'> 
                         <ProgressTable/>

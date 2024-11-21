@@ -41,6 +41,10 @@ html, body, #root {
 /*The the col div that holds the content (middle col of Body row)*/
 #HOME-CONTENT-PD {
     max-height: 85vh;
+    overflow-y: auto;
+    max-width: 1000px; 
+    width: 100%; 
+    margin: 0 auto; 
 }
 
 /*The the col div that holds the content (right col of Body row)*/
