@@ -86,6 +86,7 @@ require('dotenv').config();
       semester ENUM('Spring', 'Summer', 'Fall', 'Winter') NOT NULL,
       year INT NOT NULL,
       grade ENUM('A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'D', 'F', 'E'),
+      completed ENUM('yes', 'no'),
       PRIMARY KEY (user_id, course_id, semester, year),
       FOREIGN KEY (course_id) REFERENCES courses(id),
       FOREIGN KEY (user_id) REFERENCES users(id)

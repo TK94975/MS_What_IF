@@ -13,7 +13,7 @@ router.post('/get_user_courses', async (req, res) => {
 
         // Fetch user courses
         const [user_courses] = await db.query(
-            `SELECT c.id, c.department, c.number, c.title, uc.semester, uc.year, uc.grade, uc.user_id
+            `SELECT c.id, c.department, c.number, c.title, uc.semester, uc.year, uc.grade, uc.user_id, uc.completed, c.credits
              FROM courses c
              JOIN user_courses uc ON c.id = uc.course_id
              WHERE uc.user_id = ?`,
@@ -42,8 +42,8 @@ router.post('/update_user_courses', async (req, res) => {
             // Dont add year/semester placeholder courses
             if(element.id){
                 db.query(
-                    `INSERT INTO user_courses (user_id, course_id, semester, year, grade) VALUES (?,?,?,?,?)`,
-                    [element.user_id, element.id, element.semester, element.year, element.grade]
+                    `INSERT INTO user_courses (user_id, course_id, semester, year, grade, completed) VALUES (?,?,?,?,?,?)`,
+                    [element.user_id, element.id, element.semester, element.year, element.grade, element.completed]
                 )
             }
 

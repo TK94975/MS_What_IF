@@ -22,19 +22,22 @@ try {
 
     // Insert test data into user_courses
     const queries = [
-    ['1', '9', 'Spring', '2023', 'A'],
-    ['1', '29', 'Fall', '2023', 'A-'],
-    ['1', '4', 'Fall', '2023', 'B+'],
-    ['1', '25', 'Fall', '2023', 'B'],
-    ['1', '6', 'Spring', '2024', 'B-'],
-    ['1', '11', 'Spring', '2024', 'C+'],
-    ['1', '19', 'Spring', '2024', 'C'],
-    ['1', '21', 'Spring', '2024', 'D'],
+    ['1', '9', 'Spring', '2023', 'A', 'yes'],
+    ['1', '29', 'Fall', '2023', 'A-', 'yes'],
+    ['1', '4', 'Fall', '2023', 'B+', 'yes'],
+    ['1', '25', 'Fall', '2023', 'B', , 'yes'],
+    ['1', '6', 'Fall', '2024', 'B-', 'yes'],
+    ['1', '11', 'Fall', '2024', 'C+', 'yes'],
+    ['1', '19', 'Fall', '2024', 'C', 'yes'],
+    ['1', '21', 'Fall', '2024', 'D', 'yes'],
+    ['1', '60', 'Spring', '2024', null, 'no'],
+    ['1', '20', 'Spring', '2024', null, 'no'],
+    ['1', '37', 'Spring', '2024', null, 'no'],
     ];
 
     for (const query of queries) {
     await connection.query(
-        'INSERT INTO user_courses (user_id, course_id, semester, year, grade) VALUES (?, ?, ?, ?, ?)',
+        'INSERT INTO user_courses (user_id, course_id, semester, year, grade, completed) VALUES (?, ?, ?, ?, ?, ?)',
         query
     );
     }

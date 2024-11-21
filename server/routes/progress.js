@@ -11,8 +11,6 @@ router.post('/concentration_requirements', function(req, res) {
 
     try{
         const concentration = req.body.selectedConcentration;
-        console.log(creditValues.get(concentration));
-
         res.status(200).json(creditValues.get(concentration));
     }
     catch(error){
