@@ -29,12 +29,12 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
     const [showAddCourse, setShowAddCourse] = useState(false); // Add course modal show state
     const [addYear, setAddYear] = useState(''); // Year for add semester/course modal
     const [addSemester, setAddSemester] = useState(''); // Semester for add semester/course modal
-    const [addCourseDepartment, setAddCourseDepartment] = useState('')
-    const [addCourseNumber, setAddCourseNumber] = useState('');
-    const [addCourseBucketDepartment, setAddCourseBucketDepartment] = useState(['CSI', 'ECE']);
-    const [addCourseBucketNumber, setAddCourseBucketNumber] = useState({})
+    const [addCourseDepartment, setAddCourseDepartment] = useState('') // Department of new class
+    const [addCourseNumber, setAddCourseNumber] = useState(''); // Course # of new class
+    const [addCourseBucketDepartment, setAddCourseBucketDepartment] = useState(['CSI', 'ECE']); // New class department options
+    const [addCourseBucketNumber, setAddCourseBucketNumber] = useState({}) // Array of Maps {CSI: [number: id], ECE" [number:id]}
 
-    // Getting courses from backend
+    /* Fetching user courses from the database */
     const getUserCourses = async () => {
         const user_id = sessionStorage.getItem('userID');
         try {
@@ -46,6 +46,19 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
             console.error("Error fetching courses:");
         }
     };
+
+    // Fetching courses or clearing courses on sign in/out
+    useEffect(() => {
+        if(isUserSignedIn){
+            console.log("User logged in: fetching user data")
+            getUserCourses();
+        } else {
+            console.log("User not logged in: skipping fetch and clearing courses");
+            setCourses([]);
+            setGroupedCourses({});
+            setChangesMade(false);
+        }        
+    }, [isUserSignedIn]);
 
     // Grouping courses for display
     const getGroupedCourses = (courses) => {
@@ -62,19 +75,6 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
         return grouped;
     };
 
-    // Fetching courses or clearing courses on sign in/out
-    useEffect(() => {
-        if(isUserSignedIn){
-            console.log("User logged in: fetching user data")
-            getUserCourses();
-        } else {
-            console.log("User not logged in: skipping fetch and clearing courses");
-            setCourses([]);
-            setGroupedCourses({});
-            setChangesMade(false);
-        }        
-    }, [isUserSignedIn]);
-
     // Grouping courses after fetching
     useEffect(() => {
         if (courses.length > 0) {
@@ -85,7 +85,8 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
         }
     }, [courses]);
 
-    //Modal for course description
+    /* Code for course description modal */
+    // handlers for show state of the modal
     const handleShowDescription = async (course_id) => {
         getCourseDescription(course_id);
         setShowDescription(true); 
@@ -94,7 +95,7 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
         setShowDescription(false); 
         setCourseDescription([]);
     };
-
+    // Backend call to get the course description
     const getCourseDescription = async (course_id) =>{
         const tempDescription = await axios.post('http://localhost:5000/courses/course_description', {
             course_id,
@@ -102,7 +103,7 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
         setCourseDescription(tempDescription.data);
     }
 
-    // Lets the user change grades for courses
+    /* Logic for changing grades in the accordian*/
     const handleChangeGrade = (course, newGrade) => {
         // Iterate over courses
         const updatedCourses = courses.map((element) => {
@@ -117,7 +118,7 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
         setSaveButtonText("Save Changes");
     };
 
-    // Save changes to the database
+    /* Logic for saving changes to the database */
     const handleSave = async () =>{
         setChangesMade(false);
         setSaveButtonText("Saved");
@@ -134,19 +135,22 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
         }
     };
 
-    // Adding a semester
+    /* Logic for adding a semester to the schedule*/
+    // Show and hide handlers for the modal
     const handleAddSemesterForm = () =>{
         setShowAddSemester(true);
     };
     const handleCloseAddSemesterForm= () =>{
         setShowAddSemester(false);
     };
+    // Year and Semester state 
     const handleSetAddYear = (year) =>{
         setAddYear(year);
     };
     const handleSetAddSemester = (semester) => {
         setAddSemester(semester);
     };
+    // Addes a dummy class with year and semester info so it shows up in the accordian
     const handleAddNewSemester = () => {
         if (!addYear || !addSemester) {
             alert("Please select both a year and a semester.");
@@ -161,7 +165,6 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
             alert("This semester already exists in your schedule.");
             return;
         }
-    
         // Add a placeholder entry for the new semester
         const placeholderEntry = {
             id: null, // No ID since this isn't tied to an actual course
@@ -178,7 +181,8 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
         setShowAddSemester(false);
     };
 
-    //Removing a class
+    /* Logic for removing a course from schedule */
+    // Show and hide handlers for the modal
     const handleShowRemoveCourseWarning = (course) =>{
         setSelectedCourseRemove(course);
         setShowRemoveCourseWarning(true);
@@ -188,6 +192,7 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
         setShowRemoveCourseWarning(false);
         setSelectedCourseRemove('');
     }
+    // Actually removing the course
     const handleRemoveCourse = (badCourse) =>{
         const updatedCourses = courses.filter((course) => 
             !(course.id === badCourse.id && course.year === badCourse.year && course.semester === badCourse.semester)
@@ -197,7 +202,8 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
         setChangesMade(true);
     };
 
-    // Adding a class
+    /* Logic for adding a course to the schedule*/
+    // Show and hide handlers for the modal
     const handleShowAddCourseForm = () =>{
         const course_id = addCourseBucketNumber[addCourseDepartment].get(Number(addCourseNumber));
         getCourseDescription(String(course_id));
@@ -206,6 +212,8 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
     const handleHideAddCourseForm = () =>{
         setShowAddCourse(false);
     }
+    
+    // Getting available course info from the database
     const getAvailableCourses = async () =>{
         console.log("Getting available courses")
         try{
@@ -229,10 +237,12 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
             console.error("Error getting available courses", error);
         }
     };
+    // Will be called when the component is rendered
     useEffect(()=>{
         getAvailableCourses();
     },[]);
     
+    // State of new course department
     const handleAddCourseDepartmentChange = (e) => {
         const dept = e.target.value; 
         setAddCourseDepartment(dept); 
@@ -240,12 +250,13 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
         const firstNumber = Array.from(addCourseBucketNumber[dept]?.keys())[0];
         setAddCourseNumber(firstNumber);
     };
+    // State of new course number
     const handleAddCourseNumberChange = (e) => {
         const newNumber = e.target.value;
         setAddCourseNumber(newNumber);   
 
     };
-
+    // When new course number is changed, update class description
     useEffect(()=>{
         if(addCourseNumber){
             const course_id = addCourseBucketNumber[addCourseDepartment].get(Number(addCourseNumber));
@@ -253,14 +264,14 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
         }
     },[addCourseNumber])
 
+    // Actually adding the course
     const handleAddNewCourse = (event) =>{
         event.preventDefault(); // Stops the page from rerendering
         console.log("Adding new course");
-        // Remove placeholder if exists
+        // Remove placeholder class if exists
         let updatedCourses = courses.filter(
             (course) => !(course.id === null && course.year === addYear && course.semester === addSemester)
         );
-
         // Create new course entry
         const newCourse = {
             id: addCourseBucketNumber[addCourseDepartment].get(Number(addCourseNumber)),
@@ -279,6 +290,7 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
     return (
         <div>
             <h1>Schedule</h1>
+            {/* Main accordian with course information */}
             <Accordion alwaysOpen>
                 {Object.keys(groupedCourses).map((year, yearIndex) => (
                     <Accordion.Item eventKey={yearIndex} key={year}>
