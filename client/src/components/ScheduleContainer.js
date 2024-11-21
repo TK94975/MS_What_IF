@@ -4,16 +4,20 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import '../styles.css';
 import axios from 'axios';
 //Packages
-import {React, useState, useEffect}from "react";
+import {React, useState, useEffect, useContext}from "react";
 import { Accordion, Form, Card, Col, Row, Button, Modal, Toast, ModalBody } from 'react-bootstrap';
+import { UserContext } from '../context/userContext';
 
 
 // Containers the Title and the dropdown/accordions for each semester
 
-const ScheduleContainer =  ({isUserSignedIn}) => {
+const ScheduleContainer =  () => {
 
-    // Enum for grade updating
-    const gradeOptions = ["A", "A-", "B+", "B", "B-", "C+", "C", "D", "F", "E"];
+    const {
+        isUserSignedIn,
+    } = useContext(UserContext)
+    
+    const gradeOptions = ["A", "A-", "B+", "B", "B-", "C+", "C", "D", "F", "E"]; // Enum for grade updating
     const semesterOptions = ['Spring','Summer','Fall','Winter'];
     const yearOptions = [2022,2023,2024,2025,2026,2027];
 

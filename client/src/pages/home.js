@@ -7,7 +7,10 @@ import React from "react";
 import LeftSideBar from "../components/LeftSideBar";
 import ScheduleContainer from '../components/ScheduleContainer';
 import Header from '../components/Header';
+import ProgressTable from '../components/ProgressTable';
 import { useState, useEffect } from 'react';
+// Context
+import { UserContext, UserProvider } from '../context/userContext';
 
 /*
     --------------- TITLE ------------------
@@ -16,37 +19,26 @@ import { useState, useEffect } from 'react';
     [ Bar      ][                     ][ Bar      ]
 */
 const Home = () => {
-    const [isUserSignedIn, setIsUserSignedIn] = useState(false);
-
-    const handleSignInSuccess = (event) => {
-      setIsUserSignedIn(event);
-    };
-
-    useEffect(() => {
-        if (sessionStorage.getItem("userLoggedIn?") === 'true') {
-            setIsUserSignedIn(true);
-        } else{
-            setIsUserSignedIn(false);
-        }
-    }, []);
-
     return (
+        <UserProvider>
         <div id='HOME-PD' className='container'>
             <div id='HOME-TitleRow' className='row'>
-                <Header isUserSignedIn={isUserSignedIn} onSignInSuccess={handleSignInSuccess} />
+                <Header/>
             </div>
             <div id='HOME-BodyRow' className='row'>
                 <div id='HOME-LSB-PD' className='col'>
                     <LeftSideBar/>
                 </div>
                 <div id='HOME-CONTENT-PD' className='col-8'> 
-                    <ScheduleContainer isUserSignedIn={isUserSignedIn} />
+                    <ProgressTable/>
+                    <ScheduleContainer/>
                 </div>
                 <div id='HOME-RSB-PD' className='col'>
                     <p>RIGHT SIDE BAR</p>
                 </div>
             </div>
         </div>
+        </UserProvider>
     )
 }
 

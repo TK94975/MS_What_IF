@@ -1,15 +1,18 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Container, Row, Col, Form } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.css";
 import "../styles.css";
+import { UserContext } from "../context/userContext";
 
-const MajorConcentrationSelector = ({
-onSignInSuccess,
-signInMajor,
-signInCon,
-onMajorChange,
-onConcentrationChange,
-}) => {
+const MajorConcentrationSelector = () => {
+const {
+    isUserSignedIn,
+    setIsUserSignedIn,
+    selectedMajor,
+    handleMajorChange,
+    selectedConcentration,
+    handleConcentrationChange,
+} = useContext
 const majors = [
     ["CSI", "Computer Science"],
     ["ECE", "Electrical and Computer Engineering"],
@@ -29,16 +32,6 @@ const concentrations = {
     ],
 };
 
-const handleMajorChange = (e) => {
-    const newMajor = e.target.value;
-    onMajorChange(newMajor); // Update parent state
-    onConcentrationChange(""); // Reset concentration in parent state
-};
-
-const handleConcentrationChange = (e) => {
-    onConcentrationChange(e.target.value); // Update parent state
-};
-
 return (
     <Container>
     <Row>
@@ -47,7 +40,7 @@ return (
             Major
         </Form.Label>
         <Col sm={9}>
-            <Form.Select value={signInMajor} onChange={handleMajorChange}>
+            <Form.Select value={selectedMajor} onChange={handleMajorChange}>
             {majors.map((major) => (
                 <option key={major[0]} value={major[0]}>
                 {major[1]}
@@ -64,11 +57,11 @@ return (
         </Form.Label>
         <Col sm={9}>
             <Form.Select
-            value={signInCon}
+            value={selectedConcentration}
             onChange={handleConcentrationChange}
-            disabled={!concentrations[signInMajor]?.length}
+            disabled={!concentrations[selectedMajor]?.length}
             >
-            {concentrations[signInMajor]?.map((concentration) => (
+            {concentrations[selectedMajor]?.map((concentration) => (
                 <option key={concentration[0]} value={concentration[0]}>
                 {concentration[1]}
                 </option>

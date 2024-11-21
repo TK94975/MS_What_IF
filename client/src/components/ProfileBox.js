@@ -3,9 +3,16 @@ import 'bootstrap/dist/css/bootstrap.css'; // Import Bootstrap CSS
 import { Container, Col, Row, Form, Button } from 'react-bootstrap';
 import '../styles.css';
 //Packages 
-import {React, useState, useEffect} from "react";
+import {React, useState, useEffect, useContext} from "react";
+//Context
+import { UserContext } from '../context/userContext';
 
-const ProfileBox = ({isUserSignedIn, onSignInSuccess}) => {
+const ProfileBox = () => {
+    const {
+        isUserSignedIn,
+        onSignInSuccess
+    } = useContext(UserContext)
+
     const [email, setEmail] = useState(sessionStorage.getItem('userEmail') || '');
 
     const handleSignOut = () => {
