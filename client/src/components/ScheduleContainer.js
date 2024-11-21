@@ -83,7 +83,6 @@ const ScheduleContainer =  () => {
     useEffect(() => {
         if (courses.length > 0) {
             console.log("Grouping courses...");
-            console.log(courses);
             const grouped = getGroupedCourses(courses);
             setGroupedCourses(grouped);
         }
@@ -290,6 +289,17 @@ const ScheduleContainer =  () => {
         setCourses([...updatedCourses, newCourse]);
         setChangesMade(true);
     };
+
+    /* Logic for the completed checkbox*/
+    const handleCourseCompletionToggle = (course) => {
+        const updatedCourses = courses.map((updatedCourse) =>
+            updatedCourse.id === course.id && updatedCourse.year === course.year && updatedCourse.semester === course.semester
+                ? { ...updatedCourse, completed: updatedCourse.completed === 'yes' ? 'no' : 'yes' }
+                : updatedCourse
+        );
+        setCourses(updatedCourses);
+        setChangesMade(true); // Track changes for saving
+    };
     
     return (
         <div>
@@ -307,7 +317,7 @@ const ScheduleContainer =  () => {
                                         {groupedCourses[year][semester].map((course, courseIndex) => (
                                             <Card key={courseIndex}>
                                                 <Row>
-                                                    <Col xs={2}>
+                                                    <Col xs={1}>
                                                         <Button 
                                                         variant="link" 
                                                         onClick={() => handleShowDescription(course.id)}
@@ -316,6 +326,13 @@ const ScheduleContainer =  () => {
                                                         </Button>
                                                     </Col>
                                                     <Col xs={6} className="d-flex align-items-center">{course.title || "No courses entered"} </Col>
+                                                    <Col xs={2} className="d-flex align-items-center"> 
+                                                        <Form.Check 
+                                                        type="checkbox" 
+                                                        label="Completed?"
+                                                        checked={course.completed === 'yes'}
+                                                        onChange={() => handleCourseCompletionToggle(course)}/>
+                                                    </Col>
                                                     {course.id && (
                                                         <Col xs= {2} className="d-flex align-items-center">
                                                         <Form.Select

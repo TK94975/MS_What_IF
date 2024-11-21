@@ -12,12 +12,11 @@ const ProgressTable = () => {
     const[concentrationRequirements, setConcentrationRequirements] = useState({})
 
     const getConcentrationRequirements = async () =>{
-        console.log(selectedConcentration);
+        console.log("Getting concentration requirements");
         try{
             const response = await axios.post(
                 `${process.env.REACT_APP_SERVER_URL}/progress/concentration_requirements`, 
                 {selectedConcentration});
-            console.log("Server: ", response.data)
             setConcentrationRequirements(response.data);
         }
         catch(error){
