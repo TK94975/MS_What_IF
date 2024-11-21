@@ -29,12 +29,14 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
     const [showAddCourse, setShowAddCourse] = useState(false); // Add course modal show state
     const [addYear, setAddYear] = useState(''); // Year for add semester/course modal
     const [addSemester, setAddSemester] = useState(''); // Semester for add semester/course modal
-    const [addCourseDepartment, setAddCourseDepartment] = useState('') // Department of new class
-    const [addCourseNumber, setAddCourseNumber] = useState(''); // Course # of new class
-    const [addCourseBucketDepartment, setAddCourseBucketDepartment] = useState(['CSI', 'ECE']); // New class department options
-    const [addCourseBucketNumber, setAddCourseBucketNumber] = useState({}) // Array of Maps {CSI: [number: id], ECE" [number:id]}
+    const [addCourseDepartment, setAddCourseDepartment] = useState('CSI')
+    const [addCourseNumber, setAddCourseNumber] = useState('500')
+    const [addCourseID, setAddCourseID] = useState('')
+    const [addCourseBucket, setAddCourseBucket] = useState([]);
+    const [addCourseBucketDepartment, setAddCourseBucketDepartment] = useState(['CSI', 'ECE']);
+    const [addCourseBucketNumber, setAddCourseBucketNumber] = useState({})
 
-    /* Fetching user courses from the database */
+    // Getting courses from backend
     const getUserCourses = async () => {
         const user_id = sessionStorage.getItem('userID');
         try {
@@ -46,19 +48,6 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
             console.error("Error fetching courses:");
         }
     };
-
-    // Fetching courses or clearing courses on sign in/out
-    useEffect(() => {
-        if(isUserSignedIn){
-            console.log("User logged in: fetching user data")
-            getUserCourses();
-        } else {
-            console.log("User not logged in: skipping fetch and clearing courses");
-            setCourses([]);
-            setGroupedCourses({});
-            setChangesMade(false);
-        }        
-    }, [isUserSignedIn]);
 
     // Grouping courses for display
     const getGroupedCourses = (courses) => {
@@ -75,35 +64,42 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
         return grouped;
     };
 
+    // Fetching courses or clearing courses on sign in/out
+    useEffect(() => {
+        if(isUserSignedIn){
+            console.log("User logged in: fetching user data")
+            getUserCourses();
+        } else {
+            console.log("User not logged in: skipping fetch and clearing courses");
+            setCourses([]);
+            setGroupedCourses({});
+            setChangesMade(false);
+        }        
+    }, [isUserSignedIn]);
+
     // Grouping courses after fetching
     useEffect(() => {
         if (courses.length > 0) {
             console.log("Grouping courses...");
-            console.log(courses);
             const grouped = getGroupedCourses(courses);
             setGroupedCourses(grouped);
         }
     }, [courses]);
 
-    /* Code for course description modal */
-    // handlers for show state of the modal
+    //Modal for course description
     const handleShowDescription = async (course_id) => {
-        getCourseDescription(course_id);
+        const tempDescription = await axios.post('http://localhost:5000/courses/course_description', {
+            course_id,
+        });
+        setCourseDescription(tempDescription.data);
         setShowDescription(true); 
     };
     const handleCloseDescription = () => {
         setShowDescription(false); 
         setCourseDescription([]);
     };
-    // Backend call to get the course description
-    const getCourseDescription = async (course_id) =>{
-        const tempDescription = await axios.post('http://localhost:5000/courses/course_description', {
-            course_id,
-        });
-        setCourseDescription(tempDescription.data);
-    }
 
-    /* Logic for changing grades in the accordian*/
+    // Lets the user change grades for courses
     const handleChangeGrade = (course, newGrade) => {
         // Iterate over courses
         const updatedCourses = courses.map((element) => {
@@ -118,7 +114,7 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
         setSaveButtonText("Save Changes");
     };
 
-    /* Logic for saving changes to the database */
+    // Save changes to the database
     const handleSave = async () =>{
         setChangesMade(false);
         setSaveButtonText("Saved");
@@ -135,22 +131,19 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
         }
     };
 
-    /* Logic for adding a semester to the schedule*/
-    // Show and hide handlers for the modal
+    // Adding a semester
     const handleAddSemesterForm = () =>{
         setShowAddSemester(true);
     };
     const handleCloseAddSemesterForm= () =>{
         setShowAddSemester(false);
     };
-    // Year and Semester state 
     const handleSetAddYear = (year) =>{
         setAddYear(year);
     };
     const handleSetAddSemester = (semester) => {
         setAddSemester(semester);
     };
-    // Addes a dummy class with year and semester info so it shows up in the accordian
     const handleAddNewSemester = () => {
         if (!addYear || !addSemester) {
             alert("Please select both a year and a semester.");
@@ -165,6 +158,7 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
             alert("This semester already exists in your schedule.");
             return;
         }
+    
         // Add a placeholder entry for the new semester
         const placeholderEntry = {
             id: null, // No ID since this isn't tied to an actual course
@@ -181,8 +175,7 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
         setShowAddSemester(false);
     };
 
-    /* Logic for removing a course from schedule */
-    // Show and hide handlers for the modal
+    //Removing a class
     const handleShowRemoveCourseWarning = (course) =>{
         setSelectedCourseRemove(course);
         setShowRemoveCourseWarning(true);
@@ -192,7 +185,6 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
         setShowRemoveCourseWarning(false);
         setSelectedCourseRemove('');
     }
-    // Actually removing the course
     const handleRemoveCourse = (badCourse) =>{
         const updatedCourses = courses.filter((course) => 
             !(course.id === badCourse.id && course.year === badCourse.year && course.semester === badCourse.semester)
@@ -202,18 +194,13 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
         setChangesMade(true);
     };
 
-    /* Logic for adding a course to the schedule*/
-    // Show and hide handlers for the modal
+    // Adding a class
     const handleShowAddCourseForm = () =>{
-        const course_id = addCourseBucketNumber[addCourseDepartment].get(Number(addCourseNumber));
-        getCourseDescription(String(course_id));
         setShowAddCourse(true);
     };
     const handleHideAddCourseForm = () =>{
         setShowAddCourse(false);
     }
-    
-    // Getting available course info from the database
     const getAvailableCourses = async () =>{
         console.log("Getting available courses")
         try{
@@ -227,70 +214,31 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
                 } else {
                     eceNumbers.set(course.number, course.id)
                 }
-            });
+            })
             const formatedNumbers = {CSI: csiNumbers, ECE: eceNumbers};
             setAddCourseBucketNumber(formatedNumbers);
-            setAddCourseDepartment('CSI');
-            setAddCourseNumber("500");
         }
         catch(error){
             console.error("Error getting available courses", error);
         }
-    };
-    // Will be called when the component is rendered
+    }
+    const handleAddCourseDepartmentChange = (e) => {
+        const dept = e.target.value;
+        setAddCourseDepartment(dept); 
+        setAddCourseNumber(addCourseBucketNumber[dept][0]); 
+      };
+      const handleAddCourseNumberChange = (e) => {
+        setAddCourseNumber(e.target.value); 
+      };
+
     useEffect(()=>{
         getAvailableCourses();
     },[]);
-    
-    // State of new course department
-    const handleAddCourseDepartmentChange = (e) => {
-        const dept = e.target.value; 
-        setAddCourseDepartment(dept); 
-    
-        const firstNumber = Array.from(addCourseBucketNumber[dept]?.keys())[0];
-        setAddCourseNumber(firstNumber);
-    };
-    // State of new course number
-    const handleAddCourseNumberChange = (e) => {
-        const newNumber = e.target.value;
-        setAddCourseNumber(newNumber);   
 
-    };
-    // When new course number is changed, update class description
-    useEffect(()=>{
-        if(addCourseNumber){
-            const course_id = addCourseBucketNumber[addCourseDepartment].get(Number(addCourseNumber));
-            getCourseDescription(String(course_id));
-        }
-    },[addCourseNumber])
-
-    // Actually adding the course
-    const handleAddNewCourse = (event) =>{
-        event.preventDefault(); // Stops the page from rerendering
-        console.log("Adding new course");
-        // Remove placeholder class if exists
-        let updatedCourses = courses.filter(
-            (course) => !(course.id === null && course.year === addYear && course.semester === addSemester)
-        );
-        // Create new course entry
-        const newCourse = {
-            id: addCourseBucketNumber[addCourseDepartment].get(Number(addCourseNumber)),
-            year: addYear,
-            semester: addSemester,
-            department: addCourseDepartment,
-            number: addCourseNumber,
-            title: courseDescription.title,
-            grade: null,
-            user_id: sessionStorage.getItem('userID')
-        }
-        setCourses([...updatedCourses, newCourse]);
-        setChangesMade(true);
-    };
     
     return (
         <div>
             <h1>Schedule</h1>
-            {/* Main accordian with course information */}
             <Accordion alwaysOpen>
                 {Object.keys(groupedCourses).map((year, yearIndex) => (
                     <Accordion.Item eventKey={yearIndex} key={year}>
@@ -476,7 +424,7 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
 
             </Modal>
 
-            {/*Modal for the form to add a Course*/}
+            {/*Modal for the form to add a Class*/}
             <Modal
             size='lg'
             show={showAddCourse}
@@ -487,13 +435,12 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
                     <Modal.Title>Add a Course</Modal.Title>
                 </Modal.Header>
                     <ModalBody>
-                            <Form onSubmit={handleAddNewCourse}>
+                            <Form>
                                 <Form.Group className="mb-3" controlId="formYear">
                                     <Form.Label>Year</Form.Label>
                                     <Form.Select
                                     value={addYear}
                                     onChange={(e) => handleSetAddYear(e.target.value)}
-                                    required
                                     >
                                     <option value="" disabled>Select a year</option>
                                     {yearOptions.map((value) => (
@@ -508,7 +455,6 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
                                     <Form.Select
                                     value={addSemester}
                                     onChange={(e) => handleSetAddSemester(e.target.value)}
-                                    required
                                     >
                                     <option value="" disabled>Select a semester</option>
                                     {semesterOptions.map((value) => (
@@ -519,52 +465,42 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
                                     </Form.Select>
                                 </Form.Group>
 
-                                <Form.Group className="mb-3" controlId="formDepartment">
+                                <Form.Group className="mb-3" controlId="formMajor">
                                     <Form.Label>Department</Form.Label>
                                     <Form.Select
-                                    value={addCourseDepartment}
+                                    value={addCourseBucketDepartment}
                                     onChange={handleAddCourseDepartmentChange}
-                                    required
                                     >
-                                    {addCourseBucketDepartment.map((value) => (
+                                    {addCourseBucketDepartment.map(([value, label]) => (
                                         <option key={value} value={value}>
-                                        {value}
+                                        {label}
                                         </option>
                                     ))}
                                     </Form.Select>
                                 </Form.Group>
 
-                                <Form.Group className="mb-3" controlId="formNumber">
-                                    <Form.Label>Number</Form.Label>
+                                <Form.Group className="mb-3" controlId="formConcentration">
+                                    <Form.Label>Concentration</Form.Label>
                                     <Form.Select
-                                    value={addCourseNumber}
+                                    value={addCourseBucketNumber}
                                     onChange={handleAddCourseNumberChange}
-                                    disabled={!addCourseDepartment}
-                                    required
+                                    disabled={!addCourseBucketDepartment}
                                     >
-                                    {Array.from(addCourseBucketNumber[addCourseDepartment]?.entries() || []).map(
-                                        ([number, id]) => (
-                                            <option key={id} value={number}>
-                                                {number}
-                                            </option>
-                                        )
-                                    )}
+                                    {addCourseBucketNumber[addCourseDepartment].keys?.map(([value, label]) => (
+                                        <option key={value} value={value}>
+                                        {label}
+                                        </option>
+                                    ))}
                                     </Form.Select>
                                 </Form.Group>
-                                <Form.Group>
-                                    <Row><h5>{courseDescription.title}</h5></Row>
-                                    <Row><h6>Description</h6></Row>
-                                    <Row>{courseDescription.description}</Row>
-                                    <Row><h6>Prequisites</h6></Row>
-                                </Form.Group>
-                                <Form.Group>
-                                    <Col style={{ textAlign: 'right' }}>
-                                    <Button type='submit'>
-                                        Add Course
-                                    </Button>
-                                    </Col>
-                                </Form.Group>
                             </Form>
+                            <Col style={{ textAlign: 'right' }}>
+                                <Button
+                                onClick={handleAddNewSemester}
+                                >
+                                    Add
+                                </Button>
+                            </Col>
                     </ModalBody>
             </Modal>
 
