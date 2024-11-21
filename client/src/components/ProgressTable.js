@@ -6,7 +6,8 @@ const ProgressTable = ({onSignInSuccess}) => {
 
   return (
     <div>
-        This is a table
+      <h1>Schedule</h1>
+        This is a tables
     </div>
   );
 }

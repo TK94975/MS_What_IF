@@ -9,9 +9,8 @@ import { UserContext } from '../context/userContext';
 
 const ProfileBox = () => {
     const {
-        isUserSignedIn,
-        onSignInSuccess
-    } = useContext(UserContext)
+        setIsUserSignedIn,
+    } = useContext(UserContext);
 
     const [email, setEmail] = useState(sessionStorage.getItem('userEmail') || '');
 
@@ -21,7 +20,7 @@ const ProfileBox = () => {
         sessionStorage.removeItem('userMajor');
         sessionStorage.removeItem('userConcentration')
         sessionStorage.setItem('userLoggedIn?', "false");
-        onSignInSuccess(false);
+        setIsUserSignedIn(false);
     }
 
     return (

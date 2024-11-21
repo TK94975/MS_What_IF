@@ -1,14 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useContext} from "react";
 import { Modal, Button, Form, Container, Col, Row } from "react-bootstrap";
+import { UserContext } from "../context/userContext";
 import axios from "axios";
 
-const SignUp = ({
-  onSignInSuccess,
-  signInMajor,
-  signInCon,
-  onMajorChange,
-  onConcentrationChange,
-}) => {
+const SignUp = () => {
+  const {
+    setIsUserSignedIn,
+    selectedMajor,
+    handleMajorChange,
+    selectedConcentration,
+    handleConcentrationChange,
+  } = useContext(UserContext)
 
   // Showing and hiding hthe model
   const [show, setShow] = useState(false);
@@ -32,8 +34,8 @@ const SignUp = ({
       return;
     }
     try {
-      const major = signInMajor;
-      const concentration = signInCon;
+      const major = selectedMajor;
+      const concentration = selectedConcentration;
       const response = await axios.post(`${process.env.REACT_APP_SERVER_URL}/users/signup`, {
         email,
         password,
@@ -46,7 +48,7 @@ const SignUp = ({
         sessionStorage.setItem('userMajor', response.data[0].major);
         sessionStorage.setItem('userConcentration', response.data[0].concentration)
         sessionStorage.setItem('userLoggedIn?', 'true');
-        onSignInSuccess(true);
+        setIsUserSignedIn(true);
         setShow(false);
       }
     } catch (error) {
@@ -76,14 +78,6 @@ const SignUp = ({
     ["Control and Computer Systems", "Control Systems"],
     ],
 };
-  const handleMajorChange = (e) => {
-    const major = e.target.value;
-    onMajorChange(major); 
-    onConcentrationChange(concentrations[major][0][0]); 
-  };
-  const handleConcentrationChange = (e) => {
-    onConcentrationChange(e.target.value); 
-  };
 
   return (
     <div>
@@ -137,8 +131,8 @@ const SignUp = ({
                   <Form.Group className="mb-3" controlId="formMajor">
                     <Form.Label>Major</Form.Label>
                     <Form.Select
-                      value={signInMajor}
-                      onChange={handleMajorChange}
+                      value={selectedMajor}
+                      onChange={(e)=>handleMajorChange(e.target.value)}
                     >
                       {majors.map(([value, label]) => (
                         <option key={value} value={value}>
@@ -151,11 +145,11 @@ const SignUp = ({
                   <Form.Group className="mb-3" controlId="formConcentration">
                     <Form.Label>Concentration</Form.Label>
                     <Form.Select
-                      value={signInCon}
-                      onChange={handleConcentrationChange}
-                      disabled={!signInMajor}
+                      value={selectedConcentration}
+                      onChange={(e) => handleConcentrationChange(e.target.value)}
+                      disabled={!selectedMajor}
                     >
-                      {concentrations[signInMajor]?.map(([value, label]) => (
+                      {concentrations[selectedMajor]?.map(([value, label]) => (
                         <option key={value} value={value}>
                           {label}
                         </option>

@@ -1,8 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
 import axios from 'axios';
+import { UserContext } from '../context/userContext';
 
-const SignIn = ({onSignInSuccess}) => {
+const SignIn = () => {
+  const {
+    setIsUserSignedIn,
+  } = useContext(UserContext)
+
   // Hiding and showing modal
   const [show, setShow] = useState(false);
   const handleShow = () => setShow(true);
@@ -22,7 +27,7 @@ const SignIn = ({onSignInSuccess}) => {
       sessionStorage.setItem('userMajor', response.data[0].major);
       sessionStorage.setItem('userConcentration', response.data[0].concentration)
       sessionStorage.setItem('userLoggedIn?', 'true');
-      onSignInSuccess(true);
+      setIsUserSignedIn(true);
 
     } catch (error) {
         if(error.status === 401){
