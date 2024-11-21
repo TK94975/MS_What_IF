@@ -10,6 +10,7 @@ export const UserProvider = ({ children }) => {
     };
     const [selectedMajor, setSelectedMajor] = useState("CSI");
     const [selectedConcentration, setSelectedConcentration] = useState(defaultConcentrations['CSI']);
+    const [courses, setCourses] = useState([]); // User courses
 
     useEffect(() => {
         if (sessionStorage.getItem("userLoggedIn?") === 'true') {
@@ -43,6 +44,8 @@ export const UserProvider = ({ children }) => {
                 handleMajorChange,
                 selectedConcentration,
                 handleConcentrationChange,
+                courses,
+                setCourses,
             }}
         >
             {children}
