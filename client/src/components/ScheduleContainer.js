@@ -4,16 +4,20 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import '../styles.css';
 import axios from 'axios';
 //Packages
-import {React, useState, useEffect}from "react";
+import {React, useState, useEffect, useContext}from "react";
 import { Accordion, Form, Card, Col, Row, Button, Modal, Toast, ModalBody } from 'react-bootstrap';
+import { UserContext } from '../context/userContext';
 
 
 // Containers the Title and the dropdown/accordions for each semester
 
-const ScheduleContainer =  ({isUserSignedIn}) => {
+const ScheduleContainer =  () => {
 
-    // Enum for grade updating
-    const gradeOptions = ["A", "A-", "B+", "B", "B-", "C+", "C", "D", "F", "E"];
+    const {
+        isUserSignedIn,
+    } = useContext(UserContext)
+    
+    const gradeOptions = ["A", "A-", "B+", "B", "B-", "C+", "C", "D", "F", "E"]; // Enum for grade updating
     const semesterOptions = ['Spring','Summer','Fall','Winter'];
     const yearOptions = [2022,2023,2024,2025,2026,2027];
 
@@ -38,7 +42,7 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
     const getUserCourses = async () => {
         const user_id = sessionStorage.getItem('userID');
         try {
-            const response = await axios.post('http://localhost:5000/user_courses/get_user_courses', {
+            const response = await axios.post(`${process.env.REACT_APP_SERVER_URL}/user_courses/get_user_courses`, {
                 user_id,
             });
             setCourses(response.data.user_courses);
@@ -97,7 +101,7 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
     };
     // Backend call to get the course description
     const getCourseDescription = async (course_id) =>{
-        const tempDescription = await axios.post('http://localhost:5000/courses/course_description', {
+        const tempDescription = await axios.post(`${process.env.REACT_APP_SERVER_URL}/courses/course_description`, {
             course_id,
         });
         setCourseDescription(tempDescription.data);
@@ -124,7 +128,7 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
         setSaveButtonText("Saved");
         try{
             console.log("Saving...");
-            const response = await axios.post('http://localhost:5000/user_courses/update_user_courses', {
+            const response = await axios.post(`${process.env.REACT_APP_SERVER_URL}/user_courses/update_user_courses`, {
                 courses,
             });
         }
@@ -217,7 +221,7 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
     const getAvailableCourses = async () =>{
         console.log("Getting available courses")
         try{
-            const response = await axios.get('http://localhost:5000/courses/course_options');
+            const response = await axios.get(`${process.env.REACT_APP_SERVER_URL}/courses/course_options`);
             const availableCourses = response.data;
             let csiNumbers = new Map();
             let eceNumbers = new Map();

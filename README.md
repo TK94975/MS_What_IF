@@ -40,6 +40,10 @@ Create a file called `.env` in the directory `MS_What_IF/server` and add the fol
     DB_NAME=what_if_ms
     PORT=5000
 ```
+Create a file called `.env` in the directory `MS_What_IF/client` and add the following lines (user the URL of the backend)
+```bash
+    REACT_APP_SERVER_URL=http://localhost:5000
+```
 6. **Create the Database**
 ```bash
     cd ../server
@@ -58,4 +62,11 @@ To import data first start the server, then import data from excel file `Mserver
     npm run dev
     cd server
     node importCourses.js
+    node importSchedule.js
+```
+9. **Import test user data**
+To import an existing test user with existing course and progress data to the MySQL database, use the following commands
+```bash
+    cd server/
+    node __test__/import_test_user
 ```
