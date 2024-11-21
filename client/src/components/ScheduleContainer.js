@@ -269,12 +269,12 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
                 </Col>
 
                 <Col style={{ textAlign: 'right' }}>
-                    <Button
+                    {isUserSignedIn && <Button
                     disabled={!changesMade}
                     onClick={handleSave}
                     >
                         {saveButtonText}
-                    </Button>
+                    </Button>}
                 </Col>
 
 
