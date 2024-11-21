@@ -21,6 +21,11 @@ export const UserProvider = ({ children }) => {
         }
     }, []);
 
+    useEffect(() => {
+        setSelectedMajor(sessionStorage.getItem("userMajor") || "CSI");
+        setSelectedConcentration(sessionStorage.getItem("userConcentration") || defaultConcentrations['CSI']);
+    }, [isUserSignedIn]);
+
     const handleMajorChange = (major) => {
         setSelectedMajor(major);
         setSelectedConcentration(defaultConcentrations[major] || "none");

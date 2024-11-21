@@ -14,6 +14,7 @@ const usersRouter = require('./routes/users');
 const coursesRouter = require('./routes/courses');
 const coursePrerequisitesRouter = require('./routes/courses');
 const userCoursesRouter = require('./routes/user_courses')
+const progressRouter = require('./routes/progress')
 
 const app = express();
 app.use(cors()); // Enable CORS
@@ -30,4 +31,5 @@ app.use('/users', usersRouter);
 app.use('/courses', coursesRouter);
 app.use('/course_prerequisites', coursePrerequisitesRouter);
 app.use('/user_courses', userCoursesRouter);
+app.use('/progress', progressRouter);
 module.exports = app;
