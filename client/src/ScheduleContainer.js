@@ -29,8 +29,10 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
     const [showAddCourse, setShowAddCourse] = useState(false); // Add course modal show state
     const [addYear, setAddYear] = useState(''); // Year for add semester/course modal
     const [addSemester, setAddSemester] = useState(''); // Semester for add semester/course modal
-    const [addCourseDepartment, setAddCourseDepartment] = useState('')
-    const [addCourseNumber, setAddCourseNumber] = useState('');
+    const [addCourseDepartment, setAddCourseDepartment] = useState('CSI')
+    const [addCourseNumber, setAddCourseNumber] = useState('500')
+    const [addCourseID, setAddCourseID] = useState('')
+    const [addCourseBucket, setAddCourseBucket] = useState([]);
     const [addCourseBucketDepartment, setAddCourseBucketDepartment] = useState(['CSI', 'ECE']);
     const [addCourseBucketNumber, setAddCourseBucketNumber] = useState({})
 
@@ -79,7 +81,6 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
     useEffect(() => {
         if (courses.length > 0) {
             console.log("Grouping courses...");
-            console.log(courses);
             const grouped = getGroupedCourses(courses);
             setGroupedCourses(grouped);
         }
@@ -87,20 +88,16 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
 
     //Modal for course description
     const handleShowDescription = async (course_id) => {
-        getCourseDescription(course_id);
+        const tempDescription = await axios.post('http://localhost:5000/courses/course_description', {
+            course_id,
+        });
+        setCourseDescription(tempDescription.data);
         setShowDescription(true); 
     };
     const handleCloseDescription = () => {
         setShowDescription(false); 
         setCourseDescription([]);
     };
-
-    const getCourseDescription = async (course_id) =>{
-        const tempDescription = await axios.post('http://localhost:5000/courses/course_description', {
-            course_id,
-        });
-        setCourseDescription(tempDescription.data);
-    }
 
     // Lets the user change grades for courses
     const handleChangeGrade = (course, newGrade) => {
@@ -199,8 +196,6 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
 
     // Adding a class
     const handleShowAddCourseForm = () =>{
-        const course_id = addCourseBucketNumber[addCourseDepartment].get(Number(addCourseNumber));
-        getCourseDescription(String(course_id));
         setShowAddCourse(true);
     };
     const handleHideAddCourseForm = () =>{
@@ -219,62 +214,27 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
                 } else {
                     eceNumbers.set(course.number, course.id)
                 }
-            });
+            })
             const formatedNumbers = {CSI: csiNumbers, ECE: eceNumbers};
             setAddCourseBucketNumber(formatedNumbers);
-            setAddCourseDepartment('CSI');
-            setAddCourseNumber("500");
         }
         catch(error){
             console.error("Error getting available courses", error);
         }
-    };
+    }
+    const handleAddCourseDepartmentChange = (e) => {
+        const dept = e.target.value;
+        setAddCourseDepartment(dept); 
+        setAddCourseNumber(addCourseBucketNumber[dept][0]); 
+      };
+      const handleAddCourseNumberChange = (e) => {
+        setAddCourseNumber(e.target.value); 
+      };
+
     useEffect(()=>{
         getAvailableCourses();
     },[]);
-    
-    const handleAddCourseDepartmentChange = (e) => {
-        const dept = e.target.value; 
-        setAddCourseDepartment(dept); 
-    
-        const firstNumber = Array.from(addCourseBucketNumber[dept]?.keys())[0];
-        setAddCourseNumber(firstNumber);
-    };
-    const handleAddCourseNumberChange = (e) => {
-        const newNumber = e.target.value;
-        setAddCourseNumber(newNumber);   
 
-    };
-
-    useEffect(()=>{
-        if(addCourseNumber){
-            const course_id = addCourseBucketNumber[addCourseDepartment].get(Number(addCourseNumber));
-            getCourseDescription(String(course_id));
-        }
-    },[addCourseNumber])
-
-    const handleAddNewCourse = (event) =>{
-        event.preventDefault(); // Stops the page from rerendering
-        console.log("Adding new course");
-        // Remove placeholder if exists
-        let updatedCourses = courses.filter(
-            (course) => !(course.id === null && course.year === addYear && course.semester === addSemester)
-        );
-
-        // Create new course entry
-        const newCourse = {
-            id: addCourseBucketNumber[addCourseDepartment].get(Number(addCourseNumber)),
-            year: addYear,
-            semester: addSemester,
-            department: addCourseDepartment,
-            number: addCourseNumber,
-            title: courseDescription.title,
-            grade: null,
-            user_id: sessionStorage.getItem('userID')
-        }
-        setCourses([...updatedCourses, newCourse]);
-        setChangesMade(true);
-    };
     
     return (
         <div>
@@ -464,7 +424,7 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
 
             </Modal>
 
-            {/*Modal for the form to add a Course*/}
+            {/*Modal for the form to add a Class*/}
             <Modal
             size='lg'
             show={showAddCourse}
@@ -475,13 +435,12 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
                     <Modal.Title>Add a Course</Modal.Title>
                 </Modal.Header>
                     <ModalBody>
-                            <Form onSubmit={handleAddNewCourse}>
+                            <Form>
                                 <Form.Group className="mb-3" controlId="formYear">
                                     <Form.Label>Year</Form.Label>
                                     <Form.Select
                                     value={addYear}
                                     onChange={(e) => handleSetAddYear(e.target.value)}
-                                    required
                                     >
                                     <option value="" disabled>Select a year</option>
                                     {yearOptions.map((value) => (
@@ -496,7 +455,6 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
                                     <Form.Select
                                     value={addSemester}
                                     onChange={(e) => handleSetAddSemester(e.target.value)}
-                                    required
                                     >
                                     <option value="" disabled>Select a semester</option>
                                     {semesterOptions.map((value) => (
@@ -507,52 +465,42 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
                                     </Form.Select>
                                 </Form.Group>
 
-                                <Form.Group className="mb-3" controlId="formDepartment">
+                                <Form.Group className="mb-3" controlId="formMajor">
                                     <Form.Label>Department</Form.Label>
                                     <Form.Select
-                                    value={addCourseDepartment}
+                                    value={addCourseBucketDepartment}
                                     onChange={handleAddCourseDepartmentChange}
-                                    required
                                     >
-                                    {addCourseBucketDepartment.map((value) => (
+                                    {addCourseBucketDepartment.map(([value, label]) => (
                                         <option key={value} value={value}>
-                                        {value}
+                                        {label}
                                         </option>
                                     ))}
                                     </Form.Select>
                                 </Form.Group>
 
-                                <Form.Group className="mb-3" controlId="formNumber">
-                                    <Form.Label>Number</Form.Label>
+                                <Form.Group className="mb-3" controlId="formConcentration">
+                                    <Form.Label>Concentration</Form.Label>
                                     <Form.Select
-                                    value={addCourseNumber}
+                                    value={addCourseBucketNumber}
                                     onChange={handleAddCourseNumberChange}
-                                    disabled={!addCourseDepartment}
-                                    required
+                                    disabled={!addCourseBucketDepartment}
                                     >
-                                    {Array.from(addCourseBucketNumber[addCourseDepartment]?.entries() || []).map(
-                                        ([number, id]) => (
-                                            <option key={id} value={number}>
-                                                {number}
-                                            </option>
-                                        )
-                                    )}
+                                    {addCourseBucketNumber[addCourseDepartment].keys?.map(([value, label]) => (
+                                        <option key={value} value={value}>
+                                        {label}
+                                        </option>
+                                    ))}
                                     </Form.Select>
                                 </Form.Group>
-                                <Form.Group>
-                                    <Row><h5>{courseDescription.title}</h5></Row>
-                                    <Row><h6>Description</h6></Row>
-                                    <Row>{courseDescription.description}</Row>
-                                    <Row><h6>Prequisites</h6></Row>
-                                </Form.Group>
-                                <Form.Group>
-                                    <Col style={{ textAlign: 'right' }}>
-                                    <Button type='submit'>
-                                        Add Course
-                                    </Button>
-                                    </Col>
-                                </Form.Group>
                             </Form>
+                            <Col style={{ textAlign: 'right' }}>
+                                <Button
+                                onClick={handleAddNewSemester}
+                                >
+                                    Add
+                                </Button>
+                            </Col>
                     </ModalBody>
             </Modal>
 

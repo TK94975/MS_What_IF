@@ -23,7 +23,7 @@ router.post('/get_user_courses', async (req, res) => {
         // Send response
         res.status(200).json({ user_courses });
 
-    } catch (error) {
+    } catch (error) { 
         console.error("Error fetching user courses:", error);
 
         // Send error response
