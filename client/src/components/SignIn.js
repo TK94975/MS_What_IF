@@ -16,7 +16,7 @@ const SignIn = ({onSignInSuccess}) => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      const response = await axios.post('http://localhost:5000/users/signin', { email, password });
+      const response = await axios.post(`${process.env.REACT_APP_SERVER_URL}/users/signin`, { email, password });
       sessionStorage.setItem('userID', response.data[0].id);
       sessionStorage.setItem('userEmail', response.data[0].email);
       sessionStorage.setItem('userMajor', response.data[0].major);

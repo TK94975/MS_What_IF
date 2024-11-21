@@ -38,7 +38,7 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
     const getUserCourses = async () => {
         const user_id = sessionStorage.getItem('userID');
         try {
-            const response = await axios.post('http://localhost:5000/user_courses/get_user_courses', {
+            const response = await axios.post(`${process.env.REACT_APP_SERVER_URL}/user_courses/get_user_courses`, {
                 user_id,
             });
             setCourses(response.data.user_courses);
@@ -97,7 +97,7 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
     };
     // Backend call to get the course description
     const getCourseDescription = async (course_id) =>{
-        const tempDescription = await axios.post('http://localhost:5000/courses/course_description', {
+        const tempDescription = await axios.post(`${process.env.REACT_APP_SERVER_URL}/courses/course_description`, {
             course_id,
         });
         setCourseDescription(tempDescription.data);
@@ -124,7 +124,7 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
         setSaveButtonText("Saved");
         try{
             console.log("Saving...");
-            const response = await axios.post('http://localhost:5000/user_courses/update_user_courses', {
+            const response = await axios.post(`${process.env.REACT_APP_SERVER_URL}/user_courses/update_user_courses`, {
                 courses,
             });
         }
@@ -217,7 +217,7 @@ const ScheduleContainer =  ({isUserSignedIn}) => {
     const getAvailableCourses = async () =>{
         console.log("Getting available courses")
         try{
-            const response = await axios.get('http://localhost:5000/courses/course_options');
+            const response = await axios.get(`${process.env.REACT_APP_SERVER_URL}/courses/course_options`);
             const availableCourses = response.data;
             let csiNumbers = new Map();
             let eceNumbers = new Map();
