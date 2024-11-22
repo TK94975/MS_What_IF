@@ -69,4 +69,31 @@ router.get('/course_options', async (req, res) => {
   }
 });
 
+// GET /courses/details - Retrieve all courses and their prerequisites
+router.get('/expanded_details', async (req, res) => {
+  try {
+    let sql = `SELECT c.*, 
+  CASE
+    WHEN cpr.course_id is NULL THEN "No Required Prerequisite Courses"
+    ELSE "IDK what to put here"
+  END details, pr.*
+  FROM (
+    SELECT id, department, number, title, description, credits 
+    FROM courses
+  ) c 
+  LEFT JOIN course_prerequisites cpr on c.id = cpr.course_id
+  LEFT JOIN (
+    SELECT id pr_id, department pr_department, number pr_number, title pr_title
+    FROM courses
+  ) pr on cpr.prereq_course_id = pr.pr_id
+  order by c.id, c.department, c.number desc
+    `
+    const [courses] = await db.query(sql);
+    res.json(courses);
+  } catch (err) {
+    console.error('Error fetching courses:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 module.exports = router;

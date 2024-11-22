@@ -5,6 +5,7 @@ import '../styles.css';
 import React from "react";
 // Components
 import LeftSideBar from "../components/LeftSideBar";
+import RightSideBar from '../components/RightSideBar';
 import ScheduleContainer from '../components/ScheduleContainer';
 import Header from '../components/Header';
 import ProgressTable from '../components/ProgressTable';
@@ -33,7 +34,7 @@ const Home = () => {
                         <ScheduleContainer/>
                     </div>
                     <div id='HOME-RSB-PD' className='col'>
-                        <p>RIGHT SIDE BAR</p>
+                        <RightSideBar/>
                     </div>
                 </div>
             </div>
