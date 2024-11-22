@@ -115,18 +115,13 @@ router.post('/completed_progress', (req, res) => {
             // Everything else is an elective
             else {
                 if(course.completed === 'yes'){
-                        comelective += course.credits;
-                        comelectiveGPA += course.credits * convertGrade(course.grade);
-                        elective += course.credits;
-                        electiveGPA += course.credits * convertGrade(course.grade);
+                    comelective += course.credits;
+                    comelectiveGPA += course.credits * convertGrade(course.grade);
+                    elective += course.credits;
+                    electiveGPA += course.credits * convertGrade(course.grade);
                 } else {
-                    if(project < 4){
-                        project += course.credits;
-                        projectGPA += course.credits * convertGrade(course.grade);
-                    } else {
-                        elective += course.credits;
-                        electiveGPA += projectGPA += course.credits * convertGrade(course.grade);
-                    }
+                    elective += course.credits;
+                    electiveGPA += course.credits * convertGrade(course.grade);
                 }
             }
         });
