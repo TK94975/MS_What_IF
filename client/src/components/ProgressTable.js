@@ -43,6 +43,7 @@ const ProgressTable = () => {
 
     useEffect(()=>{
         getConcentrationRequirements();
+        getUserProgress();
     },[selectedConcentration, isUserSignedIn])
 
     useEffect(()=>{

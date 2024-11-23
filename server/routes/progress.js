@@ -24,8 +24,7 @@ router.post('/completed_progress', async (req, res) => {
     const user_courses = req.body.courses;
     const user_concentration = req.body.selectedConcentration;
 
-    const progress = progressCalculator(user_courses, user_concentration);
-    console.log(progress);
+    const progress = await progressCalculator(user_courses, user_concentration);
     res.status(200).json(progress);
 });
 
