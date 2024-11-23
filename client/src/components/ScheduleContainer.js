@@ -12,16 +12,17 @@ import { UserContext } from '../context/userContext';
 // Containers the Title and the dropdown/accordions for each semester
 
 const ScheduleContainer =  () => {
-
     const {
         isUserSignedIn,
-    } = useContext(UserContext)
+        courses,
+        setCourses,
+    } = useContext(UserContext);
     
     const gradeOptions = ["A", "A-", "B+", "B", "B-", "C+", "C", "D", "F", "E"]; // Enum for grade updating
     const semesterOptions = ['Spring','Summer','Fall','Winter'];
     const yearOptions = [2022,2023,2024,2025,2026,2027];
 
-    const [courses, setCourses] = useState([]); // User courses
+    
     const [groupedCourses, setGroupedCourses] = useState({}); // User courses grouped by year and semester
     const [showDescription, setShowDescription] = useState(false); // Course description modal state
     const [courseDescription, setCourseDescription] = useState([]); // Course details for decription modal
