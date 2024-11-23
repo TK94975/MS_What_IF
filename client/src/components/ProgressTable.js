@@ -33,6 +33,8 @@ const ProgressTable = () => {
                     courses,
                     selectedConcentration,
                 });
+                console.log(courses)
+                console.log(selectedConcentration)
                 console.log(response.data);
                 setUserProgress(response.data);
             }
