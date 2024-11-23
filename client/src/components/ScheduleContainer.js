@@ -285,6 +285,7 @@ const ScheduleContainer =  () => {
             number: addCourseNumber,
             title: courseDescription.title,
             grade: null,
+            credits: courseDescription.credits,
             user_id: sessionStorage.getItem('userID')
         }
         setCourses([...updatedCourses, newCourse]);
