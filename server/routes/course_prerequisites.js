@@ -35,4 +35,19 @@ router.post('/', async (req, res) => {
   }
 });
 
+// GET /course_prerequisites/course_id - Retrieve course prerequisites for specific class
+router.post('/course_id', async (req, res) => {
+  const course_id = req.body.id; // Retrieve `id` from query parameters
+  try {
+    const [prereqs] = await db.query(
+      'SELECT * FROM course_prerequisites WHERE course_id = ?',
+      [course_id]
+    );
+    res.json(prereqs);
+  } catch (err) {
+    console.error('Error fetching course prerequisites:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 module.exports = router;

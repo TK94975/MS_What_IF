@@ -269,8 +269,23 @@ const ScheduleContainer =  () => {
     },[addCourseNumber])
 
     // Actually adding the course
-    const handleAddNewCourse = (event) =>{
+    const handleAddNewCourse = async (event) =>{
         event.preventDefault(); // Stops the page from rerendering
+        console.log("handleAddNewCourse: Checking for dependency conflicts")
+        //TODO:
+        let course_id = addCourseBucketNumber[addCourseDepartment].get(Number(addCourseNumber))
+        // Get the prerequisites for this new course
+        try {
+            let response = await axios.post(`${process.env.REACT_APP_SERVER_URL}/course_prerequisites/course_id`, {
+                id: course_id
+            });
+            console.log(response)
+        }
+        catch (err) {
+            console.log(err)
+        }
+        // check if there are prerequisites before this course
+        // check if there are prerequisites after this course
         console.log("Adding new course");
         // Remove placeholder class if exists
         let updatedCourses = courses.filter(
@@ -278,7 +293,7 @@ const ScheduleContainer =  () => {
         );
         // Create new course entry
         const newCourse = {
-            id: addCourseBucketNumber[addCourseDepartment].get(Number(addCourseNumber)),
+            id: course_id,
             year: addYear,
             semester: addSemester,
             department: addCourseDepartment,

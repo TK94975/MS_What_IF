@@ -69,7 +69,7 @@ router.get('/course_options', async (req, res) => {
   }
 });
 
-// GET /courses/details - Retrieve all courses and their prerequisites
+// GET /courses/expanded_details - Retrieve all courses and their prerequisites
 router.get('/expanded_details', async (req, res) => {
   try {
     let sql = `SELECT c.*, 
