@@ -36,6 +36,9 @@ router.post('/concentration_requirements', (req, res) => {
     creditValues.set("Systems", {core: "7", concentration: "6", elective: "15", project: "3"})
     creditValues.set("Theoretical Computer Science", {core: "7", concentration: "6", elective: "15", project: "3"})
     creditValues.set("Old Computer Science", {core: "13", concentration: "0", elective: "15", project: "3"})
+    creditValues.set('Signal Processing and Communications', {depth: "12",breadth: "6",mathPhysics: "3",technicalElective: "3", thesis: "6"})
+    creditValues.set('Electronic Circuits and Systems', {depth: "12",breadth: "6",mathPhysics: "3",technicalElective: "3", thesis: "6"})
+    creditValues.set('Control and Computer Systems', {depth: "12",breadth: "6",mathPhysics: "3",technicalElective: "3", thesis: "6"})
     try{
         const concentration = req.body.selectedConcentration;
         res.status(200).json(creditValues.get(concentration));
