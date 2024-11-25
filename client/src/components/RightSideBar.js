@@ -115,6 +115,8 @@ const RightSideBar = props => {
                     }}>
                         <option value={"CSI"} defaultValue={true}>CSI</option>
                         <option value={"ECE"}>ECE</option>
+                        <option value={"PHY"}>PHY</option>
+                        <option value={"MAT"}>MAT</option>
                     </select>
                 </div>
             </div>
