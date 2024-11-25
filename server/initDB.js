@@ -23,7 +23,7 @@ require('dotenv').config();
       id INT AUTO_INCREMENT PRIMARY KEY,
       email VARCHAR(100) NOT NULL UNIQUE,
       password VARCHAR(255) NOT NULL,
-      major ENUM('CSI', 'ECE'),
+      major ENUM('CSI', 'ECE', 'MAT', 'PHY'),
       concentration ENUM('Core','Artificial Intelligence and Machine Learning', 'Systems', 'Theoretical Computer Science', 'Old Computer Science','Signal Processing and Communications','Electronic Circuits and Systems','Control and Computer Systems', 'none'),
       role ENUM('user', 'admin') DEFAULT 'user',
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -52,7 +52,7 @@ require('dotenv').config();
     const createCoursesTable = `
     CREATE TABLE IF NOT EXISTS courses (
       id INT AUTO_INCREMENT PRIMARY KEY,
-      department ENUM('CSI', 'ECE','PHY','MATH'),
+      department ENUM('CSI', 'ECE', 'MAT', 'PHY'),
       number INT NOT NULL,
       title VARCHAR(100) NOT NULL,
       description TEXT,
@@ -113,9 +113,9 @@ require('dotenv').config();
     const createCourseConcentrationsTable = `
     CREATE TABLE IF NOT EXISTS course_concentrations (
       course_id INT NOT NULL,
-      major ENUM('CSI', 'ECE'),
+      major ENUM('CSI', 'ECE', 'MAT', 'PHY'),
       concentration ENUM('Core','Artificial Intelligence and Machine Learning', 'Systems', 'Theoretical Computer Science', 'Old Computer Science','Signal Processing and Communications','Electronic Circuits and Systems','Control and Computer Systems', 'none'),
-      isConcentrationCore BINARY,
+      isConcentrationCore BOOLEAN,
       PRIMARY KEY (course_id, major, concentration),
       FOREIGN KEY (course_id) REFERENCES courses(id)
     );`;

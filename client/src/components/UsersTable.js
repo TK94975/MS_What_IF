@@ -42,10 +42,9 @@ return (
 		<thead>
 			<tr>
 			<th>ID</th>
-			<th>Username</th>
 			<th>Email</th>
-			<th>First Name</th>
-			<th>Last Name</th>
+			<th>Major</th>
+			<th>Conc</th>
 			<th>Role</th>
 			<th>Created At</th>
 			</tr>
@@ -54,10 +53,9 @@ return (
 			{users.map((user) => (
 			<tr key={user.id}>
 				<td>{user.id}</td>
-				<td>{user.username}</td>
 				<td>{user.email}</td>
-				<td>{user.first_name}</td>
-				<td>{user.last_name}</td>
+				<td>{user.major}</td>
+				<td>{user.concentration}</td>
 				<td>{user.role}</td>
 				<td>{new Date(user.created_at).toLocaleString()}</td>
 			</tr>

@@ -1,236 +1,368 @@
-const db = require('../config/db'); // Ensure this path is correct and db connection is set up
+// server/progressUtils1.js
+const db = require('../config/db');
 
-const convertGrade = (letterGrade) =>{
-    const conversion = new Map([
-        ['A', 4.0],
-        ['A-', 3.7],
-        ['B+', 3.3],
-        ['B', 3.0],
-        ['B-', 2.7],
-        ['C+', 2.3],
-        ['C', 2.0],
-        ['D', 1.0],
-        ['F', 0.0],
-        ['E', 0.0],
-        [null, 3.0], //Assume a B in a class
-    ])
-    return conversion.get(letterGrade);
+// Utility function to convert letter grades to grade points
+function convertGrade(letterGrade) {
+  const conversion = new Map([
+    ['A', 4.0],
+    ['A-', 3.7],
+    ['B+', 3.3],
+    ['B', 3.0],
+    ['B-', 2.7],
+    ['C+', 2.3],
+    ['C', 2.0],
+    ['D', 1.0],
+    ['F', 0.0],
+    ['E', 0.0],
+    [null, 3.0], // Assume a B in a class
+  ]);
+  return conversion.get(letterGrade);
 }
 
-const getCourseRequirements = (user_concentration) =>{
-    // Replace with database stuff eventually
-    const courseRequirements = new Map();
-    courseRequirements.set("Artificial Intelligence and Machine Learning", {
-        core: [4, 11],
-        concentration: [21,25,26], 
-        chosenElectiveOne: [1,6,9,5,17,18],
-        chosenElectiveTwo: [12,20,37,14,19,27],
-        project: [51,52,53,54,55,59,60],
-    })
-    courseRequirements.set("Systems", {
-        core: [4, 11],
-        concentration: [1,6,9], 
-        chosenElectiveOne: [21,25,26,23,30,32,50],
-        chosenElectiveTwo: [12,20,37,14,19,27],
-        project: [51,52,53,54,55,59,60],
-    })
-    courseRequirements.set("Theoretical Computer Science", {
-        core: [4, 11],
-        concentration: [12,20,37], 
-        chosenElectiveOne: [21,25,26,23,30,32,50],
-        chosenElectiveTwo: [1,6,9,5,17,18],
-        project: [51,52,53,54,55,59,60],
-    })
-    courseRequirements.set("Old Computer Science", {
-        core: [4, 11, 1, 6, 12, 37],
-        concentration: [], 
-        chosenElectiveOne: [],
-        chosenElectiveTwo: [],
-        project: [51,52,53,54,55,59,60],
-    })
-
-    const response = courseRequirements.get(user_concentration);
-    return response
-}
-
-const progressCalculator = async (user_courses, user_concentration) =>{
-    const creditValues = new Map();
-    creditValues.set("Artificial Intelligence and Machine Learning", {core: 7, concentration: 6, elective: 15, project: 3})
-    creditValues.set("Systems", {core: "7", concentration: 6, elective: 15, project: 3})
-    creditValues.set("Theoretical Computer Science", {core: 7, concentration: 6, elective: 15, project: 3})
-    creditValues.set("Old Computer Science", {core: 13, concentration: 0, elective: 15, project: 3})
-
-    // Getting different concentration requirements
-    const requirementValues = getCourseRequirements(user_concentration);
-    const chosenCore = requirementValues.core
-    const chosenConcentration = requirementValues.concentration
-    const chosenProject = requirementValues.project
-    const chosenElectiveOne = requirementValues.chosenElectiveOne
-    const chosenElectiveTwo = requirementValues.chosenElectiveTwo
-
-    // Core classes
-    let core = 0;
-    let comcore = 0;
-    let coreGPA = 0;
-    let comcoreGPA = 0;
-
-    // Concentration classes
-    let concentration = 0;
-    let comconcentration = 0;
-    let concentrationGPA = 0;
-    let comconcentrationGPA = 0; 
-
-    // Elective classes
-    let elective = 0;
-    let comelective = 0;
-    let electiveGPA = 0
-    let comelectiveGPA = 0
-
-    // Project class
-    let project = 0;
-    let comproject = 0;
-    let projectGPA = 0;
-    let comprojectGPA = 0;
-
-    // CSI breadth requirement
-    let csiElectiveOne = false;
-    let csiElectiveTwo = false;
-    let comcsiElectiveOne = false;
-    let comcsiElectiveTwo = false;
-    let breadth = 0;
-    let combreadth = 0;
-
-    user_courses.forEach((course) => {
-        // Checking for core classes
-        if (chosenCore.includes(course.id)){
-            if(convertGrade(course.grade) >= 3){
-                if(course.completed === "yes"){
-                    if(comcore < creditValues.get(user_concentration).core){
-                        comcore += course.credits;
-                        comcoreGPA += course.credits * convertGrade(course.grade);
-                        core += course.credits;
-                        coreGPA += course.credits * convertGrade(course.grade);
-                    } else {
-                        comelective += course.credits;
-                        comelectiveGPA += course.credits * convertGrade(course.grade);
-                        elective += course.credits;
-                        electiveGPA += course.credits * convertGrade(course.grade);
-                    }
-                } else{
-                    if(core < creditValues.get(user_concentration).core){
-                        core += course.credits;
-                        coreGPA += course.credits * convertGrade(course.grade);
-                    } else {
-                        elective += course.credits;
-                        electiveGPA += course.credits * convertGrade(course.grade);
-                    }
-                }
-            }
-        }
-
-        // Checking for concentration
-        else if (chosenConcentration.includes(course.id)){
-            if(course.completed === 'yes'){
-                if(comproject < creditValues.get(user_concentration).concentration){
-                    comconcentration += course.credits;
-                    comconcentrationGPA += course.credits * convertGrade(course.grade);
-                    concentration += course.credits;
-                    concentrationGPA += course.credits * convertGrade(course.grade);
-                } else {
-                    comelective += course.credits;
-                    comelectiveGPA += course.credits * convertGrade(course.grade);
-                    elective += course.credits;
-                    electiveGPA += course.credits * convertGrade(course.grade);
-                }
-            } else {
-                if(project < creditValues.get(user_concentration).concentration){
-                    concentration += course.credits;
-                    concentrationGPA += course.credits * convertGrade(course.grade);
-                } else {
-                    elective += course.credits;
-                    electiveGPA +=  course.credits * convertGrade(course.grade);
-                }
-            }
-        }
-        // Checking for project or thesis
-        else if (chosenProject.includes(course.id)){
-            if(course.completed === 'yes'){
-                if(comproject < creditValues.get(user_concentration).project){
-                    comproject += course.credits;
-                    comprojectGPA += course.credits * convertGrade(course.grade);
-                    project += course.credits;
-                    projectGPA += course.credits * convertGrade(course.grade);
-                } else {
-                    comelective += course.credits;
-                    comelectiveGPA += course.credits * convertGrade(course.grade);
-                    elective += course.credits;
-                    electiveGPA += course.credits * convertGrade(course.grade);
-                }
-            } else {
-                if(project < creditValues.get(user_concentration).project){
-                    project += course.credits;
-                    projectGPA += course.credits * convertGrade(course.grade);
-                } else {
-                    elective += course.credits;
-                    electiveGPA += course.credits * convertGrade(course.grade);
-                }
-            }
-        }
-        // Everything else is an elective
-        else {
-            if(course.completed === 'yes'){
-                comelective += course.credits;
-                comelectiveGPA += course.credits * convertGrade(course.grade);
-                elective += course.credits;
-                electiveGPA += course.credits * convertGrade(course.grade);
-                if (chosenElectiveOne.includes(course.id)){
-                    csiElectiveOne = true;
-                    comcsiElectiveOne = true;
-                }
-                if (chosenElectiveTwo.includes(course.id)){
-                    csiElectiveTwo = true
-                    comcsiElectiveTwo = true;
-                }
-            } else {
-                elective += course.credits;
-                electiveGPA += course.credits * convertGrade(course.grade);
-                if (chosenElectiveOne.includes(course.id)){
-                    comcsiElectiveOne = true
-                }
-                if (chosenElectiveTwo.includes(course.id)){
-                    comcsiElectiveTwo = true
-                }
-            }
-        }
+function calculateRequirement(userCourses, allowedCourses, requiredCredits) {
+    //Filter User Courses for Allowed Courses
+    const eligibleCourses = userCourses.filter(course =>
+      allowedCourses.includes(course.course_id)
+    );
+  
+    // If no eligible courses, return zeros
+    if (eligibleCourses.length === 0) {
+      return {
+        completed_credits: 0,
+        courses: [],
+        gpa: 0.0,
+      };
+    }
+  
+    // Add grade points and grade points per credit to each course
+    eligibleCourses.forEach(course => {
+      course.gradePoint = convertGrade(course.grade);
+      course.gradePointsPerCredit = course.gradePoint; // Since credits are the same unit
     });
-
-    if (csiElectiveOne && csiElectiveTwo){
-        breadth = 1;
+  
+    //Sort Courses by Grade Points per Credit (Descending)
+    eligibleCourses.sort((a, b) => b.gradePointsPerCredit - a.gradePointsPerCredit);
+  
+    // Accumulate courses to meet required credits, maximizing GPA
+    let accumulatedCredits = 0;
+    let selectedCourses = [];
+    let totalGradePoints = 0;
+  
+    for (let course of eligibleCourses) {
+      if (accumulatedCredits >= requiredCredits) {
+        break;
+      }
+      selectedCourses.push(course);
+      accumulatedCredits += course.credits;
+      totalGradePoints += course.gradePoint * course.credits;
     }
-    if (comcsiElectiveOne && comcsiElectiveTwo){
-        combreadth = 1;
-    }
+  
+    // If accumulated credits are less than required, return what we have
+    // Optionally, you can decide to only return if the required credits are met
+    // For now, we'll proceed with what's accumulated
+  
+    //Calculate GPA
+    const gpa = accumulatedCredits > 0 ? totalGradePoints / accumulatedCredits : 0.0;
+  
+    // Prepare the Result
+    return {
+      completed_credits: accumulatedCredits,
+      courses: selectedCourses,
+      gpa: parseFloat(gpa.toFixed(2)),
+    };
+  }
 
-    const progress = {
-        completedCore: comcore, 
-        completedConcentration: comconcentration, 
-        completedElective: comelective, 
-        completedProject: comproject, 
-        completedCoreGPA: comcoreGPA/comcore || 0,   
-        completedConcentrationGPA: comconcentrationGPA/comconcentration || 0,
-        completedElectiveGPA: comelectiveGPA/comelective || 0, 
-        completedProjectGPA: comprojectGPA/comproject || 0,
-        Core: core, Concentration: concentration, 
-        Elective: elective, 
-        Project: project,
-        CoreGPA: coreGPA/core || 0, 
-        ConcentrationGPA: concentrationGPA/concentration  || 0, 
-        ElectiveGPA: electiveGPA/elective  || 0, 
-        ProjectGPA: projectGPA/project  || 0,
-        BreadthRequirement: breadth,
-        comBreadthRequirement: combreadth,
-        }
-    return progress;
+async function calculateRequirementForCategory(userCourses, category, concentration, requiredCredits) {
+    let query = '';
+    let params = [];
+  
+    if (category === 'core') {
+      // Core courses common to all concentrations
+      query = `
+        SELECT cc.course_id
+        FROM course_concentrations cc
+        WHERE cc.concentration = 'Core' AND cc.major = 'CSI'
+      `;
+      params = [];
+    } else if (category === 'concentration') {
+      // Concentration core courses
+      query = `
+        SELECT cc.course_id
+        FROM course_concentrations cc
+        WHERE LOWER(cc.concentration) = LOWER(?) AND cc.major = 'CSI' AND cc.isConcentrationCore = 1
+      `;
+      params = [concentration];
+    }
+  
+    // Get allowed courses from the database
+    const [allowedCoursesRows] = await db.query(query, params);
+  
+    const allowedCourseIds = allowedCoursesRows.map(row => row.course_id);
+  
+    // Use calculateRequirement function
+    const result = calculateRequirement(userCourses, allowedCourseIds, requiredCredits);
+    return result;
+  }
+
+async function calculateElectiveRequirement(userCourses, concentration, requiredCredits, coreCourses, concentrationCourses) {
+    // Exclude core and concentration courses
+    const excludedCourseIds = [
+      ...coreCourses.map(course => course.course_id),
+      ...concentrationCourses.map(course => course.course_id),
+    ];
+  
+    // Get all CSI courses numbered 500 or above
+    const [allowedCoursesRows] = await db.query(
+      `SELECT id
+       FROM courses
+       WHERE department = 'CSI' AND CAST(number AS UNSIGNED) >= 500 AND id NOT IN (?)
+       `,
+      [excludedCourseIds.length > 0 ? excludedCourseIds : [0]]
+    );
+  
+    const allowedCourseIds = allowedCoursesRows.map(row => row.id);
+  
+    // Exclude courses that cannot be counted towards the degree
+    const nonCountableNumbers = ['600', '696', '697', '720', '890', '899'];
+    const [nonCountableCoursesRows] = await db.query(
+      `SELECT id FROM courses WHERE number IN (?)`,
+      [nonCountableNumbers]
+    );
+    const nonCountableCourseIds = nonCountableCoursesRows.map(row => row.id);
+  
+    // Remove non-countable courses from allowed courses
+    const finalAllowedCourseIds = allowedCourseIds.filter(id => !nonCountableCourseIds.includes(id));
+  
+    // Use calculateRequirement function
+    const result = calculateRequirement(userCourses, finalAllowedCourseIds, requiredCredits);
+    return result;
 }
 
-module.exports = { progressCalculator };
+async function checkBreadthRequirement(userCourses, userConcentration, coreCourses, concentrationCourses) {
+    // Exclude core courses and concentration core courses
+    const excludedCourseIds = [
+      ...coreCourses.map(course => course.course_id),
+      ...concentrationCourses.map(course => course.course_id),
+    ];
+  
+    // Filter user courses excluding core and concentration core courses
+    const userCourseIds = userCourses
+      .filter(course => !excludedCourseIds.includes(course.course_id))
+      .map(course => course.course_id);
+  
+    // Define concentration areas
+    const concentrationAreas = ['Artificial Intelligence and Machine Learning', 'Systems', 'Theoretical Computer Science'];
+  
+    // Initialize result
+    let breadthRequirementMet = true;
+    const breadthCoursesTaken = {};
+  
+    for (const concentration of concentrationAreas) {
+      // Get non-core courses for the concentration
+      const [areaCoursesRows] = await db.query(
+        `SELECT cc.course_id
+         FROM course_concentrations cc
+         WHERE cc.concentration = ? AND cc.major = 'CSI' AND cc.isConcentrationCore = 0`,
+        [concentration]
+      );
+      const areaCourseIds = areaCoursesRows.map(row => row.course_id);
+  
+      // Check if the user has taken any course from this area
+      const coursesInArea = userCourses.filter(
+        course => areaCourseIds.includes(course.course_id) && !excludedCourseIds.includes(course.course_id)
+      );
+  
+      if (coursesInArea.length > 0) {
+        // Record the courses taken in this concentration
+        breadthCoursesTaken[concentration] = coursesInArea;
+      } else {
+        breadthRequirementMet = false;
+        // Continue checking other concentrations
+      }
+    }
+  
+    return {
+      breadthRequirementMet,
+      breadthCoursesTaken, // Courses counted towards breadth requirement
+    };
+}
+  
+// Helper function to calculate project requirement
+function calculateProjectRequirement(userCourses, requiredCredits) {
+    const projectCourseIds = [51, 52, 53, 54, 55, 59, 60];
+  
+    // Use calculateRequirement function
+    const result = calculateRequirement(userCourses, projectCourseIds, requiredCredits);
+    return result;
+}
+
+async function calculateOldCSCoreRequirement(userCourses) {
+    // Mandatory core courses (CSI 503 and CSI 518)
+    const mandatoryCoreCourseIds = [4, 11];
+  
+    // Choice core courses (choose any two)
+    const choiceCoreCourseIds = [1, 6, 12, 37];
+  
+    // Filter user's courses for mandatory core courses
+    const mandatoryCoreCourses = userCourses.filter(course =>
+      mandatoryCoreCourseIds.includes(course.course_id)
+    );
+  
+    // Check if mandatory core courses are completed
+    const mandatoryCompleted = mandatoryCoreCourses.length === mandatoryCoreCourseIds.length;
+  
+    // Filter user's courses for choice core courses
+    const choiceCoreCourses = userCourses.filter(course =>
+      choiceCoreCourseIds.includes(course.course_id)
+    );
+  
+    // Select the best two courses from choice core courses to maximize GPA
+    const choiceCoreResult = calculateRequirement(choiceCoreCourses, choiceCoreCourseIds, 6); // Assuming each course is 3 credits
+  
+    // Total core courses
+    const coreCourses = [...mandatoryCoreCourses, ...choiceCoreResult.courses];
+  
+    // Calculate total credits and GPA
+    const totalCoreCredits = coreCourses.reduce((sum, course) => sum + course.credits, 0);
+    const totalGradePoints = coreCourses.reduce(
+      (sum, course) => sum + convertGrade(course.grade) * course.credits,
+      0
+    );
+    const coreGPA = totalCoreCredits > 0 ? totalGradePoints / totalCoreCredits : 0;
+  
+    // Check if GPA requirement is met
+    const gpaRequirementMet = coreGPA >= 3.0;
+  
+    return {
+      completed_credits: totalCoreCredits,
+      courses: coreCourses,
+      gpa: parseFloat(coreGPA.toFixed(2)),
+      mandatoryCompleted,
+      gpaRequirementMet,
+    };
+}
+
+async function calculateOldCSElectiveRequirement(userCourses, coreCourses) {
+    // Exclude core courses
+    const excludedCourseIds = coreCourses.map(course => course.course_id);
+  
+    // Allowed courses are those not in core courses
+    const electiveCourses = userCourses.filter(
+      course => !excludedCourseIds.includes(course.course_id)
+    );
+  
+    // Total elective credits required: 15
+    const requiredCredits = 15;
+  
+    // Use calculateRequirement to maximize GPA up to required credits
+    const electiveResult = calculateRequirement(electiveCourses, electiveCourses.map(c => c.course_id), requiredCredits);
+  
+    return electiveResult;
+}
+  
+async function calculateECEDepthRequirement(userCourses, selectedConcentration) {
+    // Get courses in the selected concentration area
+    const [depthCoursesRows] = await db.query(
+      `SELECT cc.course_id
+       FROM course_concentrations cc
+       WHERE LOWER(cc.concentration) = LOWER(?) AND cc.major = 'ECE'`,
+      [selectedConcentration]
+    );
+    const depthCourseIds = depthCoursesRows.map(row => row.course_id);
+  
+    // Use calculateRequirement
+    const depthResult = calculateRequirement(userCourses, depthCourseIds, 12);
+  
+    return depthResult;
+}
+
+async function calculateECEBreadthRequirement(userCourses, selectedConcentration) {
+    // Get courses outside the selected concentration area
+    const [breadthCoursesRows] = await db.query(
+      `SELECT cc.course_id
+       FROM course_concentrations cc
+       WHERE LOWER(cc.concentration) != LOWER(?) AND cc.major = 'ECE'`,
+      [selectedConcentration]
+    );
+    const breadthCourseIds = breadthCoursesRows.map(row => row.course_id);
+  
+    // Use calculateRequirement
+    const breadthResult = calculateRequirement(userCourses, breadthCourseIds, 6);
+  
+    return breadthResult;
+}
+  
+function calculateECEMathPhysicsRequirement(userCourses) {
+    // Allowed departments: MAT, PHY
+    const mathPhysicsCourses = userCourses.filter(
+      course => course.department === 'MAT' || course.department === 'PHY'
+    );
+  
+    // Require 3 credits
+    const requiredCredits = 3;
+  
+    const result = calculateRequirement(mathPhysicsCourses, mathPhysicsCourses.map(c => c.course_id), requiredCredits);
+  
+    return result;
+}
+  
+function calculateECETechnicalElectiveRequirement(userCourses, coreCourses, breadthCourses, mathPhysicsCourses) {
+    // Exclude courses already counted
+    const excludedCourseIds = [
+      ...coreCourses.map(c => c.course_id),
+      ...breadthCourses.map(c => c.course_id),
+      ...mathPhysicsCourses.map(c => c.course_id),
+    ];
+  
+    const electiveCourses = userCourses.filter(
+      course => !excludedCourseIds.includes(course.course_id)
+    );
+  
+    // Require 3 credits (or 6 credits for Non-Thesis Option)
+    requiredCredits = 3; // Adjust as needed
+    option = 'Thesis';
+    if (option === 'Thesis') {
+        requiredCredits = 3;
+    } else if (option === 'Project') {
+        requiredCredits = 6;
+    }
+  
+    const result = calculateRequirement(electiveCourses, electiveCourses.map(c => c.course_id), requiredCredits);
+  
+    return result;
+}
+
+function calculateECEThesisProjectRequirement(userCourses, option) {
+    let requiredCredits = 0;
+    let allowedCourseIds = [];
+  
+    if (option === 'Thesis') {
+      requiredCredits = 6;
+      allowedCourseIds = [108];
+    } else if (option === 'Project') {
+      requiredCredits = 3;
+      allowedCourseIds = [106];
+    }
+  
+    const result = calculateRequirement(userCourses, allowedCourseIds, requiredCredits);
+  
+    return result;
+}
+  
+  
+
+module.exports = {
+  convertGrade,
+  calculateRequirement,
+  calculateRequirementForCategory,
+  calculateElectiveRequirement,
+  calculateProjectRequirement,
+  calculateECEThesisProjectRequirement,
+  calculateECETechnicalElectiveRequirement,
+  calculateECEMathPhysicsRequirement,
+  calculateECEDepthRequirement,
+  calculateECEBreadthRequirement,
+  calculateOldCSElectiveRequirement,
+  calculateOldCSCoreRequirement,
+  checkBreadthRequirement,
+};

@@ -148,8 +148,9 @@ require('dotenv').config();
           }
 
           // Map 'Core' to 1, blank or other values to 0
-          const isCore = isConcentrationCore === 'Core' ? 1 : 0;
-
+          const isCore = isConcentrationCore === 'Core' ? true : false;
+          //console.log(courseCode);
+          //console.log(isCore)
           // Insert for CSI concentration
           if (csiConcentration && csiConcentration !== 'none') {
             if (!validConcentrations.includes(csiConcentration)) {
