@@ -23,7 +23,7 @@ const handleSubmit = async (event) => {
 	if (!email || !password) {
 		setWarning("Please fill out all required fields.");
 		return; // Prevent submission
-	  }
+	}
 	try {
 	const response = await axios.post(`${process.env.REACT_APP_SERVER_URL}/users/signin`, { email, password });
 	sessionStorage.setItem('userID', response.data[0].id);

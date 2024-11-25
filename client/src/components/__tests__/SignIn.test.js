@@ -10,6 +10,13 @@ const mockSetIsUserSignedIn = jest.fn();
 
 
 describe("SignIn Component", () => {
+    beforeAll(() => {
+        jest.spyOn(global.console, "log").mockImplementation(() => {}); // Suppress console.log
+    });
+    afterAll(() => {
+        jest.restoreAllMocks(); // Restore original behavior
+    });
+
     const renderWithContext = () =>
         render(
         <UserContext.Provider value={{ setIsUserSignedIn: mockSetIsUserSignedIn }}>

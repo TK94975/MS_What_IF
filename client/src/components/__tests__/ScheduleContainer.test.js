@@ -6,6 +6,12 @@ import axios from "axios";
 jest.mock("axios")
 
 describe('ScheduleContainer Component', () => {
+    beforeAll(() => {
+        jest.spyOn(global.console, "log").mockImplementation(() => {}); // Suppress console.log
+    });
+    afterAll(() => {
+        jest.restoreAllMocks(); // Restore original behavior
+    });
     it("Renders default schedule with no courses when user is not signed in", async () => {
         const mockContextValue = {
             isUserSignedIn: false, // User is not signed in
