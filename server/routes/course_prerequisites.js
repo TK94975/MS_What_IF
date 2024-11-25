@@ -60,4 +60,30 @@ router.get('/:course_id', async (req, res) => {
   }
 });
 
+
+// GET prerequisites for a course by course_id
+router.get('/inverse/:course_id', async (req, res) => {
+  const courseId = req.params.course_id;
+
+  try {
+    const [rows] = await db.execute(
+      `SELECT cp.course_id, c.department, c.number, c.title, cp.grade
+       FROM course_prerequisites cp
+       JOIN courses c ON cp.course_id = c.id
+       WHERE cp.prereq_course_id = ?`,
+      [courseId]
+    );
+
+    // If no prerequisites found
+    if (rows.length === 0) {
+      return res.status(404).json({ message: 'This course is not a prereq for any other course' });
+    }
+
+    res.json(rows);
+  } catch (err) {
+    console.error('Error retrieving inverted prerequisites:', err.message);
+    res.status(500).json({ error: 'An error occurred while retrieving prerequisites.' });
+  }
+});
+
 module.exports = router;

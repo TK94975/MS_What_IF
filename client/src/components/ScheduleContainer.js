@@ -197,7 +197,43 @@ const ScheduleContainer =  () => {
         setSelectedCourseRemove('');
     }
     // Actually removing the course
-    const handleRemoveCourse = (badCourse) =>{
+    const handleRemoveCourse = async (badCourse) =>{
+        // TODO: Add the prereq check
+        //TODO:
+        let course_id = badCourse.id
+        let prereq = []
+
+        // Get the prerequisites for this new course
+        try {
+            let response = await axios.get(`${process.env.REACT_APP_SERVER_URL}/course_prerequisites/inverse/${course_id}`);
+            console.log('Prereqs found')
+            prereq = response.data
+            console.log(response.data)
+        }
+        catch (err) {
+            console.log(err.response.data.message)
+            prereq = []
+        }
+        
+        if(prereq.length > 0) {
+            // Check if the found courses exist in schedule
+            let i = 0
+            let j = 0
+            while(i < prereq.length) {
+                let dependent_class = prereq[i]
+                while(j < courses.length) {
+                    let current_class = courses[j]
+                    if(current_class.number == dependent_class.number) {
+                        alert(`Cannot remove ${badCourse.department}${badCourse.number} because ${dependent_class.department}${dependent_class.number} is dependent on it!\nPlease remove ${dependent_class.department}${dependent_class.number} first.`)
+                        return;
+                    }
+                    j+=1
+                }
+                j=0
+                i+=1
+            }
+        }
+        //
         const updatedCourses = courses.filter((course) => 
             !(course.id === badCourse.id && course.year === badCourse.year && course.semester === badCourse.semester)
         );
@@ -269,8 +305,75 @@ const ScheduleContainer =  () => {
     },[addCourseNumber])
 
     // Actually adding the course
-    const handleAddNewCourse = (event) =>{
+    const handleAddNewCourse = async (event) =>{
         event.preventDefault(); // Stops the page from rerendering
+        console.log("handleAddNewCourse: Checking for dependency conflicts")
+        //TODO:
+        let course_id = addCourseBucketNumber[addCourseDepartment].get(Number(addCourseNumber))
+        let prereq = []
+        let prereq_satisfied = true
+
+        // Get the prerequisites for this new course
+        try {
+            let response = await axios.get(`${process.env.REACT_APP_SERVER_URL}/course_prerequisites/${course_id}`);
+            console.log('Prereqs found')
+            prereq = response.data
+            console.log(response.data)
+        }
+        catch (err) {
+            console.log(err.response.data.message)
+            prereq = []
+        }
+        let any_prereq_found = prereq.length === 0
+        if(prereq.length > 0) {
+            let classes_found = false
+            let semester_map = {
+                "winter": 0,
+                "spring": 1,
+                "summer": 2,
+                "fall": 3
+            }
+            prereq.map(pr => {
+                let prereq_num = pr.number
+                let i = 0
+                while(i < courses.length) {
+                    let current_course_number = courses[i].number
+                    let error_msg = `${addCourseDepartment}${addCourseNumber} MUST occur after ${courses[i].semester} ${courses[i].year} (prerequisite class ${pr.department}${prereq_num})`
+                    // We found the prerequisite class in the schedule
+                    if(current_course_number == prereq_num) {
+                        any_prereq_found = true
+                        // check if there are prerequisites before this course
+                        if(addYear < courses[i].year) {
+                            // TODO: Error
+                            prereq_satisfied = false
+                            alert(error_msg)
+                        }
+                        else if( addYear == courses[i].year && semester_map[addSemester.toLowerCase()] <= semester_map[courses[i].semester.toLowerCase()]) {
+                            //TODO: Error
+                            prereq_satisfied = false
+                            alert(error_msg)
+                        }
+                        else {
+                            //This class is valid
+                            classes_found = true
+                            // If prereqs are valid, this will stay valid
+                            prereq_satisfied = prereq_satisfied && classes_found
+                        }
+                    }
+                    i+=1
+                }
+            })
+            console.log(courses)
+            // check if there are prerequisites after this course
+        }
+        if (!prereq_satisfied || !any_prereq_found) {
+            //Error occured so return
+            if (!any_prereq_found) {
+                alert(`No prerequisite courses found in schedule! Please use the course lookup on the right sidebar for more information regarding ${addCourseDepartment}${addCourseNumber}`)
+            }
+            console.log("Prereq check FAILED... Exiting")
+            return;
+        }
         console.log("Adding new course");
         // Remove placeholder class if exists
         let updatedCourses = courses.filter(
@@ -278,7 +381,7 @@ const ScheduleContainer =  () => {
         );
         // Create new course entry
         const newCourse = {
-            id: addCourseBucketNumber[addCourseDepartment].get(Number(addCourseNumber)),
+            id: course_id,
             year: addYear,
             semester: addSemester,
             department: addCourseDepartment,
