@@ -20,6 +20,10 @@ const [warning, setWarning] = useState("");
 
 const handleSubmit = async (event) => {
 	event.preventDefault();
+	if (!email || !password) {
+		setWarning("Please fill out all required fields.");
+		return; // Prevent submission
+	  }
 	try {
 	const response = await axios.post(`${process.env.REACT_APP_SERVER_URL}/users/signin`, { email, password });
 	sessionStorage.setItem('userID', response.data[0].id);
@@ -85,7 +89,7 @@ return (
 			</Form.Group>
 
 
-			<Button variant="primary" type="submit">
+			<Button variant="primary" type="submit" id="submit_signin" data-testid="submit-signin">
 			Sign In
 			</Button>
 			
