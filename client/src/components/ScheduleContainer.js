@@ -274,18 +274,70 @@ const ScheduleContainer =  () => {
         console.log("handleAddNewCourse: Checking for dependency conflicts")
         //TODO:
         let course_id = addCourseBucketNumber[addCourseDepartment].get(Number(addCourseNumber))
+        let prereq = []
+        let prereq_satisfied = true
+        let any_prereq_found = false
+
         // Get the prerequisites for this new course
         try {
-            let response = await axios.post(`${process.env.REACT_APP_SERVER_URL}/course_prerequisites/course_id`, {
-                id: course_id
-            });
-            console.log(response)
+            let response = await axios.get(`${process.env.REACT_APP_SERVER_URL}/course_prerequisites/${course_id}`);
+            console.log('Prereqs found')
+            prereq = response.data
+            console.log(response.data)
         }
         catch (err) {
-            console.log(err)
+            console.log(err.response.data.message)
+            prereq = []
         }
-        // check if there are prerequisites before this course
-        // check if there are prerequisites after this course
+        if(prereq.length > 0) {
+            let classes_found = false
+            let semester_map = {
+                "winter": 0,
+                "spring": 1,
+                "summer": 2,
+                "fall": 3
+            }
+            prereq.map(pr => {
+                let prereq_num = pr.number
+                let i = 0
+                while(i < courses.length) {
+                    let current_course_number = courses[i].number
+                    let error_msg = `${addCourseDepartment}${addCourseNumber} MUST occur after ${courses[i].semester} ${courses[i].year} (prerequisite class ${pr.department}${prereq_num})`
+                    // We found the prerequisite class in the schedule
+                    if(current_course_number == prereq_num) {
+                        any_prereq_found = true
+                        // check if there are prerequisites before this course
+                        if(addYear < courses[i].year) {
+                            // TODO: Error
+                            prereq_satisfied = false
+                            alert(error_msg)
+                        }
+                        else if( addYear == courses[i].year && semester_map[addSemester.toLowerCase()] <= semester_map[courses[i].semester.toLowerCase()]) {
+                            //TODO: Error
+                            prereq_satisfied = false
+                            alert(error_msg)
+                        }
+                        else {
+                            //This class is valid
+                            classes_found = true
+                            // If prereqs are valid, this will stay valid
+                            prereq_satisfied = prereq_satisfied && classes_found
+                        }
+                    }
+                    i+=1
+                }
+            })
+            console.log(courses)
+            // check if there are prerequisites after this course
+        }
+        if (!prereq_satisfied || !any_prereq_found) {
+            //Error occured so return
+            if (!any_prereq_found) {
+                alert(`No prerequisite courses found in schedule! Please use the course lookup on the right sidebar for more information regarding ${addCourseDepartment}${addCourseNumber}`)
+            }
+            console.log("Prereq check FAILED... Exiting")
+            return;
+        }
         console.log("Adding new course");
         // Remove placeholder class if exists
         let updatedCourses = courses.filter(
