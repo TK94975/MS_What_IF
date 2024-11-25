@@ -34,13 +34,15 @@ const MajorConcentrationSelector = () => {
         <Container>
         <Row>
             <Form.Group as={Row}>
-            <Form.Label column sm={3}>
+            <Form.Label column sm={3} id="major-label">
                 Major
             </Form.Label>
             <Col sm={9}>
                 <Form.Select 
+                    aria-labelledby="major-label"
                     value={selectedMajor} 
-                    onChange={(e) => handleMajorChange(e.target.value)}>
+                    onChange={(e) => handleMajorChange(e.target.value)}
+                >
                     {majors.map((major) => (
                     <option key={major[0]} value={major[0]}>
                     {major[1]}
@@ -52,11 +54,12 @@ const MajorConcentrationSelector = () => {
         </Row>
         <Row>
             <Form.Group as={Row}>
-            <Form.Label column sm={3}>
+            <Form.Label column sm={3} id="concentration-label">
                 Concentration
             </Form.Label>
             <Col sm={9}>
                 <Form.Select
+                aria-labelledby="concentration-label"
                 value={selectedConcentration}
                 onChange={(e) => handleConcentrationChange(e.target.value)}
                 disabled={!concentrations[selectedMajor]?.length}

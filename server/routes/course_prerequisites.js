@@ -35,18 +35,28 @@ router.post('/', async (req, res) => {
   }
 });
 
-// GET /course_prerequisites/course_id - Retrieve course prerequisites for specific class
-router.post('/course_id', async (req, res) => {
-  const course_id = req.body.id; // Retrieve `id` from query parameters
+// GET prerequisites for a course by course_id
+router.get('/:course_id', async (req, res) => {
+  const courseId = req.params.course_id;
+
   try {
-    const [prereqs] = await db.query(
-      'SELECT * FROM course_prerequisites WHERE course_id = ?',
-      [course_id]
+    const [rows] = await db.execute(
+      `SELECT cp.prereq_course_id, c.department, c.number, c.title, cp.grade
+       FROM course_prerequisites cp
+       JOIN courses c ON cp.prereq_course_id = c.id
+       WHERE cp.course_id = ?`,
+      [courseId]
     );
-    res.json(prereqs);
+
+    // If no prerequisites found
+    if (rows.length === 0) {
+      return res.status(404).json({ message: 'No prerequisites found for this course.' });
+    }
+
+    res.json(rows);
   } catch (err) {
-    console.error('Error fetching course prerequisites:', err);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error('Error retrieving prerequisites:', err.message);
+    res.status(500).json({ error: 'An error occurred while retrieving prerequisites.' });
   }
 });
 

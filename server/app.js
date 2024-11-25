@@ -12,7 +12,7 @@ const db = require('./config/db'); // Import the database connection
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
 const coursesRouter = require('./routes/courses');
-const coursePrerequisitesRouter = require('./routes/courses');
+const coursePrerequisitesRouter = require('./routes/course_prerequisites');
 const userCoursesRouter = require('./routes/user_courses')
 const progressRouter = require('./routes/progress')
 
