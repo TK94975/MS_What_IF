@@ -59,6 +59,45 @@ router.get('/:concentration', async (req, res) => {
     }
 });
 
+// GET route to fetch course concentration by department and course_id
+router.get('/:department/:course_id/concentration', async (req, res) => {
+    const department = req.params.department;
+    const course_id = parseInt(req.params.course_id, 10);
+  
+    try {
+      // verifying course exists
+      const [courseRows] = await db.query(
+        'SELECT id, number, title FROM courses WHERE department = ? AND id = ?',
+        [department, course_id]
+      );
+  
+      if (courseRows.length === 0) {
+        return res.status(404).json({ error: 'Course not found' });
+      }
+  
+      const course = courseRows[0];
+  
+      // Query
+      const [concentrationRows] = await db.query(
+        'SELECT concentration, isConcentrationCore FROM course_concentrations WHERE course_id = ? AND major = ?',
+        [course_id, department]
+      );
+  
+      if (concentrationRows.length === 0) {
+        return res.status(404).json({ error: 'No concentration found for this course' });
+      }
+  
+      const concentrationInfo = concentrationRows[0];
+  
+      // Respond with concentration
+      res.json({ concentration: concentrationInfo.concentration });
+
+    } catch (error) {
+      console.error('Error fetching course concentration:', error);
+      res.status(500).json({ error: 'An error occurred while fetching course concentration.' });
+    }
+  });
+
 
 
 
