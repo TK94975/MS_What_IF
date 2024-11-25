@@ -36,7 +36,7 @@ const ScheduleContainer =  () => {
     const [addSemester, setAddSemester] = useState(''); // Semester for add semester/course modal
     const [addCourseDepartment, setAddCourseDepartment] = useState('') // Department of new class
     const [addCourseNumber, setAddCourseNumber] = useState(''); // Course # of new class
-    const [addCourseBucketDepartment, setAddCourseBucketDepartment] = useState(['CSI', 'ECE']); // New class department options
+    const [addCourseBucketDepartment, setAddCourseBucketDepartment] = useState(['CSI', 'ECE','PHY','MAT']); // New class department options
     const [addCourseBucketNumber, setAddCourseBucketNumber] = useState({}) // Array of Maps {CSI: [number: id], ECE" [number:id]}
 
     /* Fetching user courses from the database */
@@ -261,14 +261,20 @@ const ScheduleContainer =  () => {
             const availableCourses = response.data;
             let csiNumbers = new Map();
             let eceNumbers = new Map();
+            let phyNumbers = new Map();
+            let matNumbers = new Map();
             availableCourses.forEach((course) => {
                 if(course.department === 'CSI'){
                     csiNumbers.set(course.number, course.id)
+                }if(course.department === 'PHY'){
+                    phyNumbers.set(course.number, course.id)
+                }if(course.department === 'MAT'){
+                    matNumbers.set(course.number, course.id)
                 } else {
                     eceNumbers.set(course.number, course.id)
                 }
             });
-            const formatedNumbers = {CSI: csiNumbers, ECE: eceNumbers};
+            const formatedNumbers = {CSI: csiNumbers, ECE: eceNumbers,PHY: phyNumbers,MAT: matNumbers};
             setAddCourseBucketNumber(formatedNumbers);
             setAddCourseDepartment('CSI');
             setAddCourseNumber("500");
