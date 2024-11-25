@@ -223,7 +223,7 @@ const ScheduleContainer =  () => {
                 let dependent_class = prereq[i]
                 while(j < courses.length) {
                     let current_class = courses[j]
-                    if(current_class.number == dependent_class.number) {
+                    if(current_class.number === dependent_class.number) {
                         alert(`Cannot remove ${badCourse.department}${badCourse.number} because ${dependent_class.department}${dependent_class.number} is dependent on it!\nPlease remove ${dependent_class.department}${dependent_class.number} first.`)
                         return;
                     }
@@ -346,7 +346,7 @@ const ScheduleContainer =  () => {
                     let current_course_number = courses[i].number
                     let error_msg = `${addCourseDepartment}${addCourseNumber} MUST occur after ${courses[i].semester} ${courses[i].year} (prerequisite class ${pr.department}${prereq_num})`
                     // We found the prerequisite class in the schedule
-                    if(current_course_number == prereq_num) {
+                    if(current_course_number === prereq_num) {
                         any_prereq_found = true
                         // check if there are prerequisites before this course
                         if(addYear < courses[i].year) {
@@ -354,7 +354,7 @@ const ScheduleContainer =  () => {
                             prereq_satisfied = false
                             alert(error_msg)
                         }
-                        else if( addYear == courses[i].year && semester_map[addSemester.toLowerCase()] <= semester_map[courses[i].semester.toLowerCase()]) {
+                        else if( addYear === courses[i].year && semester_map[addSemester.toLowerCase()] <= semester_map[courses[i].semester.toLowerCase()]) {
                             //TODO: Error
                             prereq_satisfied = false
                             alert(error_msg)
