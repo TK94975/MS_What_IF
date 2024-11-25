@@ -197,7 +197,43 @@ const ScheduleContainer =  () => {
         setSelectedCourseRemove('');
     }
     // Actually removing the course
-    const handleRemoveCourse = (badCourse) =>{
+    const handleRemoveCourse = async (badCourse) =>{
+        // TODO: Add the prereq check
+        //TODO:
+        let course_id = badCourse.id
+        let prereq = []
+
+        // Get the prerequisites for this new course
+        try {
+            let response = await axios.get(`${process.env.REACT_APP_SERVER_URL}/course_prerequisites/inverse/${course_id}`);
+            console.log('Prereqs found')
+            prereq = response.data
+            console.log(response.data)
+        }
+        catch (err) {
+            console.log(err.response.data.message)
+            prereq = []
+        }
+        
+        if(prereq.length > 0) {
+            // Check if the found courses exist in schedule
+            let i = 0
+            let j = 0
+            while(i < prereq.length) {
+                let dependent_class = prereq[i]
+                while(j < courses.length) {
+                    let current_class = courses[j]
+                    if(current_class.number == dependent_class.number) {
+                        alert(`Cannot remove ${badCourse.department}${badCourse.number} because ${dependent_class.department}${dependent_class.number} is dependent on it!\nPlease remove ${dependent_class.department}${dependent_class.number} first.`)
+                        return;
+                    }
+                    j+=1
+                }
+                j=0
+                i+=1
+            }
+        }
+        //
         const updatedCourses = courses.filter((course) => 
             !(course.id === badCourse.id && course.year === badCourse.year && course.semester === badCourse.semester)
         );
@@ -276,7 +312,6 @@ const ScheduleContainer =  () => {
         let course_id = addCourseBucketNumber[addCourseDepartment].get(Number(addCourseNumber))
         let prereq = []
         let prereq_satisfied = true
-        let any_prereq_found = false
 
         // Get the prerequisites for this new course
         try {
@@ -289,6 +324,7 @@ const ScheduleContainer =  () => {
             console.log(err.response.data.message)
             prereq = []
         }
+        let any_prereq_found = prereq.length === 0
         if(prereq.length > 0) {
             let classes_found = false
             let semester_map = {
