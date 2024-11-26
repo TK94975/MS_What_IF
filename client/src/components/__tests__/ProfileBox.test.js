@@ -5,7 +5,6 @@ import ProfileBox from '../ProfileBox';
 
 describe('ProfileBox Component', () => {
   beforeEach(() => {
-    jest.spyOn(global.console, "log").mockImplementation(() => {}); // Suppress console.log
     // Mock sessionStorage for each test
     jest.spyOn(window.sessionStorage.__proto__, 'getItem').mockImplementation((key) => {
       const storage = {

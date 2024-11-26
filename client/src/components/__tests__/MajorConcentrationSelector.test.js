@@ -4,12 +4,6 @@ import { UserContext } from '../../context/userContext';
 import MajorConcentrationSelector from '../MajorConcentrationSelector';
 
 describe('MajorConcentrationSelector Component', () => {
-    beforeAll(() => {
-        jest.spyOn(global.console, "log").mockImplementation(() => {}); // Suppress console.log
-    });
-    afterAll(() => {
-        jest.restoreAllMocks(); // Restore original behavior
-    });
     it('Checks if default major and concentration are displayed', () => {
         render(
         <UserContext.Provider value={{ 

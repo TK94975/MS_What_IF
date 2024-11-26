@@ -7,12 +7,6 @@ import { UserContext } from "../../context/userContext";
 jest.mock("axios");
 
 describe("SignUp Component", () => {
-    beforeAll(() => {
-        jest.spyOn(global.console, "log").mockImplementation(() => {}); // Suppress console.log
-    });
-    afterAll(() => {
-        jest.restoreAllMocks(); // Restore original behavior
-    });
     it("renders the Sign-Up form after clicking link", () => {
         render(
             <UserContext.Provider value={{}}>
