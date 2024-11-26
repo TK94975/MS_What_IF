@@ -418,4 +418,80 @@ describe('ScheduleContainer Component', () => {
         expect(alertMock).toHaveBeenCalledTimes(1)
     });
 
+    it("test dependency checking course removal", async () => {
+        const mockSetCourses = jest.fn()
+        const mockContextValue = {
+            isUserSignedIn: false, // User is not signed in
+            courses: [{ id: 1, department: "CSI", number: "521", title: "Discrete Math", semester:'Fall', year: 2022, grade:'A'},
+                { id: 14, department: "CSI", number: "503", title: "Algorithms", semester:'Fall', year: 2023, grade:'A'}
+            ], // No courses
+            setCourses: mockSetCourses, // Mock function for updating courses
+        };
+        // Axios response for course options
+        const mockResponse = {
+            data: [
+            { id: 14, department: "CSI", number: "503", title: "Advanced Algorithms" },
+            ],
+        };
+        axios.get.mockResolvedValueOnce(mockResponse);
+        // Axios response for course options
+        const mockDependencies = {
+            data: [
+            { id: 1, department: "CSI", number: "521", title: "Discrete Math" },
+            ],
+        };
+        axios.get.mockResolvedValueOnce(mockDependencies);
+
+        // Axios response for default course description
+        axios.post.mockImplementation((url) => {
+            console.log("axios.post called with URL:", url);
+            if (url && url.endsWith("/courses/course_description")) {
+                return Promise.resolve({
+                    data: {
+                        department: "CSI",
+                        number: "503",
+                        title: "Advanced Algorithms",
+                        description: "P vs NP",
+                    },
+                });
+            }
+            return Promise.reject(new Error(`Unexpected axios.post call to ${url}`));
+        });
+
+        // Axios response for default course description
+        axios.get.mockImplementation((url) => {
+            console.log("axios.post called with URL:", url);
+            if (url && url.endsWith("/course_prerequisites/inverse/14")) {
+                //cp.prereq_course_id, c.department, c.number, c.title, cp.grade
+                return Promise.resolve(mockDependencies);
+            }
+            return Promise.reject(new Error(`Unexpected axios.post call to ${url}`));
+        });
+
+        // Mock the alert function
+        const alertMock = jest.spyOn(window, 'alert').mockImplementation(() => {});
+
+        await act(async () => {
+            render(
+                <UserContext.Provider value={mockContextValue}>
+                    <ScheduleContainer />
+                </UserContext.Provider>
+            );
+        });
+
+        // Click remove course to get modal
+        const submitButton = screen.getAllByTestId("btn-removeCourse")[0]
+        await act(async () => {
+            fireEvent.click(submitButton);
+        })
+
+        // Click remove course final
+        const removeCourseFinalButtons = screen.getByTestId("btn-finalRemoveCourse")
+        await act(async () => {
+            fireEvent.click(removeCourseFinalButtons);
+        })
+        
+        expect(alertMock).toHaveBeenCalledTimes(1)
+    });
+
 });

@@ -464,6 +464,7 @@ const ScheduleContainer =  () => {
                                                         variant='danger'
                                                         size='sm'
                                                         onClick={()=>handleShowRemoveCourseWarning(course)}
+                                                        data-testid="btn-removeCourse"
                                                         >
                                                         X
                                                         </Button>
@@ -593,6 +594,7 @@ const ScheduleContainer =  () => {
                         <Col xs={2}>
                             <Button
                                 onClick={()=>handleRemoveCourse(selectedCourseRemove)}
+                                data-testid="btn-finalRemoveCourse"
                             >
                                 Yes
                             </Button>
