@@ -29,6 +29,10 @@ const [checkPassword, setCheckPassword] = useState("");
 const [warning, setWarning] = useState("");
 const handleSubmit = async (event) => {
 	event.preventDefault();
+	if (!email || !password || !checkPassword) {
+		setWarning("Please fill out all required fields.");
+		return; // Prevent submission
+	}
 	if (password !== checkPassword) {
 	setWarning("Passwords do not match.");
 	return;
@@ -161,7 +165,7 @@ return (
 					<p className="text-danger">{warning}</p>
 				</Form.Group>
 
-				<Button variant="primary" type="submit">
+				<Button variant="primary" type="submit" id="submit_signup" data-testid="submit-signup">
 					Sign Up
 				</Button>
 				</Col>

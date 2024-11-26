@@ -31,7 +31,8 @@ describe('MajorConcentrationSelector Component', () => {
             <MajorConcentrationSelector />
         </UserContext.Provider>
         );
-      // Find the major dropdown
+
+    // Find the major dropdown
     const majorDropdown = screen.getByLabelText(/Major/i);
     expect(majorDropdown).toBeInTheDocument();
 
@@ -55,7 +56,7 @@ describe('MajorConcentrationSelector Component', () => {
             <MajorConcentrationSelector />
         </UserContext.Provider>
         );
-      // Find the major dropdown
+    // Find the major dropdown
     const concentrationDropdown = screen.getByLabelText(/Concentration/i);
     expect(concentrationDropdown).toBeInTheDocument();
 

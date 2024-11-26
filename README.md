@@ -70,3 +70,10 @@ To import an existing test user with existing course and progress data to the My
     cd server/
     node __test__/import_test_user
 ```
+
+10. **Running frontend tests**
+To run Jest implementation tests for frontend componenets, use the following commands
+```bash
+    cd client/
+    node npm test
+```

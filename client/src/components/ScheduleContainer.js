@@ -223,7 +223,7 @@ const ScheduleContainer =  () => {
                 let dependent_class = prereq[i]
                 while(j < courses.length) {
                     let current_class = courses[j]
-                    if(current_class.number == dependent_class.number) {
+                    if(current_class.number === dependent_class.number) {
                         alert(`Cannot remove ${badCourse.department}${badCourse.number} because ${dependent_class.department}${dependent_class.number} is dependent on it!\nPlease remove ${dependent_class.department}${dependent_class.number} first.`)
                         return;
                     }
@@ -346,7 +346,7 @@ const ScheduleContainer =  () => {
                     let current_course_number = courses[i].number
                     let error_msg = `${addCourseDepartment}${addCourseNumber} MUST occur after ${courses[i].semester} ${courses[i].year} (prerequisite class ${pr.department}${prereq_num})`
                     // We found the prerequisite class in the schedule
-                    if(current_course_number == prereq_num) {
+                    if(current_course_number === prereq_num) {
                         any_prereq_found = true
                         // check if there are prerequisites before this course
                         if(addYear < courses[i].year) {
@@ -354,7 +354,7 @@ const ScheduleContainer =  () => {
                             prereq_satisfied = false
                             alert(error_msg)
                         }
-                        else if( addYear == courses[i].year && semester_map[addSemester.toLowerCase()] <= semester_map[courses[i].semester.toLowerCase()]) {
+                        else if( addYear === courses[i].year && semester_map[addSemester.toLowerCase()] <= semester_map[courses[i].semester.toLowerCase()]) {
                             //TODO: Error
                             prereq_satisfied = false
                             alert(error_msg)
@@ -482,10 +482,10 @@ const ScheduleContainer =  () => {
             {/* Add semester and save change buttons */}
             <Row className="align-items-center" style={{ marginTop: '20px' }}>
                 <Col style={{ textAlign: 'left', display: 'flex', gap: '10px' }}>
-                    <Button onClick={handleAddSemesterForm}>
+                    <Button onClick={handleAddSemesterForm} id="show_addsemester" data-testid="show_addsemester">
                     Add Semester
                     </Button>
-                    <Button onClick={handleShowAddCourseForm}>
+                    <Button onClick={handleShowAddCourseForm} id="show_addcourse" data-testid="show_addcourse">
                     Add Course
                     </Button>
                 </Col>
@@ -535,22 +535,24 @@ const ScheduleContainer =  () => {
                     <ModalBody>
                             <Form>
                                 <Form.Group className="mb-3" controlId="formYear">
-                                    <Form.Label>Year</Form.Label>
+                                    <Form.Label id="addsemester-year-field">New Year</Form.Label>
                                     <Form.Select
+                                    aria-labelledby="addsemester-year-field"
                                     value={addYear}
                                     onChange={(e) => handleSetAddYear(e.target.value)}
                                     >
                                     <option value="" disabled>Select a year</option>
                                     {yearOptions.map((value) => (
                                         <option key={value} value={value}>
-                                        {value}
+                                            {value}
                                         </option>
                                     ))}
                                     </Form.Select>
                                 </Form.Group>
                                 <Form.Group className="mb-3" controlId="formYear">
-                                    <Form.Label>Semester</Form.Label>
+                                    <Form.Label id="addsemester-semester-field">New Semester</Form.Label>
                                     <Form.Select
+                                    aria-labelledby="addsemester-semester-field"
                                     value={addSemester}
                                     onChange={(e) => handleSetAddSemester(e.target.value)}
                                     >
@@ -565,6 +567,7 @@ const ScheduleContainer =  () => {
                             </Form>
                             <Col style={{ textAlign: 'right' }}>
                                 <Button
+                                data-testid="submit-addsemester"
                                 onClick={handleAddNewSemester}
                                 >
                                     Add
@@ -621,8 +624,9 @@ const ScheduleContainer =  () => {
                     <ModalBody>
                             <Form onSubmit={handleAddNewCourse}>
                                 <Form.Group className="mb-3" controlId="formYear">
-                                    <Form.Label>Year</Form.Label>
+                                    <Form.Label id="addcourse-year-field">Select Year</Form.Label>
                                     <Form.Select
+                                    aria-labelledby="addcourse-year-field"
                                     value={addYear}
                                     onChange={(e) => handleSetAddYear(e.target.value)}
                                     required
@@ -636,8 +640,9 @@ const ScheduleContainer =  () => {
                                     </Form.Select>
                                 </Form.Group>
                                 <Form.Group className="mb-3" controlId="formYear">
-                                    <Form.Label>Semester</Form.Label>
+                                    <Form.Label id="addcourse-semester-field" >Select Semester</Form.Label>
                                     <Form.Select
+                                    aria-labelledby="addcourse-semester-field"
                                     value={addSemester}
                                     onChange={(e) => handleSetAddSemester(e.target.value)}
                                     required
@@ -652,8 +657,9 @@ const ScheduleContainer =  () => {
                                 </Form.Group>
 
                                 <Form.Group className="mb-3" controlId="formDepartment">
-                                    <Form.Label>Department</Form.Label>
+                                    <Form.Label id="addcourse-department-field">Department</Form.Label>
                                     <Form.Select
+                                    aria-labelledby="addcourse-department-field"
                                     value={addCourseDepartment}
                                     onChange={handleAddCourseDepartmentChange}
                                     required
@@ -667,8 +673,9 @@ const ScheduleContainer =  () => {
                                 </Form.Group>
 
                                 <Form.Group className="mb-3" controlId="formNumber">
-                                    <Form.Label>Number</Form.Label>
+                                    <Form.Label id="addcourse-number-field">Number</Form.Label>
                                     <Form.Select
+                                    aria-labelledby="addcourse-number-field"
                                     value={addCourseNumber}
                                     onChange={handleAddCourseNumberChange}
                                     disabled={!addCourseDepartment}
@@ -691,7 +698,7 @@ const ScheduleContainer =  () => {
                                 </Form.Group>
                                 <Form.Group>
                                     <Col style={{ textAlign: 'right' }}>
-                                    <Button type='submit'>
+                                    <Button type='submit' data-testid="submit-addcourse" > 
                                         Add Course
                                     </Button>
                                     </Col>
