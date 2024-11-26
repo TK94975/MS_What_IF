@@ -7,7 +7,7 @@ const bcrypt = require('bcrypt');
 router.get('/', async (req, res, next) => {
   try {
     const [rows] = await db.query(
-      'SELECT id, username, email, first_name, last_name, role, created_at FROM users'
+      'SELECT id, email, role, created_at FROM users'
     );
     res.json(rows);
   } catch (err) {
