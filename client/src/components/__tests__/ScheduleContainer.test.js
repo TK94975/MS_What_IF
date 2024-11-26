@@ -302,4 +302,196 @@ describe('ScheduleContainer Component', () => {
         //});
     });
 
+    
+
+    it("test dependency checking", async () => {
+        const mockSetCourses = jest.fn()
+        const mockContextValue = {
+            isUserSignedIn: false, // User is not signed in
+            courses: [], // No courses
+            setCourses: mockSetCourses, // Mock function for updating courses
+        };
+        // Axios response for course options
+        const mockResponse = {
+            data: [
+            { id: 14, department: "CSI", number: "503", title: "Advanced Algorithms" },
+            ],
+        };
+        axios.get.mockResolvedValueOnce(mockResponse);
+        // Axios response for course options
+        const mockDependencies = {
+            data: [
+            { id: 1, department: "CSI", number: "500", title: "OS" },
+            { id: 2, department: "CSI", number: "501", title: "Intro to breakfast" },
+            ],
+        };
+        axios.get.mockResolvedValueOnce(mockDependencies);
+
+        // Axios response for default course description
+        axios.post.mockImplementation((url) => {
+            console.log("axios.post called with URL:", url);
+            if (url && url.endsWith("/courses/course_description")) {
+                return Promise.resolve({
+                    data: {
+                        department: "CSI",
+                        number: "503",
+                        title: "Advanced Algorithms",
+                        description: "P vs NP",
+                    },
+                });
+            }
+            return Promise.reject(new Error(`Unexpected axios.post call to ${url}`));
+        });
+
+        // Axios response for default course description
+        axios.get.mockImplementation((url) => {
+            console.log("axios.post called with URL:", url);
+            if (url && url.endsWith("/course_prerequisites/14")) {
+                //cp.prereq_course_id, c.department, c.number, c.title, cp.grade
+                return Promise.resolve(mockDependencies);
+            }
+            return Promise.reject(new Error(`Unexpected axios.post call to ${url}`));
+        });
+
+        // Mock the alert function
+        const alertMock = jest.spyOn(window, 'alert').mockImplementation(() => {});
+
+        await act(async () => {
+            render(
+                <UserContext.Provider value={mockContextValue}>
+                    <ScheduleContainer />
+                </UserContext.Provider>
+            );
+        });
+
+        // Find and click the "Add Course" button to open the modal
+        const addCourseButton = screen.getByText("Add Course");
+        await act(async () => {
+            fireEvent.click(addCourseButton);
+        });
+
+         //Wait for the modal to render and find the dropdown
+        const yearDropdown = await screen.findByLabelText("Select Year");
+        expect(yearDropdown).toBeInTheDocument();
+
+        // Change the year to 2025
+        await act(async () => {
+            fireEvent.change(yearDropdown, { target: { value: '2025' } });
+        });
+
+        // Wait for state update
+        await waitFor(() => {
+            expect(yearDropdown.value).toBe("2025");
+        });
+
+        const semesterDropdown = await screen.findByLabelText("Select Semester");
+        expect(semesterDropdown).toBeInTheDocument();
+
+        // Change the semester to Spring
+        fireEvent.change(semesterDropdown, { target: { value: "Spring" } });
+
+        // Wait for state update
+        await waitFor(() => {
+            expect(semesterDropdown.value).toBe("Spring");
+        });
+
+        // Select Department
+        const departmentDropdown = screen.getByLabelText("Department");
+        await act(async () => {
+            fireEvent.change(departmentDropdown, { target: { value: "CSI" } });
+        });
+        expect(departmentDropdown.value).toBe("CSI");
+
+        // Select Course
+        const courseDropdown = screen.getByLabelText("Number");
+        await act(async () => {
+            fireEvent.change(courseDropdown, { target: { value: "503" } });
+        });
+        expect(courseDropdown.value).toBe("503");
+
+        // Submit the course addition
+        const submitButton = screen.getByTestId("submit-addcourse")
+        await act(async () => {
+            fireEvent.click(submitButton);
+        })
+        
+        expect(alertMock).toHaveBeenCalledTimes(1)
+    });
+
+    it("test dependency checking course removal", async () => {
+        const mockSetCourses = jest.fn()
+        const mockContextValue = {
+            isUserSignedIn: false, // User is not signed in
+            courses: [{ id: 1, department: "CSI", number: "521", title: "Discrete Math", semester:'Fall', year: 2022, grade:'A'},
+                { id: 14, department: "CSI", number: "503", title: "Algorithms", semester:'Fall', year: 2023, grade:'A'}
+            ], // No courses
+            setCourses: mockSetCourses, // Mock function for updating courses
+        };
+        // Axios response for course options
+        const mockResponse = {
+            data: [
+            { id: 14, department: "CSI", number: "503", title: "Advanced Algorithms" },
+            ],
+        };
+        axios.get.mockResolvedValueOnce(mockResponse);
+        // Axios response for course options
+        const mockDependencies = {
+            data: [
+            { id: 1, department: "CSI", number: "521", title: "Discrete Math" },
+            ],
+        };
+        axios.get.mockResolvedValueOnce(mockDependencies);
+
+        // Axios response for default course description
+        axios.post.mockImplementation((url) => {
+            console.log("axios.post called with URL:", url);
+            if (url && url.endsWith("/courses/course_description")) {
+                return Promise.resolve({
+                    data: {
+                        department: "CSI",
+                        number: "503",
+                        title: "Advanced Algorithms",
+                        description: "P vs NP",
+                    },
+                });
+            }
+            return Promise.reject(new Error(`Unexpected axios.post call to ${url}`));
+        });
+
+        // Axios response for default course description
+        axios.get.mockImplementation((url) => {
+            console.log("axios.post called with URL:", url);
+            if (url && url.endsWith("/course_prerequisites/inverse/14")) {
+                //cp.prereq_course_id, c.department, c.number, c.title, cp.grade
+                return Promise.resolve(mockDependencies);
+            }
+            return Promise.reject(new Error(`Unexpected axios.post call to ${url}`));
+        });
+
+        // Mock the alert function
+        const alertMock = jest.spyOn(window, 'alert').mockImplementation(() => {});
+
+        await act(async () => {
+            render(
+                <UserContext.Provider value={mockContextValue}>
+                    <ScheduleContainer />
+                </UserContext.Provider>
+            );
+        });
+
+        // Click remove course to get modal
+        const submitButton = screen.getAllByTestId("btn-removeCourse")[0]
+        await act(async () => {
+            fireEvent.click(submitButton);
+        })
+
+        // Click remove course final
+        const removeCourseFinalButtons = screen.getByTestId("btn-finalRemoveCourse")
+        await act(async () => {
+            fireEvent.click(removeCourseFinalButtons);
+        })
+        
+        expect(alertMock).toHaveBeenCalledTimes(1)
+    });
+
 });
