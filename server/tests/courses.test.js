@@ -139,7 +139,6 @@ describe('Courses Routes', () => {
         expect(course).toHaveProperty('title');
         expect(course).toHaveProperty('description');
         expect(course).toHaveProperty('credits');
-        // Additional properties from the JOINs can be checked here
       }
     });
   });
