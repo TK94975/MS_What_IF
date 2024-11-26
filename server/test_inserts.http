@@ -37,7 +37,7 @@ Content-Type: application/json
 }
 
 ### course description
-POST http://localhost:5000/courses/description
+POST http://localhost:5000/courses/course_description
 Content-Type: application/json
 
 {
@@ -60,9 +60,6 @@ Content-Type: application/json
   ],
   "selectedConcentration": "Signal Processing and Communications"
 }
-
-
-
 
 
 ### Progress test

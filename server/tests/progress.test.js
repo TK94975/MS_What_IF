@@ -21,7 +21,7 @@ describe('POST /progress/completed_progress', () => {
       .post('/progress/completed_progress')
       .send({
         user_courses: [
-          { id: 1, credits: 3, grade: 'A', completed: 'yes' },
+          { id: 11, credits: 3, grade: 'A', completed: 'yes' },
           { id: 4, credits: 3, grade: 'A', completed: 'yes' }
         ],
         user_concentration: 'Artificial Intelligence and Machine Learning',
@@ -30,7 +30,24 @@ describe('POST /progress/completed_progress', () => {
       .expect(200);
 
     expect(response.body).toHaveProperty('core');
-    expect(response.body.core.completed_credits).toBeGreaterThan(0);
+    expect(response.body.core.completed_credits).toBe(6);
+  });
+
+  test('should calculate progress for only completed courses', async () => {
+    const response = await request(app)
+      .post('/progress/completed_progress')
+      .send({
+        user_courses: [
+          { id: 11, credits: 3, grade: 'A', completed: 'yes' },
+          { id: 4, credits: 3, grade: 'A', completed: 'no' }
+        ],
+        user_concentration: 'Artificial Intelligence and Machine Learning',
+        calculation_type: 'current',
+      })
+      .expect(200);
+
+    expect(response.body).toHaveProperty('core');
+    expect(response.body.core.completed_credits).toBe(3);
   });
 
 });
