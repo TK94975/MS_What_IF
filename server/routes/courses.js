@@ -36,27 +36,27 @@ router.post('/', async (req, res) => {
 });
 
 // POST /courses - Get full course description for a given course ID
-router.post('/course_description', async (req, res) =>{
+router.post('/course_description', async (req, res) => {
   try {
-    const course_id = req.body.course_id;
+    const course_id = parseInt(req.body.course_id, 10);
     console.log('courseID', course_id);
-    if (!course_id){
-      return res.status(400).json({error: "Need course ID"})
+    if (isNaN(course_id)) {
+      return res.status(400).json({ error: "Need course ID" });
     }
-    const [description] = await db.query(
+    const [rows] = await db.query(
       'SELECT * FROM courses WHERE courses.id = ?', 
       [course_id]
-    )
-    if (description) {
-      res.status(200).json(description[0])
+    );
+    if (rows.length > 0) {
+      res.status(200).json(rows[0]);
     } else {
-      return res.status(400).json({error: "No course with that ID found"});
+      return res.status(404).json({ error: "No course with that ID found" });
     }
-  }
-  catch(error){
+  } catch (error) {
     console.error("Error getting course description", error);
+    res.status(500).json({ error: "Internal server error" });
   }
-})
+});
 
 // GET /courses - Retrieve courses options
 router.get('/course_options', async (req, res) => {

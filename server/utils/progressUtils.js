@@ -3,6 +3,7 @@ const db = require('../config/db');
 
 // Utility function to convert letter grades to grade points
 function convertGrade(letterGrade) {
+    
   const conversion = new Map([
     ['A', 4.0],
     ['A-', 3.7],
@@ -14,9 +15,11 @@ function convertGrade(letterGrade) {
     ['D', 1.0],
     ['F', 0.0],
     ['E', 0.0],
-    [null, 3.0], // Assume a B in a class
+    [null, 0.0], // Assume a B in a class
   ]);
-  return conversion.get(letterGrade);
+
+  converted = conversion.get(letterGrade);
+  return converted || 0.0;
 }
 
 function calculateRequirement(userCourses, allowedCourses, requiredCredits) {
