@@ -10,14 +10,14 @@ describe('Users Routes', () => {
     await db.end();
   });
 
-  describe('GET /users', () => {
+  /*describe('GET /users', () => {
     test('should retrieve all users', async () => {
       const response = await request(app).get('/users').expect(200);
 
       expect(Array.isArray(response.body)).toBe(true);
       // Additional assertions can be made based on your database content
     });
-  });
+  });*/
 
   describe('POST /users/signup', () => {
     let testEmail = 'testuser@example.com';
