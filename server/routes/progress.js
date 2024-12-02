@@ -61,9 +61,9 @@ router.post('/completed_progress', async (req, res) => {
     let userCourses = req.body.user_courses; // Array of user's completed courses with grades
     const userConcentration = req.body.user_concentration; // String
     const calculationType = req.body.calculation_type; // 'current' or 'projected'
-    console.log(req.body)
-    console.log(userConcentration);
-    console.log(userCourses);
+    //console.log(req.body)
+    //console.log(userConcentration);
+    //console.log(userCourses);
 
     try {
       // Validate input
