@@ -3,7 +3,7 @@ import { Container, Row, Col, Form, Button } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.css";
 import "../styles.css";
 import { UserContext } from "../context/userContext";
-import {ColorByconcentration,ColorByMajor} from "./ColorBy";
+import {ColorByconcentration, ColorByMajor, ColorPartByconcentration} from "./ColorBy";
 import axios from 'axios';
 
 const MajorConcentrationSelector = () => {
@@ -18,7 +18,7 @@ const MajorConcentrationSelector = () => {
         userStartSemester,
         setUserStartSemester,
         passedDME,
-        setPassedDME, 
+        setPassedDME,
         thesisProject,
         setThesisProject
     } = useContext(UserContext)
@@ -84,11 +84,11 @@ const MajorConcentrationSelector = () => {
 
     return (
         <Container>
-        <Row>
+        <Row style={{paddingBottom: "1px"}}>
             <ColorByMajor major={selectedMajor}>
-            <h3 >Major</h3>
+            <h6 >Major</h6>
             <Form.Group className="mb-3">
-            <Col sm={9}>
+            <Col sm={20}>
                 <Form.Select 
                     aria-labelledby="major-label"
                     value={selectedMajor} 
@@ -104,11 +104,11 @@ const MajorConcentrationSelector = () => {
             </Form.Group>
             </ColorByMajor>
         </Row>
-        <Row>
-            <ColorByconcentration concentration={selectedConcentration}>
-            <h3 >Concentration</h3>
+        <Row style={{padding: "3px"}}>
+            <ColorPartByconcentration concentration={selectedConcentration}>
+            <h6 >Concentration</h6>
             <Form.Group className="mb-3">
-            <Col sm={9}>
+            <Col sm={20}>
                 <Form.Select
                 aria-labelledby="concentration-label"
                 value={selectedConcentration}
@@ -123,13 +123,13 @@ const MajorConcentrationSelector = () => {
                 </Form.Select>
             </Col>
             </Form.Group>
-            </ColorByconcentration>
+            </ColorPartByconcentration>
         </Row>
-        <Row>
+        <Row style={{padding: "3px"}}>
             <ColorByMajor major={selectedMajor}>
-                <h3>Starting Semester</h3>
+                <h6>Starting Semester</h6>
                 <Form.Group as={Row} className="mb-3">
-                    <Col sm={6}>
+                    <Col sm={7}>
                         <Form.Select
                             value={userStartYear}
                             onChange={(e) => handleUserStartYear(e.target.value)}
@@ -143,7 +143,7 @@ const MajorConcentrationSelector = () => {
                             ))}
                         </Form.Select>
                     </Col>
-                    <Col sm={6}>
+                    <Col sm={8} >
                         <Form.Select
                             value={userStartSemester}
                             onChange={(e) => handleUserStartSemester(e.target.value)}
@@ -160,10 +160,10 @@ const MajorConcentrationSelector = () => {
                 </Form.Group>
             </ColorByMajor>
         </Row>
-        <Row>
-            <ColorByconcentration concentration={selectedConcentration}>
-                <Col sm={8}>
-                    <h3>Discrete Mathematics Exam / Thesis</h3>
+        <Row style={{paddingTop: "3px",}}>
+            <ColorPartByconcentration concentration={selectedConcentration}>
+                <Col sm={10}>
+                    <h6>Discrete Math Exam</h6>
                     <Form.Group as={Row} className="mb-3 align-items-center">
                         <Col>
                             <Form.Check
@@ -172,6 +172,7 @@ const MajorConcentrationSelector = () => {
                                 checked={passedDME}
                                 onChange={() => setPassedDME(!passedDME)}
                             />
+                            <h6>Thesis Requirement</h6>
                             <Form.Check
                                 type="checkbox"
                                 label="Thesis?"
@@ -186,9 +187,9 @@ const MajorConcentrationSelector = () => {
                         </Col>
                     </Form.Group>
                 </Col>
-            </ColorByconcentration>
+            </ColorPartByconcentration>
         </Row>
-        <Row className="align-items-center" style={{ marginTop: '20px' }}>
+        <Row className="align-items-center" style={{ marginTop: '10px' }}>
                 <Col style={{ textAlign: 'right' }}>
                     {isUserSignedIn && <Button
                     disabled={!changesMade}

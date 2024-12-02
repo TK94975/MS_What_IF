@@ -28,47 +28,47 @@ const DateRange = () => {
     }
 
     return (
-<Container>
-    <Col className="d-flex flex-column align-items-start">
-    <ColorByMajor major={selectedMajor}>
-            <Row className="align-items-center">
-            <h3 >Starting Semester</h3>
-                <Col xs={6}>
-                    <Form.Group className="mb-3" controlId="formYear">
-                        <Form.Select
-                            value={userStartYear}
-                            onChange={(e) => handleUserStartYear(e.target.value)}
-                            required
-                        >
-                            <option value="" disabled>Year</option>
-                            {yearOptions.map((value) => (
-                                <option key={value} value={value}>
-                                    {value}
-                                </option>
-                            ))}
-                        </Form.Select>
-                    </Form.Group>
-                </Col>
-                <Col xs={6}>
-                    <Form.Group className="mb-3" controlId="formSemester">
-                        <Form.Select
-                            value={userStartSemester}
-                            onChange={(e) => handleUserStartSemester(e.target.value)}
-                            required
-                        >
-                            <option value="" disabled>Semester</option>
-                            {semesterOptions.map((value) => (
-                                <option key={value} value={value}>
-                                    {value}
-                                </option>
-                            ))}
-                        </Form.Select>
-                    </Form.Group>
-                </Col>
-            </Row>
-        </ColorByMajor>
-    </Col>
-</Container>
+        <Container>
+            <Col className="d-flex flex-column align-items-start">
+            <ColorByMajor major={selectedMajor}>
+                    <Row className="align-items-center">
+                    <h3 >Starting Semester</h3>
+                        <Col xs={6}>
+                            <Form.Group className="mb-3" controlId="formYear">
+                                <Form.Select
+                                    value={userStartYear}
+                                    onChange={(e) => handleUserStartYear(e.target.value)}
+                                    required
+                                >
+                                    <option value="" disabled>Year</option>
+                                    {yearOptions.map((value) => (
+                                        <option key={value} value={value}>
+                                            {value}
+                                        </option>
+                                    ))}
+                                </Form.Select>
+                            </Form.Group>
+                        </Col>
+                        <Col xs={6}>
+                            <Form.Group className="mb-3" controlId="formSemester">
+                                <Form.Select
+                                    value={userStartSemester}
+                                    onChange={(e) => handleUserStartSemester(e.target.value)}
+                                    required
+                                >
+                                    <option value="" disabled>Semester</option>
+                                    {semesterOptions.map((value) => (
+                                        <option key={value} value={value}>
+                                            {value}
+                                        </option>
+                                    ))}
+                                </Form.Select>
+                            </Form.Group>
+                        </Col>
+                    </Row>
+                </ColorByMajor>
+            </Col>
+        </Container>
     )
 }
 

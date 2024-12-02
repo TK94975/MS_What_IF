@@ -466,7 +466,13 @@ const ScheduleContainer =  () => {
 
     return (
         <div
-            style={{backgroundColor: "lightgray"}}
+            style={{
+                backgroundColor: "lightgray",
+                padding: "8px",
+                borderRadius: "8px",
+                border: "5px solid",
+                borderColor: "purple",
+        }}
         >
             <h1>Schedule</h1>
             {/* Main accordian with course information */}
@@ -482,9 +488,9 @@ const ScheduleContainer =  () => {
                                     <h5>{semester}</h5>
                                     <ul>
                                         {groupedCourses[year][semester].map((course) => {
-                                            // Determine if the course is a core course
                                             return (
                                                 <ColorBycore
+                                    // Determine if the course is a core course
                                                     key={course.id}
                                                     department={course.department}
                                                     title={course.title}
@@ -562,14 +568,22 @@ const ScheduleContainer =  () => {
             {/* Add semester and save change buttons */}
             <Row className="align-items-center" style={{ marginTop: '20px' }}>
                 <Col style={{ textAlign: 'left', display: 'flex', gap: '10px' }}>
-                    <Button onClick={handleAddSemesterForm} id="show_addsemester" data-testid="show_addsemester">
+                    <Button onClick={handleAddSemesterForm} id="show_addsemester" data-testid="show_addsemester"
+                            style={{
+                                padding: '10px'
+                            }}
+                    >
                     Add Semester
                     </Button>
-                    <Button onClick={handleShowAddCourseForm} id="show_addcourse" data-testid="show_addcourse">
+                    <Button onClick={handleShowAddCourseForm} id="show_addcourse" data-testid="show_addcourse"
+                            style={{
+                                padding: '10px'
+                    }}
+                    >
                     Add Course
                     </Button>
                 </Col>
-                <Col style={{ textAlign: 'right' }}>
+                <Col style={{ textAlign: 'right'}}>
                     {isUserSignedIn && <Button
                     disabled={!changesMade}
                     onClick={handleSave}
