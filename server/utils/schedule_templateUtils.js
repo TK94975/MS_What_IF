@@ -1,8 +1,9 @@
 const db = require('../config/db');
 
 const preferredElectives = [25, 7, 9, 21, 32, 20, 21, 17];
+const ecePreferredElectives = [80, 94, 95, 107]//[63, 84, 85, 90, 97, 99, 100]
 
-const createFullSchedule = async (userCourses, userProgress, concentration, classesPerSemester, dme) =>{
+const createFullSchedule = async (userCourses, userProgress, concentration, classesPerSemester, dme, thesis) =>{
     console.log(`In createFullSchedule... concentration: ${concentration}`)
     let newSchedule = [[]]
     if (concentration === 'Old Computer Science'){
@@ -15,13 +16,13 @@ const createFullSchedule = async (userCourses, userProgress, concentration, clas
     else {
         // ECE
         console.log('createFullSchedule: ECE CONCENTRATION')
-        newSchedule = await createFullECESchedule(userCourses, userProgress, concentration, classesPerSemester, dme, newSchedule);
+        newSchedule = await createFullECESchedule(userCourses, userProgress, concentration, classesPerSemester, thesis, newSchedule);
     }
     return newSchedule;
 }
 
-const createFullECESchedule = async (userCourses, userProgress, concentration, classesPerSemester, dme, schedule) => {
-    console.log(`\ncreateFullECESchedule: \nuserCourses: ${userCourses}\nuserProgress: ${userProgress}\nconcentration: ${concentration}\nclassesPerSemester: ${classesPerSemester}\ndme: ${dme}\nschedule: ${schedule}`)
+const createFullECESchedule = async (userCourses, userProgress, concentration, classesPerSemester, thesis, schedule) => {
+    console.log(`\ncreateFullECESchedule: \nuserCourses: ${userCourses}\nuserProgress: ${userProgress}\nconcentration: ${concentration}\nclassesPerSemester: ${classesPerSemester}\nthesis: ${thesis}\nschedule: ${schedule}`)
     // Get their current progress
     let newSchedule = schedule;
     let courses = userCourses;
@@ -47,12 +48,158 @@ const createFullECESchedule = async (userCourses, userProgress, concentration, c
     console.log(`electiveCompleted: ${electiveCompleted}`)
     console.log(`conCoreCredits: ${conCoreCredits}`)
     
-    let neededCourses = 5 - electiveCompleted ;
-    if (!dme){ 
-        newSchedule = addCourseToSchedule(14, [], newSchedule, classesPerSemester)
-        neededCourses -= 1;   
+    // https://www.albany.edu/graduate-bulletin/electrical-computer-engineering-ms.php
+    // Technical electives 2 classes for non thesis 1 class for thesis
+    // Math and Science 1 course
+    // Depth (concentration) = 4
+    // breadth (breadth) = 2
+    let neededCourses = 6 - electiveCompleted ;
+    
+    // Get the core courses for this class
+    console.log('\nuserProgress:\n')
+    console.log(userProgress)
+    console.log('\nAdding depth courses')
+    if(!userProgress?.requirementsMet?.coreCourses){
+        for(const course of coreCourses){
+            if(!courses.includes(course)){
+                const prereqs = await getPrereqs(course);
+                for (const prereq of prereqs){
+                    if(!courses.includes(prereq)){
+                        newSchedule = addCourseToSchedule(prereq, [], newSchedule, classesPerSemester);
+                        courses.push(prereq)
+                    }
+                }
+                newSchedule = addCourseToSchedule(course, prereqs, newSchedule, classesPerSemester);
+                courses.push(course);
+            }
+        }
     }
-    courses.push(14)
+    console.log('new Schedule: ')
+    console.log(newSchedule)
+    console.log('\nAdding concentration core courses')
+    if(!userProgress?.requirementsMet?.concentrationCoreCourses){
+        let credits = conCoreCredits;
+        console.log("Init Credits", credits);
+        let tries = []
+        while (credits < 12 && conCourses.length > 3 && tries.length < conCourses.length){
+            const randomCourse = conCourses[Math.floor(Math.random() * conCourses.length)];
+            if(!courses.includes(randomCourse)){
+                const prereqs = await getPrereqs(randomCourse);
+                for (const prereq of prereqs){
+                    if(!courses.includes(prereq)){
+                        newSchedule = addCourseToSchedule(prereq, [], newSchedule, classesPerSemester);
+                        courses.push(prereq);
+                        neededCourses-=1
+                    }
+                }
+                newSchedule = addCourseToSchedule(randomCourse, prereqs, newSchedule, classesPerSemester);
+                courses.push(randomCourse);
+                credits += 3;
+                console.log("Credits", credits);
+            }
+        }
+    }
+    console.log('new Schedule: ')
+    console.log(newSchedule)
+    console.log('\nGetting BreadthRequirements...')
+    if(!userProgress?.requirementsMet?.breadthRequirements){
+        electiveOneFlag = false;
+        electiveTwoFlag = false;
+        while(!electiveOneFlag){
+            const randomCourse = breadthReqs[0][Math.floor(Math.random() * breadthReqs[0].length)];
+            if(!courses.includes(randomCourse)){
+                const prereqs = await getPrereqs(randomCourse);
+                for (const prereq of prereqs){
+                    if(!courses.includes(prereq)){
+                        newSchedule = addCourseToSchedule(prereq, [], newSchedule, classesPerSemester);
+                        courses.push(prereq);
+                        neededCourses -= 1;
+                    }
+                }
+                newSchedule = addCourseToSchedule(randomCourse, prereqs, newSchedule, classesPerSemester);
+                courses.push(randomCourse);
+                console.log("Breadth 1", randomCourse)
+                neededCourses -= 1;
+                electiveOneFlag = true;
+            }
+        }
+        while(!electiveTwoFlag){
+            const randomCourse = breadthReqs[1][Math.floor(Math.random() * breadthReqs[1].length)];
+            if(!courses.includes(randomCourse)){
+                const prereqs = await getPrereqs(randomCourse);
+                for (const prereq of prereqs){
+                    if(!courses.includes(prereq)){
+                        newSchedule = addCourseToSchedule(prereq, [], newSchedule, classesPerSemester);
+                        courses.push(prereq);
+                        neededCourses -= 1;
+                    }
+                }
+                newSchedule = addCourseToSchedule(randomCourse, prereqs, newSchedule, classesPerSemester);
+                courses.push(randomCourse);
+                console.log("Breadth 2", randomCourse)
+                neededCourses -= 1;
+                electiveTwoFlag = true;
+            }
+        }
+    }
+    console.log('new Schedule: ')
+    console.log(newSchedule)
+
+    console.log('neededCourses')
+    while (neededCourses > 0){
+        const randomCourse = ecePreferredElectives[Math.floor(Math.random() * preferredElectives.length)]
+        if(!courses.includes(randomCourse)){
+            let prereqs = await getPrereqs(randomCourse)
+            for (const prereq of prereqs){
+                if(!courses.includes(prereq)){
+                    if(neededCourses === 1){
+                        break
+                    }
+                    newSchedule = addCourseToSchedule(prereq, [], newSchedule, classesPerSemester)
+                    courses.push(prereq)
+                    neededCourses -= 1;
+                } 
+            }
+            newSchedule = addCourseToSchedule(randomCourse, prereqs, newSchedule, classesPerSemester)
+            courses.push(randomCourse)
+            neededCourses -= 1;
+        }
+    }
+    // Add Math 
+    let mathClasses = [111, 112]
+    let math = mathClasses[Math.floor(Math.random() * 2)]
+    console.log('Adding Math/Phys')
+    newSchedule = addCourseToSchedule(math, [], newSchedule, classesPerSemester)
+    // Add thesis
+    if(thesis) {
+        console.log('Adding Thesis')
+        addCourseToSchedule(108, [], newSchedule, classesPerSemester)
+    }
+    else {
+        console.log('Adding Additional TE')
+        // Add technical Elective
+        var randomCourse = ecePreferredElectives[Math.floor(Math.random() * preferredElectives.length)]
+        if(!courses.includes(randomCourse)){
+            let prereqs = await getPrereqs(randomCourse)
+            for (const prereq of prereqs){
+                if(!courses.includes(prereq)){
+                    if(neededCourses === 1){
+                        break
+                    }
+                    newSchedule = addCourseToSchedule(prereq, [], newSchedule, classesPerSemester)
+                    courses.push(prereq)
+                    neededCourses -= 1;
+                } 
+            }
+            newSchedule = addCourseToSchedule(randomCourse, prereqs, newSchedule, classesPerSemester)
+            courses.push(randomCourse)
+            neededCourses -= 1;
+        }
+        // Add Project
+        console.log('Adding Project')
+        addCourseToSchedule(106, [], newSchedule, classesPerSemester)
+    }
+    return newSchedule;
 }
 
 const createFullCSISchedule = async (userCourses, userProgress, concentration, classesPerSemester, dme, schedule) =>{

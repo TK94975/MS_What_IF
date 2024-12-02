@@ -73,6 +73,7 @@ router.post('/generate_schedule', async (req, res) =>{
     let userStartSemester = req.body.startSemester;
     const userID = req.body.user_id;
     const userDME = req.body.dme;
+    const userThesis = req.body.thesis;
     const userCourseLimit = 3; // Default to 3 unless course per semester is implemented 
     
     if (userCourses.length !== 0){
@@ -82,7 +83,7 @@ router.post('/generate_schedule', async (req, res) =>{
     }
 
     try{
-        const baseSchedule = await createFullSchedule(userCourses, userProgress, userConcentration, userCourseLimit, userDME);
+        const baseSchedule = await createFullSchedule(userCourses, userProgress, userConcentration, userCourseLimit, userDME, userThesis);
         console.log("Base Schedule:",baseSchedule)
         const dateSchedule = await createDatedSchedule(userStartYear, userStartSemester, baseSchedule, userID, userCourseLimit);
         res.status(200).json(dateSchedule);

@@ -447,7 +447,8 @@ const ScheduleContainer =  () => {
                 startYear: userStartYear,
                 startSemester: userStartSemester,
                 user_id: sessionStorage.getItem('userID') || 'null',
-                dme: passedDME
+                dme: passedDME, 
+                thesis: false
             });
             console.log(response.data);
             setCourses(courses => [...courses, ...response.data])

@@ -11,7 +11,8 @@ const ProgressTable = () => {
         selectedMajor,
         courses,
         userProgressProjected,
-        setUserProgressProjected
+        setUserProgressProjected,
+        thesisProject
     } = useContext(UserContext)
 
     const[concentrationRequirements, setConcentrationRequirements] = useState({})
@@ -37,6 +38,11 @@ const ProgressTable = () => {
             console.log("Response from server:", response);
             console.log("Response data:", response.data);  // To see the actual data
             console.log("Response status:", response.status);  // To see the HTTP status code
+            //TODO GET THESIS OPTION
+            if(thesisProject === 'Project') {
+                response.data.technicalElective = '6'
+                response.data.thesis = '3'
+            }
             setConcentrationRequirements(response.data);
         } catch (error) {
             console.log("Error status:", error.response?.status);  // Log error status code
@@ -92,6 +98,7 @@ const ProgressTable = () => {
             user_courses: courses,
             user_concentration: selectedConcentration,
             calculation_type: calculationType,
+            thesis: thesisProject
           });
       
           updateChatbotSettings(courses);

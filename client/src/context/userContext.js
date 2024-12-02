@@ -17,6 +17,7 @@ export const UserProvider = ({ children }) => {
     const [userStartSemester, setUserStartSemester] = useState("");
     const [userProgressProjected, setUserProgressProjected] = useState({});
     const [passedDME, setPassedDME] = useState(false);
+    const [thesisProject, setThesisProject] = useState('Project')
 
 
     useEffect(() => {
@@ -65,7 +66,9 @@ export const UserProvider = ({ children }) => {
                 userProgressProjected,
                 setUserProgressProjected,
                 passedDME,
-                setPassedDME
+                setPassedDME,
+                thesisProject,
+                setThesisProject
             }}
         >
             {children}
