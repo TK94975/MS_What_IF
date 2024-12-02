@@ -67,6 +67,7 @@ router.post('/generate_schedule', async (req, res) =>{
     const userCourses = extractCourseIDs(userCourseDetails);
     console.log("Original user courses", userCourses);
     const userProgress = req.body.user_progress;
+    console.log("User Progress", userProgress);
     const userConcentration = req.body.concentration;
     let userStartYear = req.body.startYear;
     let userStartSemester = req.body.startSemester;
@@ -76,14 +77,13 @@ router.post('/generate_schedule', async (req, res) =>{
     
     if (userCourses.length !== 0){
         const upcomingSemester = getUpcomingSemester();
-        console.log("Upcoming semester:", upcomingSemester)
         userStartYear = upcomingSemester.year;
         userStartSemester = upcomingSemester.semester;
     }
 
     try{
-        const baseSchedule = await createFullSchedule(userCourses, userConcentration, userCourseLimit, userDME);
-        console.log("Base schedule:", baseSchedule);
+        const baseSchedule = await createFullSchedule(userCourses, userProgress, userConcentration, userCourseLimit, userDME);
+        console.log("Base Schedule:",baseSchedule)
         const dateSchedule = await createDatedSchedule(userStartYear, userStartSemester, baseSchedule, userID, userCourseLimit);
         res.status(200).json(dateSchedule);
     }

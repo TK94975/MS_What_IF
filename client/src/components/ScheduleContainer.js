@@ -19,6 +19,7 @@ const ScheduleContainer =  () => {
         courses,
         setCourses,
         selectedConcentration,
+        selectedMajor,
         userStartYear,
         userStartSemester,
         userProgressProjected,
@@ -571,13 +572,15 @@ const ScheduleContainer =  () => {
                     </Button>}
                 </Col>
             </Row>
-            <Row className="align-items-center" style={{ marginTop: '20px' }}>
-                <Col style={{ textAlign: 'left', display: 'flex', gap: '10px' }}>
-                    <Button onClick={handleGenerateSchedule} id="generate_schedule" data-testid="generate_schedule">
-                        Generate Schedule
-                    </Button>
-                </Col>
-            </Row >
+            {selectedMajor === "CSI" && (
+                <Row className="align-items-center" style={{ marginTop: '20px' }}>
+                    <Col style={{ textAlign: 'left', display: 'flex', gap: '10px' }}>
+                        <Button onClick={handleGenerateSchedule} id="generate_schedule" data-testid="generate_schedule">
+                            Generate Schedule
+                        </Button>
+                    </Col>
+                </Row >
+            )}
 
             {/*Modal to show course description to user on request */}
             <Modal
