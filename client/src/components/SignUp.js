@@ -14,6 +14,7 @@ const SignUp = () => {
 		setUserStartYear,
 		userStartSemester,
 		setUserStartSemester,
+		passedDME,
 	} = useContext(UserContext)
 
 	// Showing and hiding hthe model
@@ -50,16 +51,18 @@ const SignUp = () => {
 				major,
 				concentration,
 				start_year: userStartYear,
-				start_semester: userStartSemester
+				start_semester: userStartSemester,
+				passed_dme: (passedDME === 'yes') ? 'yes' : 'no'
 			});
 			if (response.status === 201) {
 				sessionStorage.setItem('userID', response.data[0].id);
 				sessionStorage.setItem('userEmail', response.data[0].email);
 				sessionStorage.setItem('userMajor', response.data[0].major);
-				sessionStorage.setItem('userConcentration', response.data[0].concentration)
+				sessionStorage.setItem('userConcentration', response.data[0].concentration);
 				sessionStorage.setItem('userLoggedIn?', 'true');
-				sessionStorage.setItem('userStartYear', response.data[0].start_year)
-				sessionStorage.setItem('userStartSemester', response.data[0].start_semester)
+				sessionStorage.setItem('userStartYear', response.data[0].start_year);
+				sessionStorage.setItem('userStartSemester', response.data[0].start_semester);
+				sessionStorage.setItem('passedDME', response.data[0].passed_dme);
 				setIsUserSignedIn(true);
 				setShow(false);
 			}

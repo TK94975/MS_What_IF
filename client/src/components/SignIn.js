@@ -33,6 +33,7 @@ const handleSubmit = async (event) => {
 	sessionStorage.setItem('userLoggedIn?', 'true');
 	sessionStorage.setItem('userStartYear', response.data[0].start_year)
 	sessionStorage.setItem('userStartSemester', response.data[0].start_semester)
+	sessionStorage.setItem('passedDME', 'yes');
 	console.log("session: ", response.data[0])
 	setIsUserSignedIn(true);
 

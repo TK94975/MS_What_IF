@@ -1,12 +1,14 @@
-import React, { useContext } from "react";
-import { Container, Row, Col, Form } from "react-bootstrap";
+import React, { useContext, useEffect, useState} from "react";
+import { Container, Row, Col, Form, Button } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.css";
 import "../styles.css";
 import { UserContext } from "../context/userContext";
 import {ColorByconcentration,ColorByMajor} from "./ColorBy";
+import axios from 'axios';
 
 const MajorConcentrationSelector = () => {
     const {
+        isUserSignedIn,
         selectedMajor,
         handleMajorChange,
         selectedConcentration,
@@ -38,14 +40,45 @@ const MajorConcentrationSelector = () => {
     };
         const semesterOptions = ['Spring','Summer','Fall','Winter'];
         const yearOptions = [2022,2023,2024,2025,2026,2027];
+        const [changesMade, setChangesMade] = useState(false); // Tracks if user made change to be saved
+        const [saveButtonText, setSaveButtonText] = useState('Save Changes'); // String for save button text
 
         const handleUserStartYear = (year) =>{
             setUserStartYear(year);
+            setChangesMade(true);
         }
         const handleUserStartSemester = (semester) =>{
             setUserStartSemester(semester);
+            setChangesMade(true);
         }
-
+        const localHandleMajorChange = (e) =>{
+            handleMajorChange(e);
+            setChangesMade(true);
+        }
+        const localHandleConcentrationChange = (e) =>{
+            handleConcentrationChange(e)
+            setChangesMade(true);
+        }
+        const handleSave = async () =>{
+            setChangesMade(false);
+            setSaveButtonText("Saved");
+            try{
+                console.log("Saving...");
+                const response = await axios.post(`${process.env.REACT_APP_SERVER_URL}/users/update_user`, {
+                    id: sessionStorage.getItem('userID'),
+                    start_year: userStartYear,
+                    start_semester: userStartSemester,
+                    major: selectedMajor,
+                    concentration: selectedConcentration,
+                    passed_dme: (passedDME) ? 'yes' : 'no'
+                });
+            }
+            catch(error){
+                console.error("Update failed", error);
+                setChangesMade(true);
+                setSaveButtonText("Save Changes");
+            }
+        };
 
     return (
         <Container>
@@ -57,7 +90,7 @@ const MajorConcentrationSelector = () => {
                 <Form.Select 
                     aria-labelledby="major-label"
                     value={selectedMajor} 
-                    onChange={(e) => handleMajorChange(e.target.value)}
+                    onChange={(e) => localHandleMajorChange(e.target.value)}
                 >
                     {majors.map((major) => (
                     <option key={major[0]} value={major[0]}>
@@ -77,7 +110,7 @@ const MajorConcentrationSelector = () => {
                 <Form.Select
                 aria-labelledby="concentration-label"
                 value={selectedConcentration}
-                onChange={(e) => handleConcentrationChange(e.target.value)}
+                onChange={(e) => localHandleConcentrationChange(e.target.value)}
                 disabled={!concentrations[selectedMajor]?.length}
                 >
                 {concentrations[selectedMajor]?.map((concentration) => (
@@ -142,6 +175,16 @@ const MajorConcentrationSelector = () => {
                 </Col>
             </ColorByconcentration>
         </Row>
+        <Row className="align-items-center" style={{ marginTop: '20px' }}>
+                <Col style={{ textAlign: 'right' }}>
+                    {isUserSignedIn && <Button
+                    disabled={!changesMade}
+                    onClick={handleSave}
+                    >
+                        {saveButtonText}
+                    </Button>}
+                </Col>
+            </Row>
         </Container>
     );
 };
