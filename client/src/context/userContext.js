@@ -1,4 +1,5 @@
 import React, { createContext, useState, useEffect } from "react";
+import axios from "axios"; // Fix for axios is not defined
 
 export const UserContext = createContext();
 
@@ -11,6 +12,8 @@ export const UserProvider = ({ children }) => {
     const [selectedMajor, setSelectedMajor] = useState("CSI");
     const [selectedConcentration, setSelectedConcentration] = useState(defaultConcentrations['CSI']);
     const [courses, setCourses] = useState([]); // User courses
+    const [concentrationRequirements, setConcentrationRequirements] = useState({});
+
 
     useEffect(() => {
         if (sessionStorage.getItem("userLoggedIn?") === 'true') {
@@ -43,6 +46,7 @@ export const UserProvider = ({ children }) => {
                 selectedMajor,
                 handleMajorChange,
                 selectedConcentration,
+                concentrationRequirements, // Fixed typo here
                 handleConcentrationChange,
                 courses,
                 setCourses,
@@ -52,3 +56,5 @@ export const UserProvider = ({ children }) => {
         </UserContext.Provider>
     );
 };
+
+export default UserContext;

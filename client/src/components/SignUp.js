@@ -34,7 +34,7 @@ const handleSubmit = async (event) => {
 		return; // Prevent submission
 	}
 	if (password !== checkPassword) {
-	setWarning("Passwords do not match.");
+	setWarning("Passwords do not match");
 	return;
 	}
 	try {
