@@ -80,8 +80,8 @@ const createFullECESchedule = async (userCourses, userProgress, concentration, c
     if(!userProgress?.requirementsMet?.concentrationCoreCourses){
         let credits = conCoreCredits;
         console.log("Init Credits", credits);
-        let tries = []
-        while (credits < 12 && conCourses.length > 3 && tries.length < conCourses.length){
+        let tries = 0
+        while (credits < 12 && conCourses.length > 3 && tries < 20){
             const randomCourse = conCourses[Math.floor(Math.random() * conCourses.length)];
             if(!courses.includes(randomCourse)){
                 const prereqs = await getPrereqs(randomCourse);
@@ -96,6 +96,7 @@ const createFullECESchedule = async (userCourses, userProgress, concentration, c
                 courses.push(randomCourse);
                 credits += 3;
                 console.log("Credits", credits);
+                tries+=1
             }
         }
     }
@@ -105,7 +106,8 @@ const createFullECESchedule = async (userCourses, userProgress, concentration, c
     if(!userProgress?.requirementsMet?.breadthRequirements){
         electiveOneFlag = false;
         electiveTwoFlag = false;
-        while(!electiveOneFlag){
+        let tries = 0
+        while(!electiveOneFlag && tries < 20){
             const randomCourse = breadthReqs[0][Math.floor(Math.random() * breadthReqs[0].length)];
             if(!courses.includes(randomCourse)){
                 const prereqs = await getPrereqs(randomCourse);
@@ -122,8 +124,10 @@ const createFullECESchedule = async (userCourses, userProgress, concentration, c
                 neededCourses -= 1;
                 electiveOneFlag = true;
             }
+            tries+=1
         }
-        while(!electiveTwoFlag){
+        tries = 0
+        while(!electiveTwoFlag && tries < 20){
             const randomCourse = breadthReqs[1][Math.floor(Math.random() * breadthReqs[1].length)];
             if(!courses.includes(randomCourse)){
                 const prereqs = await getPrereqs(randomCourse);
@@ -140,6 +144,7 @@ const createFullECESchedule = async (userCourses, userProgress, concentration, c
                 neededCourses -= 1;
                 electiveTwoFlag = true;
             }
+            tries+=1
         }
     }
     console.log('new Schedule: ')
