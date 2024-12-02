@@ -18,7 +18,9 @@ const MajorConcentrationSelector = () => {
         userStartSemester,
         setUserStartSemester,
         passedDME,
-        setPassedDME
+        setPassedDME, 
+        thesisProject,
+        setThesisProject
     } = useContext(UserContext)
 
     const majors = [
@@ -161,7 +163,7 @@ const MajorConcentrationSelector = () => {
         <Row>
             <ColorByconcentration concentration={selectedConcentration}>
                 <Col sm={8}>
-                    <h3>Discrete Mathematics Exam</h3>
+                    <h3>Discrete Mathematics Exam / Thesis</h3>
                     <Form.Group as={Row} className="mb-3 align-items-center">
                         <Col>
                             <Form.Check
@@ -169,6 +171,17 @@ const MajorConcentrationSelector = () => {
                                 label="Passed?"
                                 checked={passedDME}
                                 onChange={() => setPassedDME(!passedDME)}
+                            />
+                            <Form.Check
+                                type="checkbox"
+                                label="Thesis?"
+                                checked={(thesisProject === 'Thesis')}
+                                onChange={() => {
+                                    console.log('Thesis Hit')
+                                    console.log(`current Thesis: ${thesisProject}`)
+                                    console.log(`Setting thesis to: ${((thesisProject === 'Thesis') ? 'Project' : 'Thesis')}`)
+                                    setThesisProject((thesisProject === 'Thesis') ? 'Project' : 'Thesis')
+                                }}
                             />
                         </Col>
                     </Form.Group>

@@ -339,11 +339,13 @@ function calculateECEMathPhysicsRequirement(userCourses) {
 }
   
 function calculateECETechnicalElectiveRequirement(userCourses, coreCourses, breadthCourses, mathPhysicsCourses, option) {
-    // Exclude courses already counted
+  console.log(`Option: ${option}`)  
+  // Exclude courses already counted
     const excludedCourseIds = [
       ...coreCourses.map(c => c.course_id),
       ...breadthCourses.map(c => c.course_id),
       ...mathPhysicsCourses.map(c => c.course_id),
+      108
     ];
   
     const electiveCourses = userCourses.filter(

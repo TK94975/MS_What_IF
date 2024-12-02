@@ -96,8 +96,8 @@ const createFullECESchedule = async (userCourses, userProgress, concentration, c
                 courses.push(randomCourse);
                 credits += 3;
                 console.log("Credits", credits);
-                tries+=1
             }
+            tries+=1
         }
     }
     console.log('new Schedule: ')
