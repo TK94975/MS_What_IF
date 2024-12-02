@@ -23,6 +23,7 @@ const ProfileBox = () => {
         sessionStorage.setItem('userLoggedIn?', "false");
         sessionStorage.removeItem('userStartYear')
         sessionStorage.removeItem('userStartSemester')
+        sessionStorage.removeItem('passedDME')
         setIsUserSignedIn(false);
     }
 

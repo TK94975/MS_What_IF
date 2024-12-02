@@ -36,6 +36,9 @@ export const UserProvider = ({ children }) => {
         setSelectedConcentration(sessionStorage.getItem("userConcentration") || defaultConcentrations['CSI']);
         setUserStartYear(sessionStorage.getItem('userStartYear') || "")
         setUserStartSemester(sessionStorage.getItem('userStartSemester') || "")
+        const dme = (sessionStorage?.getItem('passedDME') === 'yes') ?  true : false;
+        setPassedDME(dme);
+        setUserStartSemester(sessionStorage.getItem('userStartSemester') || "")
     }, [isUserSignedIn]);
 
     const handleMajorChange = (major) => {

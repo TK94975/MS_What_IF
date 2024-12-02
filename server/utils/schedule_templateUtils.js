@@ -23,7 +23,6 @@ const createFullCSISchedule = async (userCourses, userProgress, concentration, c
     const electiveCompleted = userProgress?.elective?.completed_credits || 0;
     const conCoreCredits = userProgress?.concentration?.completed_credits || 0;
 
-
     let neededCourses = 5 - electiveCompleted ;
     if (!dme){ 
         newSchedule = addCourseToSchedule(14, [], newSchedule, classesPerSemester)
@@ -201,11 +200,12 @@ const createFullOldCSISchedule = async (userCourses, classesPerSemester, dme, sc
     let courses = userCourses;
     const completedElectives = courses.filter(course => !oldCSICore.includes(course)).length;
     let neededCourses = 5 - completedElectives;
-    if (!dme && !courses.includes(14)){
+    console.log(dme);
+    if (!dme){
         newSchedule = addCourseToSchedule(14, [], newSchedule, classesPerSemester)
         neededCourses -= 1;
-        courses.push(14)
     }
+    courses.push(14)
 
     for(const course of oldCSICore){
         if(!courses.includes(course)){
@@ -256,6 +256,9 @@ const addCourseToSchedule= (course, prereqs, schedule, classesPerSemester) =>{
         let prereqsSatisfied = true;
 
         for (const prereq of prereqs) {
+            if (prereq === 14) {
+                continue;
+            }
             const isSatisfied = schedule.slice(0, i).some(prevSemester => prevSemester.includes(prereq));
             if (!isSatisfied) {
                 prereqsSatisfied = false;
@@ -349,9 +352,23 @@ const extractCourseIDs = (courseDetails) =>{
     return courseDetails.map(course => course.id ?? course.course_id)
 }
 
+function isEarlierSemester(year1, semester1, year2, semester2) {
+    const semesterOrder = ["Spring", "Fall"];
+
+    if (year1 < year2) {
+        return true;
+    }
+    if (year1 > year2) {
+        return false;
+    }
+
+    return semesterOrder.indexOf(semester1) < semesterOrder.indexOf(semester2);
+}
+
 module.exports = {
     createFullSchedule,
     createDatedSchedule,
     getUpcomingSemester,
-    extractCourseIDs
+    extractCourseIDs,
+    isEarlierSemester
 };

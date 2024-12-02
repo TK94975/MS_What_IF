@@ -28,6 +28,7 @@ require('dotenv').config();
       role ENUM('user', 'admin') DEFAULT 'user',
       start_year INT NOT NULL,
       start_semester ENUM('Spring', 'Summer', 'Fall', 'Winter') NOT NULL,
+      passed_dme ENUM('yes', 'no') NOT NULL,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     );`;
