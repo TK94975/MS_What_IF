@@ -1,14 +1,208 @@
 const db = require('../config/db');
 
 const preferredElectives = [25, 7, 9, 21, 32, 20, 21, 17];
+const ecePreferredElectives = [80, 94, 95, 107]//[63, 84, 85, 90, 97, 99, 100]
 
-const createFullSchedule = async (userCourses, userProgress, concentration, classesPerSemester, dme) =>{
+const createFullSchedule = async (userCourses, userProgress, concentration, classesPerSemester, dme, thesis) =>{
+    console.log(`In createFullSchedule... concentration: ${concentration}`)
     let newSchedule = [[]]
     if (concentration === 'Old Computer Science'){
         newSchedule = await createFullOldCSISchedule(userCourses, classesPerSemester, dme, newSchedule)
     }
-    else if(concentration === 'Theoretical Computer Science' || 'Systems' || 'Artificial Intelligence and Machine Learning'){
+    else if((concentration === 'Theoretical Computer Science') || (concentration === 'Systems') || (concentration ===  'Artificial Intelligence and Machine Learning')){
+        console.log('HERE')
         newSchedule = await createFullCSISchedule(userCourses, userProgress, concentration, classesPerSemester, dme, newSchedule);
+    }
+    else {
+        // ECE
+        console.log('createFullSchedule: ECE CONCENTRATION')
+        newSchedule = await createFullECESchedule(userCourses, userProgress, concentration, classesPerSemester, thesis, newSchedule);
+    }
+    return newSchedule;
+}
+
+const createFullECESchedule = async (userCourses, userProgress, concentration, classesPerSemester, thesis, schedule) => {
+    console.log(`\ncreateFullECESchedule: \nuserCourses: ${userCourses}\nuserProgress: ${userProgress}\nconcentration: ${concentration}\nclassesPerSemester: ${classesPerSemester}\nthesis: ${thesis}\nschedule: ${schedule}`)
+    // Get their current progress
+    let newSchedule = schedule;
+    let courses = userCourses;
+    //get the required prereqs
+    console.log('\nGETTING CORE REQS:')
+    const coreCourses = await getECECoreReqs();
+    console.log('\nCORE REQS:')
+    console.log(coreCourses)
+
+    console.log('\nGETTING CONCENTRATION REQS:')
+    const conCourses = await getECEConcentrationReqs(concentration);
+    console.log('\nCONCENTRATION REQS:')
+    console.log(conCourses)
+    
+    console.log('\nGETTING BREADTH REQS:')
+    const breadthReqs = await getECEBreadthReqs(concentration);
+    console.log('\nBREADTH REQS:')
+    console.log(breadthReqs)
+    
+    // Check for completed electives
+    const electiveCompleted = userProgress?.elective?.completed_credits || 0;
+    const conCoreCredits = userProgress?.concentration?.completed_credits || 0;
+    console.log(`electiveCompleted: ${electiveCompleted}`)
+    console.log(`conCoreCredits: ${conCoreCredits}`)
+    
+    // https://www.albany.edu/graduate-bulletin/electrical-computer-engineering-ms.php
+    // Technical electives 2 classes for non thesis 1 class for thesis
+    // Math and Science 1 course
+    // Depth (concentration) = 4
+    // breadth (breadth) = 2
+    let neededCourses = 6 - electiveCompleted ;
+    
+    // Get the core courses for this class
+    console.log('\nuserProgress:\n')
+    console.log(userProgress)
+    console.log('\nAdding depth courses')
+    if(!userProgress?.requirementsMet?.coreCourses){
+        for(const course of coreCourses){
+            if(!courses.includes(course)){
+                const prereqs = await getPrereqs(course);
+                for (const prereq of prereqs){
+                    if(!courses.includes(prereq)){
+                        newSchedule = addCourseToSchedule(prereq, [], newSchedule, classesPerSemester);
+                        courses.push(prereq)
+                    }
+                }
+                newSchedule = addCourseToSchedule(course, prereqs, newSchedule, classesPerSemester);
+                courses.push(course);
+            }
+        }
+    }
+    console.log('new Schedule: ')
+    console.log(newSchedule)
+    console.log('\nAdding concentration core courses')
+    if(!userProgress?.requirementsMet?.concentrationCoreCourses){
+        let credits = conCoreCredits;
+        console.log("Init Credits", credits);
+        let tries = 0
+        while (credits < 12 && conCourses.length > 3 && tries < 20){
+            const randomCourse = conCourses[Math.floor(Math.random() * conCourses.length)];
+            if(!courses.includes(randomCourse)){
+                const prereqs = await getPrereqs(randomCourse);
+                for (const prereq of prereqs){
+                    if(!courses.includes(prereq)){
+                        newSchedule = addCourseToSchedule(prereq, [], newSchedule, classesPerSemester);
+                        courses.push(prereq);
+                        neededCourses-=1
+                    }
+                }
+                newSchedule = addCourseToSchedule(randomCourse, prereqs, newSchedule, classesPerSemester);
+                courses.push(randomCourse);
+                credits += 3;
+                console.log("Credits", credits);
+                tries+=1
+            }
+        }
+    }
+    console.log('new Schedule: ')
+    console.log(newSchedule)
+    console.log('\nGetting BreadthRequirements...')
+    if(!userProgress?.requirementsMet?.breadthRequirements){
+        electiveOneFlag = false;
+        electiveTwoFlag = false;
+        let tries = 0
+        while(!electiveOneFlag && tries < 20){
+            const randomCourse = breadthReqs[0][Math.floor(Math.random() * breadthReqs[0].length)];
+            if(!courses.includes(randomCourse)){
+                const prereqs = await getPrereqs(randomCourse);
+                for (const prereq of prereqs){
+                    if(!courses.includes(prereq)){
+                        newSchedule = addCourseToSchedule(prereq, [], newSchedule, classesPerSemester);
+                        courses.push(prereq);
+                        neededCourses -= 1;
+                    }
+                }
+                newSchedule = addCourseToSchedule(randomCourse, prereqs, newSchedule, classesPerSemester);
+                courses.push(randomCourse);
+                console.log("Breadth 1", randomCourse)
+                neededCourses -= 1;
+                electiveOneFlag = true;
+            }
+            tries+=1
+        }
+        tries = 0
+        while(!electiveTwoFlag && tries < 20){
+            const randomCourse = breadthReqs[1][Math.floor(Math.random() * breadthReqs[1].length)];
+            if(!courses.includes(randomCourse)){
+                const prereqs = await getPrereqs(randomCourse);
+                for (const prereq of prereqs){
+                    if(!courses.includes(prereq)){
+                        newSchedule = addCourseToSchedule(prereq, [], newSchedule, classesPerSemester);
+                        courses.push(prereq);
+                        neededCourses -= 1;
+                    }
+                }
+                newSchedule = addCourseToSchedule(randomCourse, prereqs, newSchedule, classesPerSemester);
+                courses.push(randomCourse);
+                console.log("Breadth 2", randomCourse)
+                neededCourses -= 1;
+                electiveTwoFlag = true;
+            }
+            tries+=1
+        }
+    }
+    console.log('new Schedule: ')
+    console.log(newSchedule)
+
+    console.log('neededCourses')
+    while (neededCourses > 0){
+        const randomCourse = ecePreferredElectives[Math.floor(Math.random() * preferredElectives.length)]
+        if(!courses.includes(randomCourse)){
+            let prereqs = await getPrereqs(randomCourse)
+            for (const prereq of prereqs){
+                if(!courses.includes(prereq)){
+                    if(neededCourses === 1){
+                        break
+                    }
+                    newSchedule = addCourseToSchedule(prereq, [], newSchedule, classesPerSemester)
+                    courses.push(prereq)
+                    neededCourses -= 1;
+                } 
+            }
+            newSchedule = addCourseToSchedule(randomCourse, prereqs, newSchedule, classesPerSemester)
+            courses.push(randomCourse)
+            neededCourses -= 1;
+        }
+    }
+    // Add Math 
+    let mathClasses = [111, 112]
+    let math = mathClasses[Math.floor(Math.random() * 2)]
+    console.log('Adding Math/Phys')
+    newSchedule = addCourseToSchedule(math, [], newSchedule, classesPerSemester)
+    // Add thesis
+    if(thesis) {
+        console.log('Adding Thesis')
+        addCourseToSchedule(108, [], newSchedule, classesPerSemester)
+    }
+    else {
+        console.log('Adding Additional TE')
+        // Add technical Elective
+        var randomCourse = ecePreferredElectives[Math.floor(Math.random() * preferredElectives.length)]
+        if(!courses.includes(randomCourse)){
+            let prereqs = await getPrereqs(randomCourse)
+            for (const prereq of prereqs){
+                if(!courses.includes(prereq)){
+                    if(neededCourses === 1){
+                        break
+                    }
+                    newSchedule = addCourseToSchedule(prereq, [], newSchedule, classesPerSemester)
+                    courses.push(prereq)
+                    neededCourses -= 1;
+                } 
+            }
+            newSchedule = addCourseToSchedule(randomCourse, prereqs, newSchedule, classesPerSemester)
+            courses.push(randomCourse)
+            neededCourses -= 1;
+        }
+        // Add Project
+        console.log('Adding Project')
+        addCourseToSchedule(106, [], newSchedule, classesPerSemester)
     }
     return newSchedule;
 }
@@ -155,12 +349,44 @@ const getCSICoreReqs = async () =>{
     }
 }
 
+const getECECoreReqs = async () =>{
+    try{
+        const [results] = await db.query(`
+            SELECT cc.course_id
+            FROM course_concentrations cc
+            WHERE cc.concentration = 'Core' AND cc.major = 'ECE'
+            `
+        );
+        return extractCourseIDs(results)
+    }
+    catch(error){
+        console.log("Error getting core classes", error)
+        return []
+    }
+}
+
 const getCSIConcentrationReqs = async (concentration) =>{
     try{
         const [results] = await db.query(`
             SELECT cc.course_id
             FROM course_concentrations cc
             WHERE cc.concentration = ? AND cc.major = 'CSI' AND cc.isConcentrationCore = 1
+            `, [concentration]
+        );
+        return extractCourseIDs(results)
+    }
+    catch(error){
+        console.log("Error getting core classes", error)
+        return []
+    }
+}
+
+const getECEConcentrationReqs = async (concentration) =>{
+    try{
+        const [results] = await db.query(`
+            SELECT cc.course_id
+            FROM course_concentrations cc
+            WHERE cc.concentration = ? AND cc.major = 'ECE' AND cc.isConcentrationCore = 1
             `, [concentration]
         );
         return extractCourseIDs(results)
@@ -181,6 +407,28 @@ const getCSIBreadthReqs = async (concentration) => {
                 SELECT cc.course_id
                 FROM course_concentrations cc
                 WHERE cc.concentration = ? AND cc.major = 'CSI'
+                `, [electiveBreadthConcentration]
+            );
+            breadthCourses.push(extractCourseIDs(results));
+        }
+        catch(error){
+            console.log("Error getting core classes", error)
+            return []
+        }
+    }
+    return breadthCourses
+}
+
+const getECEBreadthReqs = async (concentration) => {
+    const possibleConcentrations = ['Control and Computer Systems', 'Electronic Circuits and Systems', 'Signal Processing and Communications'];
+    const requiredBreadth = possibleConcentrations.filter(choice => choice !== concentration);
+    let breadthCourses = []
+    for (const electiveBreadthConcentration of requiredBreadth){
+        try{
+            const [results] = await db.query(`
+                SELECT cc.course_id
+                FROM course_concentrations cc
+                WHERE cc.concentration = ? AND cc.major = 'ECE'
                 `, [electiveBreadthConcentration]
             );
             breadthCourses.push(extractCourseIDs(results));

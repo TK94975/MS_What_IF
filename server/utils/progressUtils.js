@@ -23,11 +23,15 @@ function convertGrade(letterGrade) {
 }
 
 function calculateRequirement(userCourses, allowedCourses, requiredCredits) {
+  console.log(requiredCredits)
     //Filter User Courses for Allowed Courses
     const eligibleCourses = userCourses.filter(course =>
-      allowedCourses.includes(course.course_id)
+      allowedCourses.includes(course.course_id) 
     );
-  
+    //console.log(userCourses)
+    console.log('\n-----')
+    console.log('Eligible courses')
+    console.log(eligibleCourses)
     // If no eligible courses, return zeros
     if (eligibleCourses.length === 0) {
       return {
@@ -55,6 +59,8 @@ function calculateRequirement(userCourses, allowedCourses, requiredCredits) {
       if (accumulatedCredits >= requiredCredits) {
         break;
       }
+      console.log('Adding course')
+      console.log(course)
       selectedCourses.push(course);
       accumulatedCredits += course.credits;
       totalGradePoints += course.gradePoint * course.credits;
@@ -215,7 +221,7 @@ async function checkBreadthRequirement(userCourses, userConcentration, coreCours
   
 // Helper function to calculate project requirement
 function calculateProjectRequirement(userCourses, requiredCredits) {
-    const projectCourseIds = [51, 52, 53, 54, 55, 59, 60];
+    const projectCourseIds = [51, 52, 53, 54, 55, 59, 60, 106];
   
     // Use calculateRequirement function
     const result = calculateRequirement(userCourses, projectCourseIds, requiredCredits);
@@ -332,7 +338,7 @@ function calculateECEMathPhysicsRequirement(userCourses) {
     return result;
 }
   
-function calculateECETechnicalElectiveRequirement(userCourses, coreCourses, breadthCourses, mathPhysicsCourses) {
+function calculateECETechnicalElectiveRequirement(userCourses, coreCourses, breadthCourses, mathPhysicsCourses, option) {
     // Exclude courses already counted
     const excludedCourseIds = [
       ...coreCourses.map(c => c.course_id),
@@ -343,17 +349,19 @@ function calculateECETechnicalElectiveRequirement(userCourses, coreCourses, brea
     const electiveCourses = userCourses.filter(
       course => !excludedCourseIds.includes(course.course_id)
     );
-  
+    console.log(`\n\nElective Courses\n\n`)
+    console.log(electiveCourses)
     // Require 3 credits (or 6 credits for Non-Thesis Option)
-    requiredCredits = 3; // Adjust as needed
-    option = 'Thesis';
+    var requiredCredits = 3; // Adjust as needed
     if (option === 'Thesis') {
         requiredCredits = 3;
     } else if (option === 'Project') {
         requiredCredits = 6;
     }
+    let ecCID = electiveCourses.map(c => c.course_id)
+    console.log(ecCID)
   
-    const result = calculateRequirement(electiveCourses, electiveCourses.map(c => c.course_id), requiredCredits);
+    const result = calculateRequirement(userCourses, electiveCourses.map(c => c.course_id), requiredCredits);
   
     return result;
 }

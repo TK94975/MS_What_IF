@@ -61,6 +61,7 @@ router.post('/completed_progress', async (req, res) => {
     let userCourses = req.body.user_courses; // Array of user's completed courses with grades
     const userConcentration = req.body.user_concentration; // String
     const calculationType = req.body.calculation_type; // 'current' or 'projected'
+    const thesis = req.body.thesis
     //console.log(req.body)
     //console.log(userConcentration);
     //console.log(userCourses);
@@ -122,7 +123,7 @@ router.post('/completed_progress', async (req, res) => {
             console.log("ECE");
             const selectedConcentration = userConcentration;//req.body.selected_concentration; // ECE concentration area
             //const thesisOption = req.body.thesis_option; // 'Thesis' or 'Project'
-            const thesisOption = 'Thesis';
+            const thesisOption = 'Project'; //BUG
             // Depth Courses
             const depthResult = await calculateECEDepthRequirement(userCourses, selectedConcentration);
             results.depth = depthResult;
@@ -140,7 +141,8 @@ router.post('/completed_progress', async (req, res) => {
             userCourses,
             depthResult.courses,
             breadthResult.courses,
-            mathPhysicsResult.courses
+            mathPhysicsResult.courses,
+            thesis
             );
             results.technicalElective = technicalElectiveResult;
     
@@ -149,14 +151,16 @@ router.post('/completed_progress', async (req, res) => {
             results.thesisProject = thesisProjectResult;
     
             // Determine overall requirements met
+            let thesisReq = (thesisOption === 'Thesis' ? 6 : 3)
+            let TEReq = (thesisOption === 'Thesis' ? 3 : 6)
             const requirementsMet = {
             depthCompleted: depthResult.completed_credits >= 12,
             breadthCompleted: breadthResult.completed_credits >= 6,
             mathPhysicsCompleted: mathPhysicsResult.completed_credits >= 3,
             technicalElectiveCompleted:
-                technicalElectiveResult.completed_credits >= (thesisOption === 'Thesis' ? 3 : 6),
+                technicalElectiveResult.completed_credits >= TEReq,
             thesisProjectCompleted:
-                thesisProjectResult.completed_credits >= (thesisOption === 'Thesis' ? 6 : 3),
+                thesisProjectResult.completed_credits >= thesisReq,
             };
     
             results.requirementsMet = requirementsMet;
