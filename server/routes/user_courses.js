@@ -4,7 +4,9 @@ const db = require('../config/db'); // Database connection
 
 const {
     createFullSchedule,
-    createDatedSchedule, 
+    createDatedSchedule,
+    getUpcomingSemester,
+    extractCourseIDs, 
     } = require('../utils/schedule_templateUtils.js')
 
 router.post('/get_user_courses', async (req, res) => {
@@ -60,32 +62,36 @@ router.post('/update_user_courses', async (req, res) => {
 });
 
 router.post('/generate_schedule', async (req, res) =>{
-    const creditValues = new Map();
-    creditValues.set('Artificial Intelligence and Machine Learning', { core: 7, concentration: 6, elective: 15, project: 3 });
-    creditValues.set('Systems', { core: 7, concentration: 6, elective: 15, project: 3 });
-    creditValues.set('Theoretical Computer Science', { core: 7, concentration: 6, elective: 15, project: 3 });
-    creditValues.set('Old Computer Science', { core: 13, elective: 15, project: 3 });
     
-    const userCourses = req.body.courses;
+    const userCourseDetails = req.body.courses;
+    const userCourses = extractCourseIDs(userCourseDetails);
+    console.log("Original user courses", userCourses);
     const userProgress = req.body.user_progress;
     const userConcentration = req.body.concentration;
-    const userStartYear = req.body.startYear;
-    const userStartSemester = req.body.startSemester;
+    let userStartYear = req.body.startYear;
+    let userStartSemester = req.body.startSemester;
     const userID = req.body.user_id;
     const userDME = req.body.dme;
     const userCourseLimit = 3; // Default to 3 unless course per semester is implemented 
     
-    if (userCourses.length === 0){
-        try{
-            const baseSchedule = await createFullSchedule(userConcentration, userCourseLimit, userDME);
-            const dateSchedule = await createDatedSchedule(userStartYear, userStartSemester, baseSchedule, userID, userCourseLimit);
-            res.status(200).json(dateSchedule);
-        }
-        catch(error){
-            res.status(400).json({error: "Error creating class schedule"})
-        }
-
+    if (userCourses.length !== 0){
+        const upcomingSemester = getUpcomingSemester();
+        console.log("Upcoming semester:", upcomingSemester)
+        userStartYear = upcomingSemester.year;
+        userStartSemester = upcomingSemester.semester;
     }
+
+    try{
+        const baseSchedule = await createFullSchedule(userCourses, userConcentration, userCourseLimit, userDME);
+        console.log("Base schedule:", baseSchedule);
+        const dateSchedule = await createDatedSchedule(userStartYear, userStartSemester, baseSchedule, userID, userCourseLimit);
+        res.status(200).json(dateSchedule);
+    }
+    catch(error){
+        res.status(400).json({error: "Error creating class schedule"})
+        console.log(error)
+    }
+
 })
 
 

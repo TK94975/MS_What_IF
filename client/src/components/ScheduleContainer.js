@@ -449,7 +449,7 @@ const ScheduleContainer =  () => {
                 dme: passedDME
             });
             console.log(response.data);
-            setCourses(response.data);
+            setCourses(courses => [...courses, ...response.data])
             setChangesMade(true);
 
         }

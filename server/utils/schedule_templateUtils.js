@@ -1,9 +1,9 @@
 const db = require('../config/db');
 
-const createFullSchedule = async (concentration, classesPerSemester, dme) =>{
+const createFullSchedule = async (userCourses, concentration, classesPerSemester, dme) =>{
     let newSchedule = [[]]
     if (concentration === 'Old Computer Science'){
-        newSchedule = await createFullOldCSISchedule(concentration, classesPerSemester, dme, newSchedule)
+        newSchedule = await createFullOldCSISchedule(userCourses, classesPerSemester, dme, newSchedule)
     }
     else {
         newSchedule = [];
@@ -11,15 +11,13 @@ const createFullSchedule = async (concentration, classesPerSemester, dme) =>{
     return newSchedule;
 }
 
-const createFullOldCSISchedule = async (concentration, classesPerSemester, dme, schedule) =>{
+const createFullOldCSISchedule = async (userCourses, classesPerSemester, dme, schedule) =>{
     let newSchedule = schedule;
     const oldCSICore = [4, 11, 1, 6];
     const preferredElectives = [25, 7, 9, 21, 32, 20, 21, 17];
-    let courses = [];
+    let courses = userCourses;
+    console.log("Courses:", courses);
     let neededCourses = 5;
-
-    console.log(dme)
-    console.log(!dme)
     if (!dme){
         newSchedule = addCourseToSchedule(14, [], newSchedule, classesPerSemester)
         neededCourses -= 1;
@@ -28,16 +26,18 @@ const createFullOldCSISchedule = async (concentration, classesPerSemester, dme, 
 
 
     for(const course of oldCSICore){
-        const prereqs = await getPrereqs(course)
-        for (const prereq of prereqs){
-            if(!courses.includes(prereq)){
-                newSchedule = addCourseToSchedule(prereq, [], newSchedule, classesPerSemester)
-                courses.push(prereq)
+        if(!courses.includes(course)){
+            const prereqs = await getPrereqs(course)
+            for (const prereq of prereqs){
+                if(!courses.includes(prereq)){
+                    newSchedule = addCourseToSchedule(prereq, [], newSchedule, classesPerSemester)
+                    courses.push(prereq)
+                }
             }
+            newSchedule = addCourseToSchedule(course, prereqs, newSchedule, classesPerSemester)
+            courses.push(course)
         }
-        newSchedule = addCourseToSchedule(course, prereqs, newSchedule, classesPerSemester)
     }
-
 
     while (neededCourses > 0){
         const randomCourse = preferredElectives[Math.floor(Math.random() * preferredElectives.length)]
@@ -130,7 +130,7 @@ const createDatedSchedule = async (startYear, startSemester, baseSchedule, userI
                     semester: currentSemester,
                     grade: null,
                     completed: 'no',
-                    user_id: parseInt(userID),
+                    user_id: parseInt(userID) || null,
                     credits: courseInfo[0].credits,
                 })
                 numCourses += 1;
@@ -150,7 +150,30 @@ const createDatedSchedule = async (startYear, startSemester, baseSchedule, userI
     return dateSchedule;
 }
 
+const getUpcomingSemester = () => {
+    const now = new Date(); 
+    const currentYear = now.getFullYear(); 
+    const currentMonth = now.getMonth() + 1; 
+
+    let nextSemester;
+    let nextYear = currentYear;
+
+    if (currentMonth >= 8 && currentMonth <= 12) {
+        nextSemester = "Spring";
+        nextYear = currentYear + 1;
+    } else {
+        nextSemester = "Fall";
+    } 
+    return { year: nextYear, semester: nextSemester };
+}
+
+const extractCourseIDs = (courseDetails) =>{
+    return courseDetails.map(course => course.id)
+}
+
 module.exports = {
     createFullSchedule,
-    createDatedSchedule
+    createDatedSchedule,
+    getUpcomingSemester,
+    extractCourseIDs
 };
