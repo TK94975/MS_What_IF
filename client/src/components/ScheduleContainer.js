@@ -572,6 +572,7 @@ const ScheduleContainer =  () => {
                     </Button>}
                 </Col>
             </Row>
+            {/* Generate CSI Courses */}
             {selectedMajor === "CSI" && (
                 <Row className="align-items-center" style={{ marginTop: '20px' }}>
                     <Col style={{ textAlign: 'left', display: 'flex', gap: '10px' }}>
@@ -579,7 +580,18 @@ const ScheduleContainer =  () => {
                             Generate Schedule
                         </Button>
                     </Col>
-                </Row >
+                </Row>
+            )}
+            
+            {/* Generate CSI Courses */}
+            {selectedMajor === "ECE" && (
+                <Row className="align-items-center" style={{ marginTop: '20px' }}>
+                    <Col style={{ textAlign: 'left', display: 'flex', gap: '10px' }}>
+                        <Button onClick={handleGenerateSchedule} id="generate_schedule" data-testid="generate_schedule">
+                            Generate Schedule
+                        </Button>
+                    </Col>
+                </Row>
             )}
 
             {/*Modal to show course description to user on request */}

@@ -65,9 +65,9 @@ router.post('/generate_schedule', async (req, res) =>{
     
     const userCourseDetails = req.body.courses;
     const userCourses = extractCourseIDs(userCourseDetails);
-    console.log("Original user courses", userCourses);
+    console.log("/generate_schedule: Original user courses", userCourses);
     const userProgress = req.body.user_progress;
-    console.log("User Progress", userProgress);
+    console.log("/generate_schedule: User Progress", userProgress);
     const userConcentration = req.body.concentration;
     let userStartYear = req.body.startYear;
     let userStartSemester = req.body.startSemester;

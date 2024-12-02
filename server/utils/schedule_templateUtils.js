@@ -3,14 +3,56 @@ const db = require('../config/db');
 const preferredElectives = [25, 7, 9, 21, 32, 20, 21, 17];
 
 const createFullSchedule = async (userCourses, userProgress, concentration, classesPerSemester, dme) =>{
+    console.log(`In createFullSchedule... concentration: ${concentration}`)
     let newSchedule = [[]]
     if (concentration === 'Old Computer Science'){
         newSchedule = await createFullOldCSISchedule(userCourses, classesPerSemester, dme, newSchedule)
     }
-    else if(concentration === 'Theoretical Computer Science' || 'Systems' || 'Artificial Intelligence and Machine Learning'){
+    else if((concentration === 'Theoretical Computer Science') || (concentration === 'Systems') || (concentration ===  'Artificial Intelligence and Machine Learning')){
+        console.log('HERE')
         newSchedule = await createFullCSISchedule(userCourses, userProgress, concentration, classesPerSemester, dme, newSchedule);
     }
+    else {
+        // ECE
+        console.log('createFullSchedule: ECE CONCENTRATION')
+        newSchedule = await createFullECESchedule(userCourses, userProgress, concentration, classesPerSemester, dme, newSchedule);
+    }
     return newSchedule;
+}
+
+const createFullECESchedule = async (userCourses, userProgress, concentration, classesPerSemester, dme, schedule) => {
+    console.log(`\ncreateFullECESchedule: \nuserCourses: ${userCourses}\nuserProgress: ${userProgress}\nconcentration: ${concentration}\nclassesPerSemester: ${classesPerSemester}\ndme: ${dme}\nschedule: ${schedule}`)
+    // Get their current progress
+    let newSchedule = schedule;
+    let courses = userCourses;
+    //get the required prereqs
+    console.log('\nGETTING CORE REQS:')
+    const coreCourses = await getECECoreReqs();
+    console.log('\nCORE REQS:')
+    console.log(coreCourses)
+
+    console.log('\nGETTING CONCENTRATION REQS:')
+    const conCourses = await getECEConcentrationReqs(concentration);
+    console.log('\nCONCENTRATION REQS:')
+    console.log(conCourses)
+    
+    console.log('\nGETTING BREADTH REQS:')
+    const breadthReqs = await getECEBreadthReqs(concentration);
+    console.log('\nBREADTH REQS:')
+    console.log(breadthReqs)
+    
+    // Check for completed electives
+    const electiveCompleted = userProgress?.elective?.completed_credits || 0;
+    const conCoreCredits = userProgress?.concentration?.completed_credits || 0;
+    console.log(`electiveCompleted: ${electiveCompleted}`)
+    console.log(`conCoreCredits: ${conCoreCredits}`)
+    
+    let neededCourses = 5 - electiveCompleted ;
+    if (!dme){ 
+        newSchedule = addCourseToSchedule(14, [], newSchedule, classesPerSemester)
+        neededCourses -= 1;   
+    }
+    courses.push(14)
 }
 
 const createFullCSISchedule = async (userCourses, userProgress, concentration, classesPerSemester, dme, schedule) =>{
@@ -156,12 +198,44 @@ const getCSICoreReqs = async () =>{
     }
 }
 
+const getECECoreReqs = async () =>{
+    try{
+        const [results] = await db.query(`
+            SELECT cc.course_id
+            FROM course_concentrations cc
+            WHERE cc.concentration = 'Core' AND cc.major = 'ECE'
+            `
+        );
+        return extractCourseIDs(results)
+    }
+    catch(error){
+        console.log("Error getting core classes", error)
+        return []
+    }
+}
+
 const getCSIConcentrationReqs = async (concentration) =>{
     try{
         const [results] = await db.query(`
             SELECT cc.course_id
             FROM course_concentrations cc
             WHERE cc.concentration = ? AND cc.major = 'CSI' AND cc.isConcentrationCore = 1
+            `, [concentration]
+        );
+        return extractCourseIDs(results)
+    }
+    catch(error){
+        console.log("Error getting core classes", error)
+        return []
+    }
+}
+
+const getECEConcentrationReqs = async (concentration) =>{
+    try{
+        const [results] = await db.query(`
+            SELECT cc.course_id
+            FROM course_concentrations cc
+            WHERE cc.concentration = ? AND cc.major = 'ECE' AND cc.isConcentrationCore = 1
             `, [concentration]
         );
         return extractCourseIDs(results)
@@ -182,6 +256,28 @@ const getCSIBreadthReqs = async (concentration) => {
                 SELECT cc.course_id
                 FROM course_concentrations cc
                 WHERE cc.concentration = ? AND cc.major = 'CSI'
+                `, [electiveBreadthConcentration]
+            );
+            breadthCourses.push(extractCourseIDs(results));
+        }
+        catch(error){
+            console.log("Error getting core classes", error)
+            return []
+        }
+    }
+    return breadthCourses
+}
+
+const getECEBreadthReqs = async (concentration) => {
+    const possibleConcentrations = ['Control and Computer Systems', 'Electronic Circuits and Systems', 'Signal Processing and Communications'];
+    const requiredBreadth = possibleConcentrations.filter(choice => choice !== concentration);
+    let breadthCourses = []
+    for (const electiveBreadthConcentration of requiredBreadth){
+        try{
+            const [results] = await db.query(`
+                SELECT cc.course_id
+                FROM course_concentrations cc
+                WHERE cc.concentration = ? AND cc.major = 'ECE'
                 `, [electiveBreadthConcentration]
             );
             breadthCourses.push(extractCourseIDs(results));
