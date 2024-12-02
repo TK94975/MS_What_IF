@@ -21,6 +21,8 @@ const ProfileBox = () => {
         sessionStorage.removeItem('userMajor');
         sessionStorage.removeItem('userConcentration')
         sessionStorage.setItem('userLoggedIn?', "false");
+        sessionStorage.removeItem('userStartYear')
+        sessionStorage.removeItem('userStartSemester')
         setIsUserSignedIn(false);
     }
 

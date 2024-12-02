@@ -53,7 +53,7 @@ const ScheduleContainer =  () => {
             const response = await axios.post(`${process.env.REACT_APP_SERVER_URL}/user_courses/get_user_courses`, {
                 user_id,
             });
-            console.log(response.data.user_courses)
+            console.log("User courses: ", response.data.user_courses)
             setCourses(response.data.user_courses);
         } catch (err) {
             console.error("Error fetching courses:");
@@ -447,8 +447,11 @@ const ScheduleContainer =  () => {
                 startSemester: userStartSemester,
                 user_id: sessionStorage.getItem('userID') || 'null',
                 dme: passedDME
-
             });
+            console.log(response.data);
+            setCourses(response.data);
+            setChangesMade(true);
+
         }
         catch(error){
             console.log("Error generating schedule", error)

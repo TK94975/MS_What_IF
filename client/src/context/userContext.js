@@ -24,6 +24,8 @@ export const UserProvider = ({ children }) => {
             setIsUserSignedIn(true);
             setSelectedMajor(sessionStorage.getItem("userMajor") || "CSI");
             setSelectedConcentration(sessionStorage.getItem("userConcentration") || defaultConcentrations['CSI']);
+            setUserStartYear(sessionStorage.getItem('userStartYear'))
+            setUserStartSemester(sessionStorage.getItem('userStartSemester'))
         } else {
             setIsUserSignedIn(false);
         }
@@ -32,6 +34,8 @@ export const UserProvider = ({ children }) => {
     useEffect(() => {
         setSelectedMajor(sessionStorage.getItem("userMajor") || "CSI");
         setSelectedConcentration(sessionStorage.getItem("userConcentration") || defaultConcentrations['CSI']);
+        setUserStartYear(sessionStorage.getItem('userStartYear') || "")
+        setUserStartSemester(sessionStorage.getItem('userStartSemester') || "")
     }, [isUserSignedIn]);
 
     const handleMajorChange = (major) => {

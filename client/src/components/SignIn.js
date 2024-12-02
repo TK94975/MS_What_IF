@@ -31,6 +31,9 @@ const handleSubmit = async (event) => {
 	sessionStorage.setItem('userMajor', response.data[0].major);
 	sessionStorage.setItem('userConcentration', response.data[0].concentration)
 	sessionStorage.setItem('userLoggedIn?', 'true');
+	sessionStorage.setItem('userStartYear', response.data[0].start_year)
+	sessionStorage.setItem('userStartSemester', response.data[0].start_semester)
+	console.log("session: ", response.data[0])
 	setIsUserSignedIn(true);
 
 	} catch (error) {

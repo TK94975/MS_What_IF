@@ -2,6 +2,11 @@ var express = require('express');
 var router = express.Router();
 const db = require('../config/db'); // Database connection
 
+const {
+    createFullSchedule,
+    createDatedSchedule, 
+    } = require('../utils/schedule_templateUtils.js')
+
 router.post('/get_user_courses', async (req, res) => {
     try {
         const user_id = req.body.user_id;
@@ -65,8 +70,22 @@ router.post('/generate_schedule', async (req, res) =>{
     const userProgress = req.body.user_progress;
     const userConcentration = req.body.concentration;
     const userStartYear = req.body.startYear;
-    const userStartSemester = req.body.startSemester; 
-    console.log("Req: ", req.body)
+    const userStartSemester = req.body.startSemester;
+    const userID = req.body.user_id;
+    const userDME = req.body.dme;
+    const userCourseLimit = 3; // Default to 3 unless course per semester is implemented 
+    
+    if (userCourses.length === 0){
+        try{
+            const baseSchedule = await createFullSchedule(userConcentration, userCourseLimit, userDME);
+            const dateSchedule = await createDatedSchedule(userStartYear, userStartSemester, baseSchedule, userID, userCourseLimit);
+            res.status(200).json(dateSchedule);
+        }
+        catch(error){
+            res.status(400).json({error: "Error creating class schedule"})
+        }
+
+    }
 })
 
 

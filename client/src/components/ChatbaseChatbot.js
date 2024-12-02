@@ -37,7 +37,7 @@ const ChatbaseChatbot = () => {
     <Row className="align-items-center" style={{ marginTop: '20px' }}>
       <Col style={{ textAlign: 'left', display: 'flex', gap: '10px' }}>
           <Button onClick={reloadChatbot} id="generate_schedule" data-testid="generate_schedule">
-          Reload Chatbot with Updated Courswork
+          Reload Chatbot with Updated Coursework
           </Button>
       </Col>
     </Row >
