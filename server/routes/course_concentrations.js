@@ -2,8 +2,6 @@ const express = require('express');
 const router = express.Router();
 const db = require('../config/db'); // Ensure this path is correct and db connection is set up
 
-
-
 // GET course_concentration - Retrieve all course prerequisites
 router.get('/', async (req, res) => {
     try {

@@ -19,6 +19,11 @@ const ScheduleContainer =  () => {
         courses,
         setCourses,
         selectedConcentration,
+        selectedMajor,
+        userStartYear,
+        userStartSemester,
+        userProgressProjected,
+        passedDME,
     } = useContext(UserContext);
     
     const gradeOptions = ["A", "A-", "B+", "B", "B-", "C+", "C", "D", "F", "E"]; // Enum for grade updating
@@ -49,6 +54,7 @@ const ScheduleContainer =  () => {
             const response = await axios.post(`${process.env.REACT_APP_SERVER_URL}/user_courses/get_user_courses`, {
                 user_id,
             });
+            console.log("User courses: ", response.data.user_courses)
             setCourses(response.data.user_courses);
         } catch (err) {
             console.error("Error fetching courses:");
@@ -424,7 +430,34 @@ const ScheduleContainer =  () => {
         setCourses(updatedCourses);
         setChangesMade(true); // Track changes for saving
     };
-    
+
+    /* Logic for generating schedule button */
+    const handleGenerateSchedule = async () =>{
+        console.log("year: ", userStartYear)
+        console.log("semester:", userStartSemester)
+        if (userStartYear === "" || userStartSemester === ""){
+            return
+        }
+        try{
+            console.log("Trying");
+            const response = await axios.post(`${process.env.REACT_APP_SERVER_URL}/user_courses/generate_schedule`, {
+                courses: courses,
+                user_progress: userProgressProjected,
+                concentration: selectedConcentration,
+                startYear: userStartYear,
+                startSemester: userStartSemester,
+                user_id: sessionStorage.getItem('userID') || 'null',
+                dme: passedDME
+            });
+            console.log(response.data);
+            setCourses(courses => [...courses, ...response.data])
+            setChangesMade(true);
+
+        }
+        catch(error){
+            console.log("Error generating schedule", error)
+        }
+    }
     return (
         <div
             style={{backgroundColor: "lightgray"}}
@@ -450,23 +483,23 @@ const ScheduleContainer =  () => {
                                                     department={course.department}
                                                     title={course.title}
                                                     courseNumber={course.number}
-                                                    major={course.department}
+                                                    major={course.department} 
                                                     course_id={course.id}
                                                     concentration={selectedConcentration}
                                                 >
-                                                    <p>{`${course.id} ${course.department} ${course.number} ${selectedConcentration}`}</p>
+                                                    
                                                     <Card>
                                                         <ColorByconcentration concentration={selectedConcentration}>
                                                             <Row>
                                                                 <Col xs={1}>
                                                                     <Button
-                                                                        variant="link"
+                                                                        variant="light"
                                                                         onClick={() => handleShowDescription(course.id)}
                                                                     >
                                                                         {`${course.department} ${course.number}`}
                                                                     </Button>
                                                                 </Col>
-                                                                <Col xs={6} className="d-flex align-items-center">
+                                                                <Col xs={4} className="d-flex align-items-center">
                                                                     {course.title || "No courses entered"}
                                                                 </Col>
                                                                 <Col xs={2} className="d-flex align-items-center">
@@ -478,7 +511,7 @@ const ScheduleContainer =  () => {
                                                                     />
                                                                 </Col>
                                                                 {course.id && (
-                                                                    <Col xs={2} className="d-flex align-items-center">
+                                                                    <Col xs={3} className="d-flex align-items-center">
                                                                         <Form.Select
                                                                             value={course.grade || ""}
                                                                             onChange={(e) =>
@@ -539,6 +572,15 @@ const ScheduleContainer =  () => {
                     </Button>}
                 </Col>
             </Row>
+            {selectedMajor === "CSI" && (
+                <Row className="align-items-center" style={{ marginTop: '20px' }}>
+                    <Col style={{ textAlign: 'left', display: 'flex', gap: '10px' }}>
+                        <Button onClick={handleGenerateSchedule} id="generate_schedule" data-testid="generate_schedule">
+                            Generate Schedule
+                        </Button>
+                    </Col>
+                </Row >
+            )}
 
             {/*Modal to show course description to user on request */}
             <Modal

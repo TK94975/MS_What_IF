@@ -26,6 +26,8 @@ require('dotenv').config();
       major ENUM('CSI', 'ECE', 'MAT', 'PHY'),
       concentration ENUM('Core','Artificial Intelligence and Machine Learning', 'Systems', 'Theoretical Computer Science', 'Old Computer Science','Signal Processing and Communications','Electronic Circuits and Systems','Control and Computer Systems', 'none'),
       role ENUM('user', 'admin') DEFAULT 'user',
+      start_year INT NOT NULL,
+      start_semester ENUM('Spring', 'Summer', 'Fall', 'Winter') NOT NULL,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     );`;

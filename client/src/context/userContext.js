@@ -13,6 +13,10 @@ export const UserProvider = ({ children }) => {
     const [selectedConcentration, setSelectedConcentration] = useState(defaultConcentrations['CSI']);
     const [courses, setCourses] = useState([]); // User courses
     const [concentrationRequirements, setConcentrationRequirements] = useState({});
+    const [userStartYear, setUserStartYear] = useState("");
+    const [userStartSemester, setUserStartSemester] = useState("");
+    const [userProgressProjected, setUserProgressProjected] = useState({});
+    const [passedDME, setPassedDME] = useState(false);
 
 
     useEffect(() => {
@@ -20,6 +24,8 @@ export const UserProvider = ({ children }) => {
             setIsUserSignedIn(true);
             setSelectedMajor(sessionStorage.getItem("userMajor") || "CSI");
             setSelectedConcentration(sessionStorage.getItem("userConcentration") || defaultConcentrations['CSI']);
+            setUserStartYear(sessionStorage.getItem('userStartYear'))
+            setUserStartSemester(sessionStorage.getItem('userStartSemester'))
         } else {
             setIsUserSignedIn(false);
         }
@@ -28,6 +34,8 @@ export const UserProvider = ({ children }) => {
     useEffect(() => {
         setSelectedMajor(sessionStorage.getItem("userMajor") || "CSI");
         setSelectedConcentration(sessionStorage.getItem("userConcentration") || defaultConcentrations['CSI']);
+        setUserStartYear(sessionStorage.getItem('userStartYear') || "")
+        setUserStartSemester(sessionStorage.getItem('userStartSemester') || "")
     }, [isUserSignedIn]);
 
     const handleMajorChange = (major) => {
@@ -50,6 +58,14 @@ export const UserProvider = ({ children }) => {
                 handleConcentrationChange,
                 courses,
                 setCourses,
+                userStartYear,
+                setUserStartYear,
+                userStartSemester,
+                setUserStartSemester,
+                userProgressProjected,
+                setUserProgressProjected,
+                passedDME,
+                setPassedDME
             }}
         >
             {children}

@@ -2,6 +2,13 @@ var express = require('express');
 var router = express.Router();
 const db = require('../config/db'); // Database connection
 
+const {
+    createFullSchedule,
+    createDatedSchedule,
+    getUpcomingSemester,
+    extractCourseIDs, 
+    } = require('../utils/schedule_templateUtils.js')
+
 router.post('/get_user_courses', async (req, res) => {
     try {
         const user_id = req.body.user_id;
@@ -53,5 +60,39 @@ router.post('/update_user_courses', async (req, res) => {
         console.error("Update failed", error);
     }
 });
+
+router.post('/generate_schedule', async (req, res) =>{
+    
+    const userCourseDetails = req.body.courses;
+    const userCourses = extractCourseIDs(userCourseDetails);
+    console.log("Original user courses", userCourses);
+    const userProgress = req.body.user_progress;
+    console.log("User Progress", userProgress);
+    const userConcentration = req.body.concentration;
+    let userStartYear = req.body.startYear;
+    let userStartSemester = req.body.startSemester;
+    const userID = req.body.user_id;
+    const userDME = req.body.dme;
+    const userCourseLimit = 3; // Default to 3 unless course per semester is implemented 
+    
+    if (userCourses.length !== 0){
+        const upcomingSemester = getUpcomingSemester();
+        userStartYear = upcomingSemester.year;
+        userStartSemester = upcomingSemester.semester;
+    }
+
+    try{
+        const baseSchedule = await createFullSchedule(userCourses, userProgress, userConcentration, userCourseLimit, userDME);
+        console.log("Base Schedule:",baseSchedule)
+        const dateSchedule = await createDatedSchedule(userStartYear, userStartSemester, baseSchedule, userID, userCourseLimit);
+        res.status(200).json(dateSchedule);
+    }
+    catch(error){
+        res.status(400).json({error: "Error creating class schedule"})
+        console.log(error)
+    }
+
+})
+
 
 module.exports = router;

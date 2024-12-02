@@ -11,6 +11,12 @@ const MajorConcentrationSelector = () => {
         handleMajorChange,
         selectedConcentration,
         handleConcentrationChange,
+        userStartYear,
+        setUserStartYear,
+        userStartSemester,
+        setUserStartSemester,
+        passedDME,
+        setPassedDME
     } = useContext(UserContext)
 
     const majors = [
@@ -30,15 +36,23 @@ const MajorConcentrationSelector = () => {
         ["Control and Computer Systems", "Control Systems"],
         ],
     };
+        const semesterOptions = ['Spring','Summer','Fall','Winter'];
+        const yearOptions = [2022,2023,2024,2025,2026,2027];
+
+        const handleUserStartYear = (year) =>{
+            setUserStartYear(year);
+        }
+        const handleUserStartSemester = (semester) =>{
+            setUserStartSemester(semester);
+        }
+
 
     return (
         <Container>
         <Row>
             <ColorByMajor major={selectedMajor}>
-            <Form.Group as={Row}>
-            <Form.Label column sm={3} id="major-label">
-                Major
-            </Form.Label>
+            <h3 >Major</h3>
+            <Form.Group className="mb-3">
             <Col sm={9}>
                 <Form.Select 
                     aria-labelledby="major-label"
@@ -57,10 +71,8 @@ const MajorConcentrationSelector = () => {
         </Row>
         <Row>
             <ColorByconcentration concentration={selectedConcentration}>
-            <Form.Group as={Row}>
-            <Form.Label column sm={3} id="concentration-label">
-                Concentration
-            </Form.Label>
+            <h3 >Concentration</h3>
+            <Form.Group className="mb-3">
             <Col sm={9}>
                 <Form.Select
                 aria-labelledby="concentration-label"
@@ -76,6 +88,58 @@ const MajorConcentrationSelector = () => {
                 </Form.Select>
             </Col>
             </Form.Group>
+            </ColorByconcentration>
+        </Row>
+        <Row>
+            <ColorByMajor major={selectedMajor}>
+                <h3>Starting Semester</h3>
+                <Form.Group as={Row} className="mb-3">
+                    <Col sm={6}>
+                        <Form.Select
+                            value={userStartYear}
+                            onChange={(e) => handleUserStartYear(e.target.value)}
+                            required
+                        >
+                            <option value="" disabled>Year</option>
+                            {yearOptions.map((value) => (
+                                <option key={value} value={value}>
+                                    {value}
+                                </option>
+                            ))}
+                        </Form.Select>
+                    </Col>
+                    <Col sm={6}>
+                        <Form.Select
+                            value={userStartSemester}
+                            onChange={(e) => handleUserStartSemester(e.target.value)}
+                            required
+                        >
+                            <option value="" disabled>Semester</option>
+                            {semesterOptions.map((value) => (
+                                <option key={value} value={value}>
+                                    {value}
+                                </option>
+                            ))}
+                        </Form.Select>
+                    </Col>
+                </Form.Group>
+            </ColorByMajor>
+        </Row>
+        <Row>
+            <ColorByconcentration concentration={selectedConcentration}>
+                <Col sm={8}>
+                    <h3>Discrete Mathematics Exam</h3>
+                    <Form.Group as={Row} className="mb-3 align-items-center">
+                        <Col>
+                            <Form.Check
+                                type="checkbox"
+                                label="Passed?"
+                                checked={passedDME}
+                                onChange={() => setPassedDME(!passedDME)}
+                            />
+                        </Col>
+                    </Form.Group>
+                </Col>
             </ColorByconcentration>
         </Row>
         </Container>

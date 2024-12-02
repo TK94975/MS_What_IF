@@ -10,11 +10,13 @@ const ProgressTable = () => {
         selectedConcentration,
         selectedMajor,
         courses,
+        userProgressProjected,
+        setUserProgressProjected
     } = useContext(UserContext)
 
     const[concentrationRequirements, setConcentrationRequirements] = useState({})
     const [userProgress, setUserProgress] = useState({});
-    const [userProgressProjected, setUserProgressProjected] = useState({});
+
 
     const eceConcentrations = [
         'Signal Processing and Communications',
@@ -107,21 +109,21 @@ const ProgressTable = () => {
 
 
     useEffect(() => {
-        getConcentrationRequirements();
-        getUserProgress('current');
-        getUserProgress('projected');
+        if(!isUserSignedIn){
+            setUserProgress([]);
+            setUserProgressProjected([])
+            getConcentrationRequirements();
+        } else{
+            getConcentrationRequirements();
+            getUserProgress('current');
+            getUserProgress('projected');
+        }
     }, [selectedConcentration, isUserSignedIn]);
     
     useEffect(() => {
         getUserProgress('current');
         getUserProgress('projected');
     }, [courses]);
-
-    useEffect(()=>{
-        if(!isUserSignedIn){
-            setUserProgress([]);
-        }
-    },[isUserSignedIn]);
 
     const getGPAColor = (gpa) =>({
         color: 'white',
