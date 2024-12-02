@@ -147,7 +147,7 @@ router.post('/completed_progress', async (req, res) => {
             results.technicalElective = technicalElectiveResult;
     
             // Thesis/Project
-            const thesisProjectResult = calculateECEThesisProjectRequirement(userCourses, thesisOption);
+            const thesisProjectResult = calculateECEThesisProjectRequirement(userCourses, thesis);
             results.thesisProject = thesisProjectResult;
     
             // Determine overall requirements met

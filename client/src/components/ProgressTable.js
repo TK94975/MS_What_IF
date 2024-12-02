@@ -43,6 +43,10 @@ const ProgressTable = () => {
                 response.data.technicalElective = '6'
                 response.data.thesis = '3'
             }
+            else {
+                response.data.technicalElective = '3'
+                response.data.thesis = '6'
+            }
             setConcentrationRequirements(response.data);
         } catch (error) {
             console.log("Error status:", error.response?.status);  // Log error status code
@@ -228,7 +232,7 @@ const ProgressTable = () => {
                     {/* Technical Elective */}
                     <tr>
                         <th>Technical Elective</th>
-                        <td>{formatCredits(concentrationRequirements.technicalElective)} credits</td>
+                        <td>{formatCredits((thesisProject=='Thesis'?'3':'6'))} credits</td>
                         {/* Current Progress */}
                         <td style={getCreditColor(userProgress.technicalElective?.completed_credits || 0, concentrationRequirements.technicalElective || 0)}>
                         {formatCredits(userProgress.technicalElective?.completed_credits)} credits
@@ -247,7 +251,7 @@ const ProgressTable = () => {
                     {/* Thesis/Project */}
                     <tr>
                         <th>Thesis/Project</th>
-                        <td>{formatCredits(concentrationRequirements.thesis || concentrationRequirements.project)} credits</td>
+                        <td>{formatCredits((thesisProject=='Thesis'?'6':'3'))} credits</td>
                         {/* Current Progress */}
                         <td style={getCreditColor(userProgress.thesisProject?.completed_credits || 0, (concentrationRequirements.thesis || concentrationRequirements.project) || 0)}>
                         {formatCredits(userProgress.thesisProject?.completed_credits)} credits

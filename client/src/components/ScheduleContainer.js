@@ -24,6 +24,8 @@ const ScheduleContainer =  () => {
         userStartSemester,
         userProgressProjected,
         passedDME,
+        thesisProject,
+        setThesisProject
     } = useContext(UserContext);
     
     const gradeOptions = ["A", "A-", "B+", "B", "B-", "C+", "C", "D", "F", "E"]; // Enum for grade updating
@@ -450,7 +452,7 @@ const ScheduleContainer =  () => {
                 startSemester: userStartSemester,
                 user_id: sessionStorage.getItem('userID') || 'null',
                 dme: passedDME, 
-                thesis: false
+                thesis: (thesisProject==='Thesis')
             });
             console.log(response.data);
             setCourses(courses => [...courses, ...response.data])
