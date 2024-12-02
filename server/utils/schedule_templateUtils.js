@@ -352,9 +352,23 @@ const extractCourseIDs = (courseDetails) =>{
     return courseDetails.map(course => course.id ?? course.course_id)
 }
 
+function isEarlierSemester(year1, semester1, year2, semester2) {
+    const semesterOrder = ["Spring", "Fall"];
+
+    if (year1 < year2) {
+        return true;
+    }
+    if (year1 > year2) {
+        return false;
+    }
+
+    return semesterOrder.indexOf(semester1) < semesterOrder.indexOf(semester2);
+}
+
 module.exports = {
     createFullSchedule,
     createDatedSchedule,
     getUpcomingSemester,
-    extractCourseIDs
+    extractCourseIDs,
+    isEarlierSemester
 };
