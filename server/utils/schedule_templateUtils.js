@@ -32,7 +32,6 @@ const createFullCSISchedule = async (userCourses, userProgress, concentration, c
             console.log("Added DME")
             neededCourses -= 1;
             console.log("Needed courses", neededCourses)  
-        
         } 
     }
     courses.push(14) 
@@ -358,7 +357,7 @@ const extractCourseIDs = (courseDetails) =>{
     return courseDetails.map(course => course.id ?? course.course_id)
 }
 
-function isEarlierSemester(year1, semester1, year2, semester2) {
+const isEarlierSemester = (year1, semester1, year2, semester2) => {
     const semesterOrder = ["Spring", "Fall"];
 
     if (year1 < year2) {
@@ -371,10 +370,41 @@ function isEarlierSemester(year1, semester1, year2, semester2) {
     return semesterOrder.indexOf(semester1) < semesterOrder.indexOf(semester2);
 }
 
+const findLastYearSemester = (courses) => {
+    const semesterOrder = ["Spring", "Fall"]; 
+    const semesterMap = { Spring: 0, Fall: 1 }; 
+
+    const latest = courses.reduce((latest, current) => {
+        const currentYear = current.year;
+        const currentSemester = current.semester;
+
+        if (currentYear > latest.year) {
+            return current;
+        }
+        if (
+            currentYear === latest.year &&
+            semesterMap[currentSemester] > semesterMap[latest.semester]
+        ) {
+            return current;
+        }
+        return latest;
+    }, { year: -Infinity, semester: "Spring" }); 
+
+    const latestSemesterIndex = semesterMap[latest.semester];
+    const isLastSemester = latestSemesterIndex === semesterOrder.length - 1;
+
+    const nextSemester = isLastSemester
+        ? { year: latest.year + 1, semester: semesterOrder[0] } // Move to next year, first semester
+        : { year: latest.year, semester: semesterOrder[latestSemesterIndex + 1] }; // Same year, next semester
+
+    return nextSemester;
+}
+
 module.exports = {
     createFullSchedule,
     createDatedSchedule,
     getUpcomingSemester,
     extractCourseIDs,
-    isEarlierSemester
+    isEarlierSemester,
+    findLastYearSemester
 };

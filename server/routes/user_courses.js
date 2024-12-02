@@ -7,7 +7,8 @@ const {
     createDatedSchedule,
     getUpcomingSemester,
     extractCourseIDs,
-    isEarlierSemester, 
+    isEarlierSemester,
+    findLastYearSemester 
     } = require('../utils/schedule_templateUtils.js')
 
 router.post('/get_user_courses', async (req, res) => {
@@ -66,9 +67,7 @@ router.post('/generate_schedule', async (req, res) =>{
     
     const userCourseDetails = req.body.courses;
     const userCourses = extractCourseIDs(userCourseDetails);
-    console.log("Original user courses", userCourses);
     const userProgress = req.body.user_progress;
-    console.log("User Progress", userProgress);
     const userConcentration = req.body.concentration;
     let userStartYear = req.body.startYear;
     let userStartSemester = req.body.startSemester;
@@ -80,6 +79,11 @@ router.post('/generate_schedule', async (req, res) =>{
     if(!isEarlierSemester(upcomingSemester.year, upcomingSemester.semester, userStartYear, userStartSemester)){
         userStartYear = upcomingSemester.year;
         userStartSemester = upcomingSemester.semester;
+    }
+    if (userCourseDetails.length !== 0){
+        const latestSemester = findLastYearSemester(userCourseDetails);
+        userStartYear = latestSemester.year;
+        userStartSemester = latestSemester.semester;
     }
 
     try{
