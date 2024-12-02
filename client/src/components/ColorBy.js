@@ -109,7 +109,7 @@ const ColorBycore = ({ course_id, children }) => {
 /**
  * Component to color-code courses based on their concentration.
  */
-const ColorByconcentration = ({ concentration, children }) => {
+const ColorByconcentration = ({ concentration, course_id, children }) => {
     const backgroundColor = concentrationColors[concentration] || concentrationColors.default;
 
     return (
