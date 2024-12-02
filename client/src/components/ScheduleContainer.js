@@ -495,7 +495,7 @@ const ScheduleContainer =  () => {
                                                 >
                                                     
                                                     <Card>
-                                                        <ColorByconcentration concentration={selectedConcentration}>
+                                                        <ColorByconcentration concentration={selectedConcentration} course_id={course.id}>
                                                             <Row>
                                                                 <Col xs={1}>
                                                                     <Button

@@ -109,22 +109,42 @@ const ColorBycore = ({ course_id, children }) => {
 /**
  * Component to color-code courses based on their concentration.
  */
-const ColorByconcentration = ({ concentration, course_id, children }) => {
-    const backgroundColor = concentrationColors[concentration] || concentrationColors.default;
-
+const ColorByconcentration = ({ department, course_id, children }) => {
+    const [backgroundColor, setBackgroundColor] = useState(concentrationColors.default);
+  
+    useEffect(() => {
+      const fetchConcentration = async () => {
+        try {
+          const response = await axios.get(`${process.env.REACT_APP_SERVER_URL}/course_concentrations/${department}/${course_id}/concentration`);
+          const concentration = response.data.concentration;
+  
+          // Set the background color based on concentration
+          setBackgroundColor(concentrationColors[concentration] || concentrationColors.default);
+        } catch (error) {
+          console.error("Error fetching course concentration:", error);
+          // Set to default color if no concentration is found or error occurs
+          setBackgroundColor(concentrationColors.default);
+        }
+      };
+  
+      if (course_id) {
+        fetchConcentration();
+      }
+    }, [department, course_id]);
+  
     return (
-        <div
-            style={{
-                backgroundColor,
-                padding: "5px",
-                borderRadius: "8px",
-                color: "#ffffff",
-            }}
-        >
-            {children}
-        </div>
+      <div
+        style={{
+          backgroundColor,
+          padding: "5px",
+          borderRadius: "8px",
+          color: "#ffffff",
+        }}
+      >
+        {children}
+      </div>
     );
-};
+  };
 
 /**
  * Component to color-code courses based on the user's major.
