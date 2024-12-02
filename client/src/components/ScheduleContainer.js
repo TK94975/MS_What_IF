@@ -332,10 +332,12 @@ const ScheduleContainer =  () => {
     const handleAddNewCourse = async (event) =>{
         event.preventDefault(); // Stops the page from rerendering
         console.log("handleAddNewCourse: Checking for dependency conflicts")
+        console.log('COURSES BEFORE:')
+        console.log(courses)
         //TODO:
-        let course_id = addCourseBucketNumber[addCourseDepartment].get(Number(addCourseNumber))
-        let prereq = []
-        let prereq_satisfied = true
+        var course_id = addCourseBucketNumber[addCourseDepartment].get(Number(addCourseNumber))
+        var prereq = []
+        var prereq_satisfied = true
 
         // Get the prerequisites for this new course
         try {
@@ -348,8 +350,8 @@ const ScheduleContainer =  () => {
             console.log(err.response.data.message)
             prereq = []
         }
-        let any_prereq_found = prereq.length === 0
         if(prereq.length > 0) {
+            console.log('prereq length > 0')
             let classes_found = false
             let semester_map = {
                 "winter": 0,
@@ -362,17 +364,22 @@ const ScheduleContainer =  () => {
                 let i = 0
                 while(i < courses.length) {
                     let current_course_number = courses[i].number
+                    console.log(`CURRENT COURSE NUMBER: ${current_course_number}`)
+                    console.log(`${(addYear == courses[i].year)}`)
+                    console.log(`addYear: ${addYear}`)
+                    console.log(`current Course Year: ${courses[i].year}`)
+                    console.log(`${(semester_map[addSemester.toLowerCase()] <= semester_map[courses[i].semester.toLowerCase()])}`)
                     let error_msg = `${addCourseDepartment}${addCourseNumber} MUST occur after ${courses[i].semester} ${courses[i].year} (prerequisite class ${pr.department}${prereq_num})`
+                    console.log((`${current_course_number}` === `${prereq_num}`))
                     // We found the prerequisite class in the schedule
-                    if(current_course_number === prereq_num) {
-                        any_prereq_found = true
+                    if(`${current_course_number}` === `${prereq_num}`) {
                         // check if there are prerequisites before this course
                         if(addYear < courses[i].year) {
                             // TODO: Error
                             prereq_satisfied = false
-                            alert(error_msg)
+                            alert(error_msg) 
                         }
-                        else if( addYear === courses[i].year && semester_map[addSemester.toLowerCase()] <= semester_map[courses[i].semester.toLowerCase()]) {
+                        else if( `${addYear}` === `${courses[i].year}` && (semester_map[addSemester.toLowerCase()] <= semester_map[courses[i].semester.toLowerCase()])) {
                             //TODO: Error
                             prereq_satisfied = false
                             alert(error_msg)
@@ -390,13 +397,13 @@ const ScheduleContainer =  () => {
             console.log(courses)
             // check if there are prerequisites after this course
         }
-        if (!prereq_satisfied || !any_prereq_found) {
+        if (prereq.length > 0) {
             //Error occured so return
-            if (!any_prereq_found) {
+            if (!prereq_satisfied) {
                 alert(`No prerequisite courses found in schedule! Please use the course lookup on the right sidebar for more information regarding ${addCourseDepartment}${addCourseNumber}`)
+                console.log("Prereq check FAILED... Exiting")
+                return;
             }
-            console.log("Prereq check FAILED... Exiting")
-            return;
         }
         console.log("Adding new course");
         // Remove placeholder class if exists
@@ -416,7 +423,13 @@ const ScheduleContainer =  () => {
             user_id: sessionStorage.getItem('userID')
         }
         setCourses([...updatedCourses, newCourse]);
+<<<<<<< HEAD
         updateChatbotSettings(courses);
+=======
+        console.log('COURSES AFTER:')
+        console.log(courses)
+        setShowAddCourse(false)
+>>>>>>> 1c649715ec748e2b26ab0bd0f87b42fa281edfb8
         setChangesMade(true);
     };
 
