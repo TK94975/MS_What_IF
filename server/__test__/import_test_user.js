@@ -21,7 +21,7 @@ try {
     console.log("Added test user");
 
     // Insert test data into user_courses
-    const queries = [
+    /*const queries = [
     ['1', '9', 'Spring', '2023', 'A', 'yes'],
     ['1', '29', 'Fall', '2023', 'A-', 'yes'],
     ['1', '4', 'Fall', '2023', 'B+', 'yes'],
@@ -42,7 +42,7 @@ try {
     );
     }
 
-    console.log("Added test user classes");
+    console.log("Added test user classes");*/
 
     // Close the connection
     await connection.end();

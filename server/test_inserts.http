@@ -13,6 +13,9 @@ Content-Type: application/json
 ### Get Prerequisites for a Course
 GET http://localhost:5000/course_prerequisites/21
 
+### Get course concentration
+http://localhost:5000/course_concentrations/CSI/1/concentration
+
 ### Get course by concentration
 http://localhost:5000/course_concentrations/Artificial%20Intelligence%20and%20Machine%20Learning
 
@@ -21,7 +24,7 @@ POST http://localhost:5000/progress/completed_progress
 Content-Type: application/json
 
 {
-  "user_courses": [
+  "courses": [
     { "course_id": 21, "credits": 3, "grade": "A" },
     { "course_id": 25, "credits": 3, "grade": "B+" },
     { "course_id": 5, "credits": 3, "grade": "A-" },
@@ -30,6 +33,36 @@ Content-Type: application/json
     { "course_id": 11, "credits": 4, "grade": "B-" },
     { "course_id": 27, "credits": 3, "grade": "B-" }
   ],
-  "user_concentration": "Artificial Intelligence and Machine Learning"
+  "selectedConcentration": "Artificial Intelligence and Machine Learning"
 }
 
+### course description
+POST http://localhost:5000/courses/course_description
+Content-Type: application/json
+
+{
+  "course_id": 9999
+}
+
+### Progress test
+POST http://localhost:5000/progress/completed_progress
+Content-Type: application/json
+
+{
+  "courses": [
+    { "course_id": 21, "credits": 3, "grade": "A" },
+    { "course_id": 25, "credits": 3, "grade": "B+" },
+    { "course_id": 5, "credits": 3, "grade": "A-" },
+    { "course_id": 23, "credits": 3, "grade": "B" },
+    { "course_id": 4, "credits": 3, "grade": "C+" },
+    { "course_id": 11, "credits": 4, "grade": "B-" },
+    { "course_id": 27, "credits": 3, "grade": "B-" }
+  ],
+  "selectedConcentration": "Signal Processing and Communications"
+}
+
+
+### Progress test
+POST http://localhost:5000/progress/completed_progress
+Content-Type: application/json
+[{     id: 1, year: '2023',semester: 'Fall', department: 'CSI',    number: '500',title: 'Operating Systems (3)',grade: 'A',     credits: 3,     user_id: null,     completed: 'yes'   } ]
