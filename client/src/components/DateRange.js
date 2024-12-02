@@ -2,6 +2,7 @@
 import 'bootstrap/dist/css/bootstrap.css'; // Import Bootstrap CSS
 import { Container, Col, Row, Form, Button } from 'react-bootstrap';
 import '../styles.css';
+import { ColorByMajor } from './ColorBy';
 //Packages 
 import {React, useState, useEffect, useContext} from "react";
 //Context
@@ -12,7 +13,8 @@ const DateRange = () => {
         userStartYear,
         setUserStartYear,
         userStartSemester,
-        setUserStartSemester
+        setUserStartSemester,
+        selectedMajor,
     } = useContext(UserContext);
 
     const semesterOptions = ['Spring','Summer','Fall','Winter'];
@@ -28,8 +30,9 @@ const DateRange = () => {
     return (
 <Container>
     <Col className="d-flex flex-column align-items-start">
-        <Form>
+    <ColorByMajor major={selectedMajor}>
             <Row className="align-items-center">
+            <h3 >Starting Semester</h3>
                 <Col xs={6}>
                     <Form.Group className="mb-3" controlId="formYear">
                         <Form.Select
@@ -63,7 +66,7 @@ const DateRange = () => {
                     </Form.Group>
                 </Col>
             </Row>
-        </Form>
+        </ColorByMajor>
     </Col>
 </Container>
     )

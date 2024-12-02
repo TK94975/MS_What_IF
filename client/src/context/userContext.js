@@ -13,6 +13,10 @@ export const UserProvider = ({ children }) => {
     const [selectedConcentration, setSelectedConcentration] = useState(defaultConcentrations['CSI']);
     const [courses, setCourses] = useState([]); // User courses
     const [concentrationRequirements, setConcentrationRequirements] = useState({});
+    const [userStartYear, setUserStartYear] = useState("");
+    const [userStartSemester, setUserStartSemester] = useState("");
+    const [userProgressProjected, setUserProgressProjected] = useState({});
+    const [passedDME, setPassedDME] = useState(false);
 
 
     useEffect(() => {
@@ -50,6 +54,14 @@ export const UserProvider = ({ children }) => {
                 handleConcentrationChange,
                 courses,
                 setCourses,
+                userStartYear,
+                setUserStartYear,
+                userStartSemester,
+                setUserStartSemester,
+                userProgressProjected,
+                setUserProgressProjected,
+                passedDME,
+                setPassedDME
             }}
         >
             {children}

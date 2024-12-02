@@ -44,7 +44,7 @@ const Header = () => {
                     <img src={logo} alt="UAlbany Logo" style={{ width: "100%", height: "auto" }} />
                 </Col>
             <Col>
-                <MajorConcentrationSelector/>
+                
             </Col>
 
     </Row>

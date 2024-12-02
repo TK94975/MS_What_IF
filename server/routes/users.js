@@ -19,7 +19,7 @@ router.get('/', async (req, res, next) => {
 // POST /users - Insert a new user (not admin)
 router.post('/signup', async (req, res, next) => {
   try {
-    const {email, password, major, concentration} = req.body;
+    const {email, password, major, concentration, start_year, start_semester} = req.body;
     const user = 'user';
 
     // Input validation
@@ -41,8 +41,8 @@ router.post('/signup', async (req, res, next) => {
 
     // Insert the new user into the database with password hashing
     const [result] = await db.query(
-      'INSERT INTO users (email, password, major, concentration, role) VALUES (?,?,?,?,?)',
-      [email, hashedPassword, major, concentration, user]
+      'INSERT INTO users (email, password, major, concentration, role, start_year, start_semester) VALUES (?,?,?,?,?,?,?)',
+      [email, hashedPassword, major, concentration, user, start_year, start_semester]
     );
 
     const [newUser] = await db.query(

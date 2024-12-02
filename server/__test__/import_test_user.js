@@ -14,8 +14,8 @@ try {
     });
 
     await connection.query(
-        'INSERT INTO users (email, password, major, concentration, role) VALUES (?, ?, ?, ?, ?)',
-        ['mlkerr@albany.edu', '$2b$10$Xz91xMkewlylc7oD.7udSu37MeBD0hYib59JSqSQUFlATFYFE7ro2', 'CSI', 'Old', 'user']
+        'INSERT INTO users (email, password, major, concentration, role, start_year, start_semester) VALUES (?, ?, ?, ?, ?, ?, ?)',
+        ['mlkerr@albany.edu', '$2b$10$Xz91xMkewlylc7oD.7udSu37MeBD0hYib59JSqSQUFlATFYFE7ro2', 'CSI', 'Old Computer Science', 'user', '2023', 'Spring']
       );
 
     console.log("Added test user");

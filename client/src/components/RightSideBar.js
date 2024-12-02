@@ -3,6 +3,7 @@ import React, { useState, useContext, useEffect} from 'react';
 import { UserContext } from '../context/userContext';
 import { Container, Row, Col } from "react-bootstrap";
 import DateRange from './DateRange';
+import MajorConcentrationSelector from './MajorConcentrationSelector';
 
 const RightSideBar = props => {
     const [courses, setCourses] = useState([])
@@ -105,8 +106,7 @@ const RightSideBar = props => {
 
             </div>
             <div className="container" style={styles.title}>
-                <h3 >Starting Semester</h3>
-                <DateRange/>
+                <MajorConcentrationSelector/>
             </div>
             <div className="container" style={styles.title}>
                 <h3 >Class Lookup</h3>

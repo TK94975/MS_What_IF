@@ -54,4 +54,20 @@ router.post('/update_user_courses', async (req, res) => {
     }
 });
 
+router.post('/generate_schedule', async (req, res) =>{
+    const creditValues = new Map();
+    creditValues.set('Artificial Intelligence and Machine Learning', { core: 7, concentration: 6, elective: 15, project: 3 });
+    creditValues.set('Systems', { core: 7, concentration: 6, elective: 15, project: 3 });
+    creditValues.set('Theoretical Computer Science', { core: 7, concentration: 6, elective: 15, project: 3 });
+    creditValues.set('Old Computer Science', { core: 13, elective: 15, project: 3 });
+    
+    const userCourses = req.body.courses;
+    const userProgress = req.body.user_progress;
+    const userConcentration = req.body.concentration;
+    const userStartYear = req.body.startYear;
+    const userStartSemester = req.body.startSemester; 
+    console.log("Req: ", req.body)
+})
+
+
 module.exports = router;

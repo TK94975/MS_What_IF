@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import {Row, Col} from 'react-bootstrap';
 import { Button} from 'react-bootstrap';
 
 const ChatbaseChatbot = () => {
@@ -33,7 +34,13 @@ const ChatbaseChatbot = () => {
 
   return (
     <div>
-      <Button onClick={reloadChatbot}>Reload Chatbot with Updated Courswork</Button>
+    <Row className="align-items-center" style={{ marginTop: '20px' }}>
+      <Col style={{ textAlign: 'left', display: 'flex', gap: '10px' }}>
+          <Button onClick={reloadChatbot} id="generate_schedule" data-testid="generate_schedule">
+          Reload Chatbot with Updated Courswork
+          </Button>
+      </Col>
+    </Row >
     </div>
   );
 };
