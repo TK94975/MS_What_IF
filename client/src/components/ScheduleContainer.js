@@ -5,7 +5,7 @@ import '../styles.css';
 import axios from 'axios';
 //Packages
 import {React, useState, useEffect, useContext}from "react";
-import { Accordion, Form, Card, Col, Row, Button, Modal, Toast, ModalBody } from 'react-bootstrap';
+import { Accordion, Form, Card, Col, Row, Button, Modal, Toast, ToastContainer, ModalBody } from 'react-bootstrap';
 import { UserContext } from '../context/userContext';
 import { ColorBycore, ColorByconcentration } from "./ColorBy";
 import LeftSideBar from "./LeftSideBar";
@@ -29,6 +29,7 @@ const ScheduleContainer =  () => {
     const gradeOptions = ["A", "A-", "B+", "B", "B-", "C+", "C", "D", "F", "E"]; // Enum for grade updating
     const semesterOptions = ['Spring','Summer','Fall','Winter'];
     const yearOptions = [2022,2023,2024,2025,2026,2027];
+    const [showToast, setShowToast] = useState(false);
 
     
     const [groupedCourses, setGroupedCourses] = useState({}); // User courses grouped by year and semester
@@ -436,6 +437,7 @@ const ScheduleContainer =  () => {
         console.log("year: ", userStartYear)
         console.log("semester:", userStartSemester)
         if (userStartYear === "" || userStartSemester === ""){
+            setShowToast(true);
             return
         }
         try{
@@ -459,6 +461,7 @@ const ScheduleContainer =  () => {
             console.log("Error generating schedule", error)
         }
     }
+
     return (
         <div
             style={{backgroundColor: "lightgray"}}
@@ -802,6 +805,22 @@ const ScheduleContainer =  () => {
                             </Form>
                     </ModalBody>
             </Modal>
+
+            {/*Toast for generate schedule warning*/}
+            <ToastContainer position="center" className="p-3">
+                <Toast 
+                    onClose={() => setShowToast(false)} 
+                    show={showToast} 
+                    delay={3000} 
+                    autohide
+                    bg="danger"
+                >
+                    <Toast.Header>
+                        <strong className="me-auto">Alert</strong>
+                    </Toast.Header>
+                    <Toast.Body>Please select both a start year and semester!</Toast.Body>
+                </Toast>
+            </ToastContainer>
 
         </div>
     );

@@ -6,7 +6,8 @@ const {
     createFullSchedule,
     createDatedSchedule,
     getUpcomingSemester,
-    extractCourseIDs, 
+    extractCourseIDs,
+    isEarlierSemester, 
     } = require('../utils/schedule_templateUtils.js')
 
 router.post('/get_user_courses', async (req, res) => {
@@ -76,8 +77,8 @@ router.post('/generate_schedule', async (req, res) =>{
     const userThesis = req.body.thesis;
     const userCourseLimit = 3; // Default to 3 unless course per semester is implemented 
     
-    if (userCourses.length !== 0){
-        const upcomingSemester = getUpcomingSemester();
+    const upcomingSemester = getUpcomingSemester();
+    if(!isEarlierSemester(upcomingSemester.year, upcomingSemester.semester, userStartYear, userStartSemester)){
         userStartYear = upcomingSemester.year;
         userStartSemester = upcomingSemester.semester;
     }

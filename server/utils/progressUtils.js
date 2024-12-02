@@ -168,19 +168,42 @@ async function checkBreadthRequirement(userCourses, userConcentration, coreCours
   
     for (const concentration of concentrationAreas) {
       // Get non-core courses for the concentration
-      const [areaCoursesRows] = await db.query(
-        `SELECT cc.course_id
-         FROM course_concentrations cc
-         WHERE cc.concentration = ? AND cc.major = 'CSI' AND cc.isConcentrationCore = 0`,
-        [concentration]
-      );
+      let areaCoursesRows = [];
+      if(concentration === userConcentration){
+
+        [areaCoursesRows] = await db.query(
+          `SELECT cc.course_id
+          FROM course_concentrations cc
+          WHERE cc.concentration = ? AND cc.major = 'CSI' AND cc.isConcentrationCore = false`,
+          [concentration]
+        );
+      } else {
+        console.log("Running query:", {
+          sql: `SELECT cc.course_id
+                FROM course_concentrations cc
+                WHERE cc.concentration = ? AND cc.major = 'CSI'`,
+          params: [concentration]
+        });
+        [areaCoursesRows] = await db.query(
+          `SELECT cc.course_id
+          FROM course_concentrations cc
+          WHERE cc.concentration = ? AND cc.major = 'CSI'`,
+          [concentration]
+        );
+      }
+      console.log(concentration);
+      console.log(userConcentration);
+      console.log(areaCoursesRows);
       const areaCourseIds = areaCoursesRows.map(row => row.course_id);
   
       // Check if the user has taken any course from this area
-      const coursesInArea = userCourses.filter(
+      /*const coursesInArea = userCourses.filter(
         course => areaCourseIds.includes(course.course_id) && !excludedCourseIds.includes(course.course_id)
+      );*/
+      const coursesInArea = userCourses.filter(
+        course => areaCourseIds.includes(course.course_id)
       );
-  
+
       if (coursesInArea.length > 0) {
         // Record the courses taken in this concentration
         breadthCoursesTaken[concentration] = coursesInArea;
