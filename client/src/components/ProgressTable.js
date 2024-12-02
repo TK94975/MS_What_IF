@@ -35,6 +35,46 @@ const ProgressTable = () => {
         }
 
     };
+
+    const updateChatbotSettings = async (userCourses) => {
+        const chatbotId = "75In3HL0Qo1lNM8bQCuyu"; // Your Chatbot ID
+        const secretKey = "33777c78-c604-466b-a976-ca708abfd62b"; // Your API Secret Key
+      
+        const initialMessage = `Hello! Based on your courses: \n ${courses
+            .map(
+              (course) =>
+                `${course.year} ${course.semester} - ${course.department}${course.number}: ${course.title}, Grade: ${course.grade}, Credits: ${course.credits}`
+            )
+            .join("; ")}.\n And your concentration:\n ${selectedConcentration}. How can I assist you today?`;
+        
+          const payload = {
+            chatbotId,
+            initialMessages: [
+                initialMessage
+            ],
+          };
+        
+          try {
+            const response = await fetch("https://www.chatbase.co/api/v1/update-chatbot-settings", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${secretKey}`,
+              },
+              body: JSON.stringify(payload),
+            });
+        
+            if (response.ok) {
+              console.log("Chatbot settings updated successfully!");
+            } else {
+              const error = await response.json();
+              console.error("Failed to update chatbot settings:", error);
+            }
+          } catch (err) {
+            console.error("Error while updating chatbot settings:", err);
+          }
+    };
+
     const getUserProgress = async (calculationType) => {
         console.log(`Getting user progress for ${calculationType}`);
         try {
@@ -44,7 +84,8 @@ const ProgressTable = () => {
             calculation_type: calculationType,
           });
       
-          console.log(response.data);
+          updateChatbotSettings(courses);
+          //console.log(response.data);
       
           if (calculationType === 'current') {
             setUserProgress(response.data);

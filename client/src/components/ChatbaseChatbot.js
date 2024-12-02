@@ -1,6 +1,14 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { Button} from 'react-bootstrap';
 
 const ChatbaseChatbot = () => {
+  const [reloadKey, setReloadKey] = useState(0); // State to trigger reloads
+
+  // Function to reload the chatbot
+  const reloadChatbot = () => {
+    setReloadKey((prevKey) => prevKey + 1); // Increment the key to trigger re-render
+  };
+
   useEffect(() => {
     // Chatbot config 
     window.embeddedChatbotConfig = {
@@ -21,9 +29,13 @@ const ChatbaseChatbot = () => {
     return () => {
       document.body.removeChild(script);
     };
-  }, []);
+  }, [[reloadKey]]);
 
-  return null; // no visible component to return
+  return (
+    <div>
+      <Button onClick={reloadChatbot}>Reload Chatbot with Updated Courswork</Button>
+    </div>
+  );
 };
 
 export default ChatbaseChatbot;

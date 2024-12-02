@@ -39,6 +39,19 @@ const ScheduleContainer =  () => {
     const [addCourseBucketDepartment, setAddCourseBucketDepartment] = useState(['CSI', 'ECE','PHY','MAT']); // New class department options
     const [addCourseBucketNumber, setAddCourseBucketNumber] = useState({}) // Array of Maps {CSI: [number: id], ECE" [number:id]}
 
+
+
+    const updateChatbotSettings = async (userCourses) => {
+        const chatbotId = "75In3HL0Qo1dasdM8bQCuyu"; // Your Chatbot ID
+        const secretKey = "your-secret-key"; // Your API Secret Key
+      
+        const instructions = `The user has the following courses: ${userCourses.join(
+          ", "
+        )}. Use this information to provide tailored assistance about the Master's program.`;
+        console.log(instructions);
+      };
+
+
     /* Fetching user courses from the database */
     const getUserCourses = async () => {
         const user_id = sessionStorage.getItem('userID');
@@ -47,6 +60,7 @@ const ScheduleContainer =  () => {
                 user_id,
             });
             setCourses(response.data.user_courses);
+            updateChatbotSettings(courses);
         } catch (err) {
             console.error("Error fetching courses:");
         }
@@ -60,6 +74,7 @@ const ScheduleContainer =  () => {
         } else {
             console.log("User not logged in: skipping fetch and clearing courses");
             setCourses([]);
+            updateChatbotSettings(courses);
             setGroupedCourses({});
             setChangesMade(false);
         }        
@@ -118,6 +133,7 @@ const ScheduleContainer =  () => {
             return element;
         });
         setCourses(updatedCourses);
+        updateChatbotSettings(courses);
         setChangesMade(true);
         setSaveButtonText("Save Changes");
     };
@@ -180,6 +196,7 @@ const ScheduleContainer =  () => {
             grade: null,
         };
         setCourses((prevCourses) => [...prevCourses, placeholderEntry]);
+
         setAddYear('');
         setAddSemester('');
         setShowAddSemester(false);
@@ -238,6 +255,7 @@ const ScheduleContainer =  () => {
             !(course.id === badCourse.id && course.year === badCourse.year && course.semester === badCourse.semester)
         );
         setCourses(updatedCourses);
+        updateChatbotSettings(courses);
         setShowRemoveCourseWarning(false);
         setChangesMade(true);
     };
@@ -398,6 +416,7 @@ const ScheduleContainer =  () => {
             user_id: sessionStorage.getItem('userID')
         }
         setCourses([...updatedCourses, newCourse]);
+        updateChatbotSettings(courses);
         setChangesMade(true);
     };
 
@@ -409,6 +428,7 @@ const ScheduleContainer =  () => {
                 : updatedCourse
         );
         setCourses(updatedCourses);
+        updateChatbotSettings(courses);
         setChangesMade(true); // Track changes for saving
     };
     
