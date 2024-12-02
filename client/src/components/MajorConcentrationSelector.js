@@ -3,6 +3,7 @@ import { Container, Row, Col, Form } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.css";
 import "../styles.css";
 import { UserContext } from "../context/userContext";
+import {ColorByconcentration,ColorByMajor} from "./ColorBy";
 
 const MajorConcentrationSelector = () => {
     const {
@@ -33,6 +34,7 @@ const MajorConcentrationSelector = () => {
     return (
         <Container>
         <Row>
+            <ColorByMajor major={selectedMajor}>
             <Form.Group as={Row}>
             <Form.Label column sm={3} id="major-label">
                 Major
@@ -51,8 +53,10 @@ const MajorConcentrationSelector = () => {
                 </Form.Select>
             </Col>
             </Form.Group>
+            </ColorByMajor>
         </Row>
         <Row>
+            <ColorByconcentration concentration={selectedConcentration}>
             <Form.Group as={Row}>
             <Form.Label column sm={3} id="concentration-label">
                 Concentration
@@ -72,6 +76,7 @@ const MajorConcentrationSelector = () => {
                 </Form.Select>
             </Col>
             </Form.Group>
+            </ColorByconcentration>
         </Row>
         </Container>
     );

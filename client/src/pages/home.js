@@ -22,15 +22,19 @@ import { UserProvider } from '../context/userContext';
 const Home = () => {
     return (
         <UserProvider>
-            <div id='HOME-PD' className='container'>
+            <div id='HOME-PD' className='container'
+                 style={{backgroundColor: "lightgray"}}
+            >
                 <div id='HOME-TitleRow' className='row'>
                     <Header/>
                 </div>
-                <div id='HOME-BodyRow' className='row'>
+                <div id='HOME-BodyRow' className='row'
+                     style={{backgroundColor: "lightgray"}}
+                >
                     <div id='HOME-LSB-PD' className='col'>
-                        {/* <LeftSideBar/>*/}
+                        { <LeftSideBar/>}
                     </div>
-                    <div id='HOME-CONTENT-PD' className='col-8'> 
+                    <div id='HOME-CONTENT-PD' className='col-8'>
                         <ProgressTable/>
                         <ScheduleContainer/>
                     </div>

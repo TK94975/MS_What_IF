@@ -2,11 +2,13 @@ import axios from 'axios';
 import React, { useState, useContext, useEffect} from 'react';
 import {Table} from 'react-bootstrap';
 import { UserContext } from '../context/userContext';
+import {ColorByMajor} from "./ColorBy";
 
 const ProgressTable = () => {
     const {
         isUserSignedIn,
         selectedConcentration,
+        selectedMajor,
         courses,
     } = useContext(UserContext)
 
@@ -22,19 +24,25 @@ const ProgressTable = () => {
       
     const isECE = eceConcentrations.includes(selectedConcentration);
 
-    const getConcentrationRequirements = async () =>{
+    const getConcentrationRequirements = async () => {
         console.log("Getting concentration requirements");
-        try{
+        try {
             const response = await axios.post(
-                `${process.env.REACT_APP_SERVER_URL}/progress/concentration_requirements`, 
-                {selectedConcentration});
+                `${process.env.REACT_APP_SERVER_URL}/progress/concentration_requirements`,
+                { selectedConcentration }
+            );
+            // Log the entire response object
+            console.log("Response from server:", response);
+            console.log("Response data:", response.data);  // To see the actual data
+            console.log("Response status:", response.status);  // To see the HTTP status code
             setConcentrationRequirements(response.data);
+        } catch (error) {
+            console.log("Error status:", error.response?.status);  // Log error status code
+            console.log("Error message:", error.message);  // Log error message
+            console.log("Error response data:", error.response?.data);  // Log the error response data
         }
-        catch(error){
-            console.log(error.status, error.data);
-        }
-
     };
+
     const getUserProgress = async (calculationType) => {
         console.log(`Getting user progress for ${calculationType}`);
         try {
@@ -55,6 +63,7 @@ const ProgressTable = () => {
           console.log(`Error getting user progress (${calculationType})`, error);
         }
     };
+
 
     useEffect(() => {
         getConcentrationRequirements();
@@ -93,6 +102,7 @@ const ProgressTable = () => {
 
     return (
         <div>
+            <ColorByMajor major={selectedMajor}>
             <h1>Progress</h1>
             <Table>
                 <thead>
@@ -288,7 +298,8 @@ const ProgressTable = () => {
                 )}
                 </tbody>
             </Table>
-            </div>
+            </ColorByMajor>
+        </div>
     );
 }
 

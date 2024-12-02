@@ -7,7 +7,7 @@ const db = require('../config/db'); // Ensure this path is correct and db connec
 // GET course_concentration - Retrieve all course prerequisites
 router.get('/', async (req, res) => {
     try {
-      const [prereqs] = await db.query('SELECT * FROM course_concentration');
+      const [prereqs] = await db.query('SELECT * FROM course_concentrations');
       res.json(prereqs);
     } catch (err) {
       console.error('Error fetching course concentration:', err);

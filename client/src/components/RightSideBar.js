@@ -72,7 +72,13 @@ const RightSideBar = props => {
             while(i < courses.length){
                 if (courses[i].number == desiredCourse && courses[i].department === desiredDept){
                     return (
-                        <div style={{"paddingTop":"10px"}}>
+                        <div style={{
+                            padding: "8px",
+                            borderRadius: "8px",
+                            border: "5px solid",
+                            borderColor: "purple",
+                        }}
+                        >
                             <h6>Title</h6>
                             <p>{courses[i].title}</p>
                             <h6>Description</h6>
@@ -104,10 +110,10 @@ const RightSideBar = props => {
 
             </div>
             <div className="container" style={styles.title}>
-                <h3 >Class Lookup</h3>
-                <div style={{flexDirection:'row'}}>
+                <h3>Class Lookup</h3>
+                <div style={{flexDirection: 'row'}}>
                     <input type='text' placeholder='Enter course number' onChange={event => {
-                        setDesiredCourse(event.target.value.substring(0,3))
+                        setDesiredCourse(event.target.value.substring(0, 3))
                     }}/>
                     <select onChange={event => {
                         setDesiredDept(event.target.value)
@@ -131,12 +137,12 @@ const styles = {
     "sidebar": {
         "display": "flex",
         "flexDirection": "column",
-        "padding": "10px",
+        "padding": "7px",
         "borderBottomRightRadius": "10px",
         "borderBottomLeftRadius": "10px",
         "backgroundColor": "lightGrey",
         "overflowY": "scroll",
-        "maxHeight": "60%"
+        "maxHeight": "70%"
     },
     "title": {
         "backgroundColor": "lightGrey",
@@ -146,10 +152,10 @@ const styles = {
         "paddingRight": "5px",
     },
     "spacer": {
-        "height": "10%"
+        "height": "3%"
     },
     "parent": {
-        "maxHeight": "90%",
+        "maxHeight": "100%",
         "justifyContent": "center"
     }
 }

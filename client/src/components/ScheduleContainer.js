@@ -7,6 +7,8 @@ import axios from 'axios';
 import {React, useState, useEffect, useContext}from "react";
 import { Accordion, Form, Card, Col, Row, Button, Modal, Toast, ModalBody } from 'react-bootstrap';
 import { UserContext } from '../context/userContext';
+import { ColorBycore, ColorByconcentration } from "./ColorBy";
+import LeftSideBar from "./LeftSideBar";
 
 
 // Containers the Title and the dropdown/accordions for each semester
@@ -16,6 +18,7 @@ const ScheduleContainer =  () => {
         isUserSignedIn,
         courses,
         setCourses,
+        selectedConcentration,
     } = useContext(UserContext);
     
     const gradeOptions = ["A", "A-", "B+", "B", "B-", "C+", "C", "D", "F", "E"]; // Enum for grade updating
@@ -413,65 +416,92 @@ const ScheduleContainer =  () => {
     };
     
     return (
-        <div>
+        <div
+            style={{backgroundColor: "lightgray"}}
+        >
             <h1>Schedule</h1>
             {/* Main accordian with course information */}
             <Accordion alwaysOpen>
                 {Object.keys(groupedCourses).map((year, yearIndex) => (
                     <Accordion.Item eventKey={yearIndex} key={year}>
                         <Accordion.Header>{`Year: ${year}`}</Accordion.Header>
-                        <Accordion.Body>
+                        <Accordion.Body
+                            style={{backgroundColor: "lightgray"}}
+                        >
                             {Object.keys(groupedCourses[year]).map((semester, semesterIndex) => (
                                 <div key={semester}>
                                     <h5>{semester}</h5>
                                     <ul>
-                                        {groupedCourses[year][semester].map((course, courseIndex) => (
-                                            <Card key={courseIndex}>
-                                                <Row>
-                                                    <Col xs={1}>
-                                                        <Button 
-                                                        variant="link" 
-                                                        onClick={() => handleShowDescription(course.id)}
-                                                        >
-                                                        <Row> {course.department} {course.number}</Row>
-                                                        </Button>
-                                                    </Col>
-                                                    <Col xs={6} className="d-flex align-items-center">{course.title || "No courses entered"} </Col>
-                                                    <Col xs={2} className="d-flex align-items-center"> 
-                                                        <Form.Check 
-                                                        type="checkbox" 
-                                                        label="Completed?"
-                                                        checked={course.completed === 'yes'}
-                                                        onChange={() => handleCourseCompletionToggle(course)}/>
-                                                    </Col>
-                                                    {course.id && (
-                                                        <Col xs= {2} className="d-flex align-items-center">
-                                                        <Form.Select
-                                                            value={course.grade || ''}
-                                                            onChange={(e) => handleChangeGrade(course, e.target.value)}
-                                                        >
-                                                            <option value="" disabled>Select grade</option>
-                                                            {gradeOptions.map((grade) => (
-                                                                <option key={grade} value={grade}>
-                                                                    {grade}
-                                                                </option>
-                                                            ))}
-                                                        </Form.Select>
-                                                        </Col> 
-                                                    )}
-                                                    <Col xs={1} className="d-flex align-items-center justify-content-center">
-                                                        <Button
-                                                        variant='danger'
-                                                        size='sm'
-                                                        onClick={()=>handleShowRemoveCourseWarning(course)}
-                                                        data-testid="btn-removeCourse"
-                                                        >
-                                                        X
-                                                        </Button>
-                                                    </Col>
-                                                </Row>
-                                            </Card>
-                                        ))}
+                                        {groupedCourses[year][semester].map((course) => {
+                                            // Determine if the course is a core course
+                                            return (
+                                                <ColorBycore
+                                                    key={course.id}
+                                                    department={course.department}
+                                                    title={course.title}
+                                                    courseNumber={course.number}
+                                                    major={course.department}
+                                                    course_id={course.id}
+                                                    concentration={selectedConcentration}
+                                                >
+                                                    <p>{`${course.id} ${course.department} ${course.number} ${selectedConcentration}`}</p>
+                                                    <Card>
+                                                        <ColorByconcentration concentration={selectedConcentration}>
+                                                            <Row>
+                                                                <Col xs={1}>
+                                                                    <Button
+                                                                        variant="link"
+                                                                        onClick={() => handleShowDescription(course.id)}
+                                                                    >
+                                                                        {`${course.department} ${course.number}`}
+                                                                    </Button>
+                                                                </Col>
+                                                                <Col xs={6} className="d-flex align-items-center">
+                                                                    {course.title || "No courses entered"}
+                                                                </Col>
+                                                                <Col xs={2} className="d-flex align-items-center">
+                                                                    <Form.Check
+                                                                        type="checkbox"
+                                                                        label="Completed?"
+                                                                        checked={course.completed === "yes"}
+                                                                        onChange={() => handleCourseCompletionToggle(course)}
+                                                                    />
+                                                                </Col>
+                                                                {course.id && (
+                                                                    <Col xs={2} className="d-flex align-items-center">
+                                                                        <Form.Select
+                                                                            value={course.grade || ""}
+                                                                            onChange={(e) =>
+                                                                                handleChangeGrade(course, e.target.value)
+                                                                            }
+                                                                        >
+                                                                            <option value="" disabled>
+                                                                                Select grade
+                                                                            </option>
+                                                                            {gradeOptions.map((grade) => (
+                                                                                <option key={grade} value={grade}>
+                                                                                    {grade}
+                                                                                </option>
+                                                                            ))}
+                                                                        </Form.Select>
+                                                                    </Col>
+                                                                )}
+                                                                <Col xs={1}
+                                                                     className="d-flex align-items-center justify-content-center">
+                                                                    <Button
+                                                                        variant="danger"
+                                                                        size="sm"
+                                                                        onClick={() => handleShowRemoveCourseWarning(course)}
+                                                                        data-testid="btn-removeCourse">
+                                                                        X
+                                                                    </Button>
+                                                                </Col>
+                                                            </Row>
+                                                        </ColorByconcentration>
+                                                    </Card>
+                                                </ColorBycore>
+                                            );
+                                        })}
                                     </ul>
                                 </div>
                             ))}
@@ -594,7 +624,6 @@ const ScheduleContainer =  () => {
                         <Col xs={2}>
                             <Button
                                 onClick={()=>handleRemoveCourse(selectedCourseRemove)}
-                                data-testid="btn-finalRemoveCourse"
                             >
                                 Yes
                             </Button>
