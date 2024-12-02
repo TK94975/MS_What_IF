@@ -16,21 +16,29 @@ const createFullSchedule = async (userCourses, userProgress, concentration, clas
 const createFullCSISchedule = async (userCourses, userProgress, concentration, classesPerSemester, dme, schedule) =>{
     let newSchedule = schedule;
     let courses = userCourses;
+    console.log("courses")
     const coreCourses = await getCSICoreReqs();
     const conCourses = await getCSIConcentrationReqs(concentration);
-    const breadthReqs = await getCSIBreadthReqs(concentration);
+    const breadthReqs = await getCSIBreadthReqs();
 
-    const electiveCompleted = userProgress?.elective?.completed_credits || 0;
+    const electiveCompleted = userProgress?.elective?.completed_credits/3 || 0;
     const conCoreCredits = userProgress?.concentration?.completed_credits || 0;
 
     let neededCourses = 5 - electiveCompleted ;
-    if (!dme){ 
-        newSchedule = addCourseToSchedule(14, [], newSchedule, classesPerSemester)
-        neededCourses -= 1;   
+    console.log("Needed courses", neededCourses)
+    if (!dme){
+        if(!courses.includes(14)){
+            newSchedule = addCourseToSchedule(14, [], newSchedule, classesPerSemester)
+            console.log("Added DME")
+            neededCourses -= 1;
+            console.log("Needed courses", neededCourses)  
+        
+        } 
     }
-    courses.push(14)
+    courses.push(14) 
 
-    if(!userProgress?.requirementsMet?.coreCourses){
+    if(userProgress?.requirementsMet?.coreCourses === false || userProgress?.requirementsMet?.coreCourses == null ){
+        console.log("core requirement not met")
         for(const course of coreCourses){
             if(!courses.includes(course)){
                 const prereqs = await getPrereqs(course);
@@ -42,13 +50,14 @@ const createFullCSISchedule = async (userCourses, userProgress, concentration, c
                 }
                 newSchedule = addCourseToSchedule(course, prereqs, newSchedule, classesPerSemester);
                 courses.push(course);
+                console.log("added core:", course)
             }
         }
     }
 
-    if(!userProgress?.requirementsMet?.concentrationCoreCourses){
+    if(userProgress?.requirementsMet?.concentrationCoreCourses === false || userProgress?.requirementsMet?.concentrationCoreCourses == null){
         let credits = conCoreCredits;
-        console.log("Credits", credits);
+        //console.log("Credits", credits);
         while (credits < 6){
             const randomCourse = conCourses[Math.floor(Math.random() * conCourses.length)];
             if(!courses.includes(randomCourse)){
@@ -61,58 +70,27 @@ const createFullCSISchedule = async (userCourses, userProgress, concentration, c
                 }
                 newSchedule = addCourseToSchedule(randomCourse, prereqs, newSchedule, classesPerSemester);
                 courses.push(randomCourse);
+                console.log("added concentration:", randomCourse)
                 credits += 3;
-                console.log("Credits", credits);
             }
         }
     }
 
-    console.log(breadthReqs[0])
-    console.log(breadthReqs[1])
-
-    if(!userProgress?.requirementsMet?.breadthRequirements){
-        electiveOneFlag = false;
-        electiveTwoFlag = false;
-        while(!electiveOneFlag){
-            const randomCourse = breadthReqs[0][Math.floor(Math.random() * breadthReqs[0].length)];
-            if(!courses.includes(randomCourse)){
-                const prereqs = await getPrereqs(randomCourse);
-                for (const prereq of prereqs){
-                    if(!courses.includes(prereq)){
-                        newSchedule = addCourseToSchedule(prereq, [], newSchedule, classesPerSemester);
-                        courses.push(prereq);
-                        neededCourses -= 1;
-                    }
-                }
-                newSchedule = addCourseToSchedule(randomCourse, prereqs, newSchedule, classesPerSemester);
-                courses.push(randomCourse);
-                console.log("Breadth 1", randomCourse)
-                neededCourses -= 1;
-                electiveOneFlag = true;
-            }
-        }
-        while(!electiveTwoFlag){
-            const randomCourse = breadthReqs[1][Math.floor(Math.random() * breadthReqs[1].length)];
-            if(!courses.includes(randomCourse)){
-                const prereqs = await getPrereqs(randomCourse);
-                for (const prereq of prereqs){
-                    if(!courses.includes(prereq)){
-                        newSchedule = addCourseToSchedule(prereq, [], newSchedule, classesPerSemester);
-                        courses.push(prereq);
-                        neededCourses -= 1;
-                    }
-                }
-                newSchedule = addCourseToSchedule(randomCourse, prereqs, newSchedule, classesPerSemester);
-                courses.push(randomCourse);
-                console.log("Breadth 2", randomCourse)
-                neededCourses -= 1;
-                electiveTwoFlag = true;
-            }
-        }
+    console.log("Needed courses", neededCourses);
+    if(userProgress?.requirementsMet?.breadthRequirement === false || userProgress?.requirementsMet?.breadthRequirement == null){
+        ({ newSchedule, courses, neededCourses } = await addBreadthCourse(breadthReqs[0], courses, newSchedule, classesPerSemester, neededCourses));
+        console.log("Needed courses", neededCourses);
+        ({ newSchedule, courses, neededCourses } = await addBreadthCourse(breadthReqs[1], courses, newSchedule, classesPerSemester, neededCourses));
+        console.log("Needed courses", neededCourses);
+        ({ newSchedule, courses, neededCourses } = await addBreadthCourse(breadthReqs[2], courses, newSchedule, classesPerSemester, neededCourses));
+        console.log("Needed courses", neededCourses);
     }
+    
 
     while (neededCourses > 0){
-        const randomCourse = preferredElectives[Math.floor(Math.random() * preferredElectives.length)]
+        console.log("Elective requirement not met")
+        const availableElectives = preferredElectives.filter(course => !courses.includes(course));
+        const randomCourse = availableElectives[Math.floor(Math.random() * availableElectives.length)];
         if(!courses.includes(randomCourse)){
             let prereqs = await getPrereqs(randomCourse)
             if (dme){
@@ -131,11 +109,16 @@ const createFullCSISchedule = async (userCourses, userProgress, concentration, c
             }
             newSchedule = addCourseToSchedule(randomCourse, prereqs, newSchedule, classesPerSemester)
             courses.push(randomCourse)
+            console.log("added elective", randomCourse);
             neededCourses -= 1;
         }
+        console.log("Needed courses", neededCourses);
     }
-    newSchedule = addCourseToSchedule(51, [], newSchedule, classesPerSemester)
 
+    if(userProgress?.requirementsMet?.project === false || userProgress?.requirementsMet?.project == null){
+        console.log("Project requirement not met")
+        newSchedule = addCourseToSchedule(51, [], newSchedule, classesPerSemester)
+    }
     return newSchedule;
 }
 
@@ -171,9 +154,8 @@ const getCSIConcentrationReqs = async (concentration) =>{
     }
 }
 
-const getCSIBreadthReqs = async (concentration) => {
-    const possibleConcentrations = ['Artificial Intelligence and Machine Learning', 'Systems', 'Theoretical Computer Science'];
-    const requiredBreadth = possibleConcentrations.filter(choice => choice !== concentration);
+const getCSIBreadthReqs = async () => {
+    const requiredBreadth = ['Artificial Intelligence and Machine Learning', 'Systems', 'Theoretical Computer Science'];
     let breadthCourses = []
     for (const electiveBreadthConcentration of requiredBreadth){
         try{
@@ -193,6 +175,26 @@ const getCSIBreadthReqs = async (concentration) => {
     return breadthCourses
 }
 
+const addBreadthCourse = async (breadthList, courses, newSchedule, classesPerSemester, neededCourses) => {
+    const availableCourses = breadthList.filter(course => !courses.includes(course));
+    const randomCourse = availableCourses[Math.floor(Math.random() * availableCourses.length)];
+
+    const prereqs = await getPrereqs(randomCourse);
+    for (const prereq of prereqs) {
+        if (!courses.includes(prereq)) {
+            newSchedule = addCourseToSchedule(prereq, [], newSchedule, classesPerSemester);
+            console.log("added breadth prereq", prereq)
+            courses.push(prereq);
+            neededCourses -= 1;
+        }
+    }
+    newSchedule = addCourseToSchedule(randomCourse, prereqs, newSchedule, classesPerSemester);
+    courses.push(randomCourse);
+    neededCourses -= 1;
+    console.log("Added Breadth Course", randomCourse);
+    return { newSchedule, courses, neededCourses };
+}
+
 const createFullOldCSISchedule = async (userCourses, classesPerSemester, dme, schedule) =>{
     let newSchedule = schedule;
     const oldCSICore = [4, 11, 1, 6];
@@ -200,13 +202,14 @@ const createFullOldCSISchedule = async (userCourses, classesPerSemester, dme, sc
     let courses = userCourses;
     const completedElectives = courses.filter(course => !oldCSICore.includes(course)).length;
     let neededCourses = 5 - completedElectives;
-    console.log(dme);
     if (!dme){
-        newSchedule = addCourseToSchedule(14, [], newSchedule, classesPerSemester)
-        neededCourses -= 1;
+        if(!courses.includes(14)){
+            newSchedule = addCourseToSchedule(14, [], newSchedule, classesPerSemester)
+            neededCourses -= 1;
+            courses.push(14)
+        }
     }
-    courses.push(14)
-
+    
     for(const course of oldCSICore){
         if(!courses.includes(course)){
             const prereqs = await getPrereqs(course)
@@ -244,7 +247,10 @@ const createFullOldCSISchedule = async (userCourses, classesPerSemester, dme, sc
             neededCourses -= 1;
         }
     }
-    newSchedule = addCourseToSchedule(51, [], newSchedule, classesPerSemester)
+    if(!courses.includes(51)){
+        newSchedule = addCourseToSchedule(51, [], newSchedule, classesPerSemester)
+    }
+    
     
     return newSchedule
 }
@@ -313,7 +319,7 @@ const createDatedSchedule = async (startYear, startSemester, baseSchedule, userI
                     number: courseInfo[0].number,
                     year: currentYear,
                     semester: currentSemester,
-                    grade: null,
+                    grade: 'B',
                     completed: 'no',
                     user_id: parseInt(userID) || null,
                     credits: courseInfo[0].credits,
