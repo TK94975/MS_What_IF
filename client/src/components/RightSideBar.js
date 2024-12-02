@@ -2,6 +2,7 @@ import axios from 'axios';
 import React, { useState, useContext, useEffect} from 'react';
 import { UserContext } from '../context/userContext';
 import { Container, Row, Col } from "react-bootstrap";
+import DateRange from './DateRange';
 
 const RightSideBar = props => {
     const [courses, setCourses] = useState([])
@@ -72,13 +73,7 @@ const RightSideBar = props => {
             while(i < courses.length){
                 if (courses[i].number == desiredCourse && courses[i].department === desiredDept){
                     return (
-                        <div style={{
-                            padding: "8px",
-                            borderRadius: "8px",
-                            border: "5px solid",
-                            borderColor: "purple",
-                        }}
-                        >
+                        <div style={{"paddingTop":"10px"}}>
                             <h6>Title</h6>
                             <p>{courses[i].title}</p>
                             <h6>Description</h6>
@@ -110,10 +105,14 @@ const RightSideBar = props => {
 
             </div>
             <div className="container" style={styles.title}>
-                <h3>Class Lookup</h3>
-                <div style={{flexDirection: 'row'}}>
+                <h3 >Starting Semester</h3>
+                <DateRange/>
+            </div>
+            <div className="container" style={styles.title}>
+                <h3 >Class Lookup</h3>
+                <div style={{flexDirection:'row'}}>
                     <input type='text' placeholder='Enter course number' onChange={event => {
-                        setDesiredCourse(event.target.value.substring(0, 3))
+                        setDesiredCourse(event.target.value.substring(0,3))
                     }}/>
                     <select onChange={event => {
                         setDesiredDept(event.target.value)
@@ -137,12 +136,12 @@ const styles = {
     "sidebar": {
         "display": "flex",
         "flexDirection": "column",
-        "padding": "7px",
+        "padding": "10px",
         "borderBottomRightRadius": "10px",
         "borderBottomLeftRadius": "10px",
         "backgroundColor": "lightGrey",
         "overflowY": "scroll",
-        "maxHeight": "70%"
+        "maxHeight": "60%"
     },
     "title": {
         "backgroundColor": "lightGrey",
@@ -152,10 +151,10 @@ const styles = {
         "paddingRight": "5px",
     },
     "spacer": {
-        "height": "3%"
+        "height": "10%"
     },
     "parent": {
-        "maxHeight": "100%",
+        "maxHeight": "90%",
         "justifyContent": "center"
     }
 }
