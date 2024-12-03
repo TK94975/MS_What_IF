@@ -286,10 +286,6 @@ const createFullCSISchedule = async (userCourses, userProgress, concentration, c
         const randomCourse = availableElectives[Math.floor(Math.random() * availableElectives.length)];
         if(!courses.includes(randomCourse)){
             let prereqs = await getPrereqs(randomCourse)
-            if (dme){
-                const newPreReq = prereqs.filter(course => course !== 14);
-                prereqs = newPreReq;
-            }
             for (const prereq of prereqs){
                 if(!courses.includes(prereq)){
                     if(neededCourses === 1){
