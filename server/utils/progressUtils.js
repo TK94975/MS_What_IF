@@ -355,9 +355,9 @@ function calculateECETechnicalElectiveRequirement(userCourses, coreCourses, brea
     //console.log(electiveCourses)
     // Require 3 credits (or 6 credits for Non-Thesis Option)
     var requiredCredits = 3; // Adjust as needed
-    if (option === 'Thesis') {
+    if (option) {
         requiredCredits = 3;
-    } else if (option === 'Project') {
+    } else {
         requiredCredits = 6;
     }
     let ecCID = electiveCourses.map(c => c.course_id)
@@ -372,10 +372,10 @@ function calculateECEThesisProjectRequirement(userCourses, option) {
     let requiredCredits = 0;
     let allowedCourseIds = [];
     console.log(option);
-    if (option === 'Thesis') {
+    if (option) {
       requiredCredits = 6;
       allowedCourseIds = [108];
-    } else if (option === 'Project') {
+    } else {
       requiredCredits = 3;
       allowedCourseIds = [106];
     }

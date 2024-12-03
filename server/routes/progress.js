@@ -151,8 +151,8 @@ router.post('/completed_progress', async (req, res) => {
             results.thesisProject = thesisProjectResult;
     
             // Determine overall requirements met
-            let thesisReq = (thesis=== 'Thesis' ? 6 : 3)
-            let TEReq = (thesis === 'Thesis' ? 3 : 6)
+            let thesisReq = (thesis? 6 : 3)
+            let TEReq = (thesis? 3 : 6)
             const requirementsMet = {
             depthCompleted: depthResult.completed_credits >= 12,
             breadthCompleted: breadthResult.completed_credits >= 6,

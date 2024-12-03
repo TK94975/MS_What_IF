@@ -102,7 +102,7 @@ const ProgressTable = () => {
             user_courses: courses,
             user_concentration: selectedConcentration,
             calculation_type: calculationType,
-            thesis: thesisProject
+            thesis: (thesisProject==='Thesis')
           });
       
           updateChatbotSettings(courses);
