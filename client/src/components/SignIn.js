@@ -34,6 +34,7 @@ const handleSubmit = async (event) => {
 	sessionStorage.setItem('userStartYear', response.data[0].start_year)
 	sessionStorage.setItem('userStartSemester', response.data[0].start_semester)
 	sessionStorage.setItem('passedDME', 'yes');
+	sessionStorage.setItem('thesisProject', 'Project');
 	console.log("session: ", response.data[0])
 	setIsUserSignedIn(true);
 

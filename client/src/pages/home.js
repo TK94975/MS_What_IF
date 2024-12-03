@@ -10,8 +10,10 @@ import ScheduleContainer from '../components/ScheduleContainer';
 import Header from '../components/Header';
 import ProgressTable from '../components/ProgressTable';
 import ChatbaseChatbot from '../components/ChatbaseChatbot';
+import ColorLegend from '../components/ColorLegend';
 // Context
 import { UserProvider } from '../context/userContext';
+
 
 /*
     --------------- TITLE ------------------
@@ -41,6 +43,7 @@ const Home = () => {
                     </div>
                     <div id='HOME-RSB-PD' className='col'>
                         <RightSideBar/>
+                        <ColorLegend/>
                     </div>
                 </div>
             </div>

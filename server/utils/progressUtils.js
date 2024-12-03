@@ -371,7 +371,7 @@ function calculateECETechnicalElectiveRequirement(userCourses, coreCourses, brea
 function calculateECEThesisProjectRequirement(userCourses, option) {
     let requiredCredits = 0;
     let allowedCourseIds = [];
-  
+    console.log(option);
     if (option === 'Thesis') {
       requiredCredits = 6;
       allowedCourseIds = [108];

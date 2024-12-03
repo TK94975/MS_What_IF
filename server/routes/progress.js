@@ -61,7 +61,7 @@ router.post('/completed_progress', async (req, res) => {
     let userCourses = req.body.user_courses; // Array of user's completed courses with grades
     const userConcentration = req.body.user_concentration; // String
     const calculationType = req.body.calculation_type; // 'current' or 'projected'
-    const thesis = req.body.thesis
+    const thesis = req.body.thesis;
     //console.log(req.body)
     //console.log(userConcentration);
     //console.log(userCourses);
@@ -123,7 +123,7 @@ router.post('/completed_progress', async (req, res) => {
             console.log("ECE");
             const selectedConcentration = userConcentration;//req.body.selected_concentration; // ECE concentration area
             //const thesisOption = req.body.thesis_option; // 'Thesis' or 'Project'
-            const thesisOption = 'Project'; //BUG
+            //const thesisOption = 'Project'; //BUG
             // Depth Courses
             const depthResult = await calculateECEDepthRequirement(userCourses, selectedConcentration);
             results.depth = depthResult;
@@ -151,8 +151,8 @@ router.post('/completed_progress', async (req, res) => {
             results.thesisProject = thesisProjectResult;
     
             // Determine overall requirements met
-            let thesisReq = (thesisOption === 'Thesis' ? 6 : 3)
-            let TEReq = (thesisOption === 'Thesis' ? 3 : 6)
+            let thesisReq = (thesis=== 'Thesis' ? 6 : 3)
+            let TEReq = (thesis === 'Thesis' ? 3 : 6)
             const requirementsMet = {
             depthCompleted: depthResult.completed_credits >= 12,
             breadthCompleted: breadthResult.completed_credits >= 6,

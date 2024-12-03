@@ -16,6 +16,7 @@ export const UserProvider = ({ children }) => {
     const [concentrationRequirements, setConcentrationRequirements] = useState({});
     const [userProgressProjected, setUserProgressProjected] = useState({});
     const [passedDME, setPassedDME] = useState(false);
+    const [thesisProject, setThesisProject] = useState('Project');
     const [userStartYear, setUserStartYear] = useState("");
     const [userStartSemester, setUserStartSemester] = useState("");
 
@@ -90,7 +91,9 @@ export const UserProvider = ({ children }) => {
                 userProgressProjected,
                 setUserProgressProjected,
                 passedDME,
-                setPassedDME
+                setPassedDME,
+                thesisProject,          // **Provide thesisProject**
+                setThesisProject
             }}
         >
             {children}
