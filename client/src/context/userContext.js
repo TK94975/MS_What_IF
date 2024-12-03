@@ -4,6 +4,7 @@ import axios from "axios"; // Fix for axios is not defined
 export const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
+
     const [isUserSignedIn, setIsUserSignedIn] = useState(false);
     const defaultConcentrations = {
         CSI: "Artificial Intelligence and Machine Learning",
@@ -13,11 +14,28 @@ export const UserProvider = ({ children }) => {
     const [selectedConcentration, setSelectedConcentration] = useState(defaultConcentrations['CSI']);
     const [courses, setCourses] = useState([]); // User courses
     const [concentrationRequirements, setConcentrationRequirements] = useState({});
-    const [userStartYear, setUserStartYear] = useState("");
-    const [userStartSemester, setUserStartSemester] = useState("");
     const [userProgressProjected, setUserProgressProjected] = useState({});
     const [passedDME, setPassedDME] = useState(false);
-    const [thesisProject, setThesisProject] = useState('Project')
+    const [userStartYear, setUserStartYear] = useState("");
+    const [userStartSemester, setUserStartSemester] = useState("");
+
+    const getUpcomingSemester = () => {
+        const now = new Date(); 
+        const currentYear = now.getFullYear(); 
+        const currentMonth = now.getMonth() + 1; 
+    
+        let nextSemester;
+        let nextYear = currentYear;
+    
+        if (currentMonth >= 8 && currentMonth <= 12) {
+            nextSemester = "Spring";
+            nextYear = currentYear + 1;
+        } else {
+            nextSemester = "Fall";
+        } 
+        return { year: nextYear, semester: nextSemester };
+    }
+
 
 
     useEffect(() => {
@@ -25,21 +43,22 @@ export const UserProvider = ({ children }) => {
             setIsUserSignedIn(true);
             setSelectedMajor(sessionStorage.getItem("userMajor") || "CSI");
             setSelectedConcentration(sessionStorage.getItem("userConcentration") || defaultConcentrations['CSI']);
-            setUserStartYear(sessionStorage.getItem('userStartYear'))
-            setUserStartSemester(sessionStorage.getItem('userStartSemester'))
+            setUserStartYear(sessionStorage.getItem('userStartYear') || "")
+            setUserStartSemester(sessionStorage.getItem('userStartSemester') || "")
         } else {
             setIsUserSignedIn(false);
         }
     }, []);
 
     useEffect(() => {
+        const nextSemester = getUpcomingSemester()
+        console.log(nextSemester);
         setSelectedMajor(sessionStorage.getItem("userMajor") || "CSI");
         setSelectedConcentration(sessionStorage.getItem("userConcentration") || defaultConcentrations['CSI']);
-        setUserStartYear(sessionStorage.getItem('userStartYear') || "")
-        setUserStartSemester(sessionStorage.getItem('userStartSemester') || "")
+        setUserStartYear(sessionStorage.getItem('userStartYear') || nextSemester.year)
+        setUserStartSemester(sessionStorage.getItem('userStartSemester') || nextSemester.semester)
         const dme = (sessionStorage?.getItem('passedDME') === 'yes') ?  true : false;
         setPassedDME(dme);
-        setUserStartSemester(sessionStorage.getItem('userStartSemester') || "")
     }, [isUserSignedIn]);
 
     const handleMajorChange = (major) => {
@@ -49,6 +68,8 @@ export const UserProvider = ({ children }) => {
     const handleConcentrationChange = (concentration) => {
         setSelectedConcentration(concentration);
     };
+
+
 
     return (
         <UserContext.Provider
@@ -69,9 +90,7 @@ export const UserProvider = ({ children }) => {
                 userProgressProjected,
                 setUserProgressProjected,
                 passedDME,
-                setPassedDME,
-                thesisProject,
-                setThesisProject
+                setPassedDME
             }}
         >
             {children}

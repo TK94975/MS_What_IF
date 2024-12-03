@@ -8,6 +8,7 @@ const {
     getUpcomingSemester,
     extractCourseIDs,
     isEarlierSemester, 
+    findLastYearSemester
     } = require('../utils/schedule_templateUtils.js')
 
 router.post('/get_user_courses', async (req, res) => {
@@ -66,26 +67,28 @@ router.post('/generate_schedule', async (req, res) =>{
     
     const userCourseDetails = req.body.courses;
     const userCourses = extractCourseIDs(userCourseDetails);
-    console.log("/generate_schedule: Original user courses", userCourses);
     const userProgress = req.body.user_progress;
-    console.log("/generate_schedule: User Progress", userProgress);
     const userConcentration = req.body.concentration;
     let userStartYear = req.body.startYear;
     let userStartSemester = req.body.startSemester;
     const userID = req.body.user_id;
     const userDME = req.body.dme;
-    const userThesis = req.body.thesis;
     const userCourseLimit = 3; // Default to 3 unless course per semester is implemented 
+    console.log("Progress", userProgress);
     
     const upcomingSemester = getUpcomingSemester();
     if(!isEarlierSemester(upcomingSemester.year, upcomingSemester.semester, userStartYear, userStartSemester)){
         userStartYear = upcomingSemester.year;
         userStartSemester = upcomingSemester.semester;
     }
+    if (userCourseDetails.length !== 0){
+        const latestSemester = findLastYearSemester(userCourseDetails);
+        userStartYear = latestSemester.year;
+        userStartSemester = latestSemester.semester;
+    }
 
     try{
-        const baseSchedule = await createFullSchedule(userCourses, userProgress, userConcentration, userCourseLimit, userDME, userThesis);
-        console.log("Base Schedule:",baseSchedule)
+        const baseSchedule = await createFullSchedule(userCourses, userProgress, userConcentration, userCourseLimit, userDME);
         const dateSchedule = await createDatedSchedule(userStartYear, userStartSemester, baseSchedule, userID, userCourseLimit);
         res.status(200).json(dateSchedule);
     }
@@ -94,7 +97,7 @@ router.post('/generate_schedule', async (req, res) =>{
         console.log(error)
     }
 
-})
+});
 
 
 module.exports = router;

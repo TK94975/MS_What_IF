@@ -23,15 +23,15 @@ function convertGrade(letterGrade) {
 }
 
 function calculateRequirement(userCourses, allowedCourses, requiredCredits) {
-  console.log(requiredCredits)
+  //console.log(requiredCredits)
     //Filter User Courses for Allowed Courses
     const eligibleCourses = userCourses.filter(course =>
       allowedCourses.includes(course.course_id) 
     );
     //console.log(userCourses)
-    console.log('\n-----')
-    console.log('Eligible courses')
-    console.log(eligibleCourses)
+    //console.log('\n-----')
+    //console.log('Eligible courses')
+    //console.log(eligibleCourses)
     // If no eligible courses, return zeros
     if (eligibleCourses.length === 0) {
       return {
@@ -59,8 +59,8 @@ function calculateRequirement(userCourses, allowedCourses, requiredCredits) {
       if (accumulatedCredits >= requiredCredits) {
         break;
       }
-      console.log('Adding course')
-      console.log(course)
+      //console.log('Adding course')
+      //console.log(course)
       selectedCourses.push(course);
       accumulatedCredits += course.credits;
       totalGradePoints += course.gradePoint * course.credits;
@@ -178,12 +178,12 @@ async function checkBreadthRequirement(userCourses, userConcentration, coreCours
           [concentration]
         );
       } else {
-        console.log("Running query:", {
+        /*console.log("Running query:", {
           sql: `SELECT cc.course_id
                 FROM course_concentrations cc
                 WHERE cc.concentration = ? AND cc.major = 'CSI'`,
           params: [concentration]
-        });
+        });*/
         [areaCoursesRows] = await db.query(
           `SELECT cc.course_id
           FROM course_concentrations cc
@@ -191,9 +191,9 @@ async function checkBreadthRequirement(userCourses, userConcentration, coreCours
           [concentration]
         );
       }
-      console.log(concentration);
-      console.log(userConcentration);
-      console.log(areaCoursesRows);
+      //console.log(concentration);
+      //console.log(userConcentration);
+      //console.log(areaCoursesRows);
       const areaCourseIds = areaCoursesRows.map(row => row.course_id);
   
       // Check if the user has taken any course from this area
@@ -339,7 +339,7 @@ function calculateECEMathPhysicsRequirement(userCourses) {
 }
   
 function calculateECETechnicalElectiveRequirement(userCourses, coreCourses, breadthCourses, mathPhysicsCourses, option) {
-  console.log(`Option: ${option}`)  
+  //console.log(`Option: ${option}`)  
   // Exclude courses already counted
     const excludedCourseIds = [
       ...coreCourses.map(c => c.course_id),
@@ -351,8 +351,8 @@ function calculateECETechnicalElectiveRequirement(userCourses, coreCourses, brea
     const electiveCourses = userCourses.filter(
       course => !excludedCourseIds.includes(course.course_id)
     );
-    console.log(`\n\nElective Courses\n\n`)
-    console.log(electiveCourses)
+    //console.log(`\n\nElective Courses\n\n`)
+    //console.log(electiveCourses)
     // Require 3 credits (or 6 credits for Non-Thesis Option)
     var requiredCredits = 3; // Adjust as needed
     if (option === 'Thesis') {
@@ -361,7 +361,7 @@ function calculateECETechnicalElectiveRequirement(userCourses, coreCourses, brea
         requiredCredits = 6;
     }
     let ecCID = electiveCourses.map(c => c.course_id)
-    console.log(ecCID)
+    //console.log(ecCID)
   
     const result = calculateRequirement(userCourses, electiveCourses.map(c => c.course_id), requiredCredits);
   
