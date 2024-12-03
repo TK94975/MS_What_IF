@@ -1,6 +1,6 @@
 const db = require('../config/db');
 
-const preferredElectives = [25, 7, 9, 21, 32, 20, 21, 17];
+const preferredElectives = [25, 7, 9, 21, 32, 20, 21, 17, 8, 29, 33];
 const ecePreferredElectives = [80, 94, 95, 107]//[63, 84, 85, 90, 97, 99, 100]
 
 const createFullSchedule = async (userCourses, userProgress, concentration, classesPerSemester, dme, thesis) =>{
