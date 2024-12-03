@@ -226,8 +226,9 @@ const ScheduleContainer =  () => {
             console.log(err.response.data.message)
             prereq = []
         }
-        
+        console.log('\n\nHandle Remove Class')
         if(prereq.length > 0) {
+            console.log('Prereqs Found')
             // Check if the found courses exist in schedule
             let i = 0
             let j = 0
@@ -235,7 +236,8 @@ const ScheduleContainer =  () => {
                 let dependent_class = prereq[i]
                 while(j < courses.length) {
                     let current_class = courses[j]
-                    if(current_class.number === dependent_class.number) {
+                    console.log(`Current Prereq ${dependent_class.number} current class number: ${current_class.number}`)
+                    if(`${current_class.number}` === `${dependent_class.number}`) {
                         alert(`Cannot remove ${badCourse.department}${badCourse.number} because ${dependent_class.department}${dependent_class.number} is dependent on it!\nPlease remove ${dependent_class.department}${dependent_class.number} first.`)
                         return;
                     }
@@ -325,7 +327,7 @@ const ScheduleContainer =  () => {
     // Actually adding the course
     const handleAddNewCourse = async (event) =>{
         event.preventDefault(); // Stops the page from rerendering
-        console.log("handleAddNewCourse: Checking for dependency conflicts")
+        console.log("\n\nhandleAddNewCourse: Checking for dependency conflicts")
         console.log('COURSES BEFORE:')
         console.log(courses)
         //TODO:
@@ -365,26 +367,33 @@ const ScheduleContainer =  () => {
                     console.log(`${(semester_map[addSemester.toLowerCase()] <= semester_map[courses[i].semester.toLowerCase()])}`)
                     let error_msg = `${addCourseDepartment}${addCourseNumber} MUST occur after ${courses[i].semester} ${courses[i].year} (prerequisite class ${pr.department}${prereq_num})`
                     console.log((`${current_course_number}` === `${prereq_num}`))
+                    console.log(`Current prereq_num: ${prereq_num}`)
                     // We found the prerequisite class in the schedule
                     if(`${current_course_number}` === `${prereq_num}`) {
+                        console.log('Prereq found')
                         // check if there are prerequisites before this course
                         if(addYear < courses[i].year) {
+                            console.log("Adding before prereq")
                             // TODO: Error
                             prereq_satisfied = false
                             alert(error_msg) 
                         }
                         else if( `${addYear}` === `${courses[i].year}` && (semester_map[addSemester.toLowerCase()] <= semester_map[courses[i].semester.toLowerCase()])) {
                             //TODO: Error
+                            console.log('Adding before semester')
                             prereq_satisfied = false
                             alert(error_msg)
                         }
                         else {
+                            console.log('Classes found')
                             //This class is valid
                             classes_found = true
+                            console.log(`${prereq_satisfied} and ${classes_found}`)
                             // If prereqs are valid, this will stay valid
                             prereq_satisfied = prereq_satisfied && classes_found
                         }
                     }
+                    prereq_satisfied = prereq_satisfied && classes_found
                     i+=1
                 }
             })
