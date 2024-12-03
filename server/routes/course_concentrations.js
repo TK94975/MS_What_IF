@@ -65,8 +65,8 @@ router.get('/:department/:course_id/concentration', async (req, res) => {
   if (userConcentration === 'Signal Processing and Communications' || userConcentration ===  'Electronic Circuits and Systems' || userConcentration === 'Control and Computer Systems'){
     department = 'ECE';
   }
-  console.log(department);
-  console.log(course_id);
+  //console.log(department);
+  //console.log(course_id);
   try {
     // verifying course exists
     const [courseRows] = await db.query(
