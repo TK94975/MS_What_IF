@@ -32,12 +32,12 @@ const Home = () => {
                      style={{backgroundColor: "lightgray"}}
                 >
                     <div id='HOME-LSB-PD' className='col'>
-                        { <LeftSideBar/>}
+                        {<LeftSideBar/>}
                     </div>
                     <div id='HOME-CONTENT-PD' className='col-8'>
                         <ProgressTable/>
                         <ScheduleContainer/>
-                        <ChatbaseChatbot />
+                        <ChatbaseChatbot/>
                     </div>
                     <div id='HOME-RSB-PD' className='col'>
                         <RightSideBar/>
@@ -45,7 +45,8 @@ const Home = () => {
                 </div>
             </div>
         </UserProvider>
-    )
-}
+    );
+};
+
 
 export default Home;

@@ -2,7 +2,8 @@ import 'bootstrap/dist/css/bootstrap.css'; // Import Bootstrap CSS
 import '../styles.css';
 import React, { useState, useContext } from 'react';
 import axios from 'axios';
-import { UserContext } from '../context/userContext'; // Adjust the import path as necessary
+import { UserContext } from '../context/userContext';
+import MajorConcentrationSelector from "./MajorConcentrationSelector"; // Adjust the import path as necessary
 
 const LeftSideBar = () => {
     const { selectedMajor, selectedConcentration } = useContext(UserContext); // Extract from context
@@ -58,21 +59,38 @@ const LeftSideBar = () => {
         );
     };
 
+    const majorColors = {
+        CSI: "#2980b9", // Example color for a major
+        "Computer Science": "#2980b9",
+        ECE: "#c0392b",
+        "Electrical and Computer Engineering": "#c0392b",
+        default: "#7f8c8d",
+    };
+
+    const selectedMajorColor = majorColors[selectedMajor] || majorColors.default;
+
     return (
         <div style={styles.parent}>
             <div style={styles.spacer}></div>
-            <div className="container" style={styles.title}>
-                <h3>Courses for {selectedMajor || 'Unknown Major'}</h3>
-                <p>Concentration: {selectedConcentration || 'Unknown Concentration'}</p>
-            </div>
-            <div style={styles.sidebar}>
-                <div>{renderCourses()}</div>
+                <div style={styles.sidebar}>
+
+                <div className="container" style={styles.title}>
+                    <h3>Courses for {selectedMajor || 'Unknown Major'}</h3>
+                </div>
+                <div
+                    className="container"
+                    style={{...styles.title, ...styles.concentrationSelector}}>
+
+                    <MajorConcentrationSelector/>
+                </div>
+
+                <div style={{paddingTop: "2%"}}></div>
+
+                <h5>Search Parameters:</h5>
+
                 <div style={styles.parameters}>
-                    <p>
-                        <strong>Search Parameters:</strong>
-                    </p>
-                    <p>Major: {selectedMajor || 'None'}</p>
-                    <p>Concentration: {selectedConcentration || 'None'}</p>
+                    <p><strong>Major:</strong> {selectedMajor || 'None'}</p>
+                    <p><strong>Concentration:</strong> {selectedConcentration || 'None'}</p>
                     <button
                         style={styles.button}
                         onClick={getCourses}
@@ -80,11 +98,13 @@ const LeftSideBar = () => {
                     >
                         {loading ? 'Loading...' : 'Get Courses'}
                     </button>
+                    <div style={styles.courseOutput(selectedMajorColor)}>{renderCourses()}</div>
                 </div>
                 <div style={styles.footer}>
-                    <p>Contact your advisor for more information.</p>
+                    <p>Please Contact your advisor for more information.</p>
                 </div>
             </div>
+            <div style={{padding: "10%"}}></div>
         </div>
     );
 };
@@ -92,7 +112,7 @@ const LeftSideBar = () => {
 // Styles
 const styles = {
     parent: {
-        maxHeight: '75%',
+        maxHeight: '65%',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
@@ -114,11 +134,13 @@ const styles = {
         borderBottomLeftRadius: '10px',
         backgroundColor: 'lightGrey',
         overflowY: 'scroll',
-        maxHeight: '100%',
+        maxHeight: "100%",
+
+
     },
     parameters: {
         margin: '10px 0',
-        textAlign: 'center',
+        textAlign: 'left',
     },
     button: {
         marginTop: '10px',
@@ -135,6 +157,18 @@ const styles = {
         backgroundColor: '#f8f9fa',
         borderTop: '1px solid #dee2e6',
     },
+    concentrationSelector: {
+        border: '6px solid purple', // Purple border for MajorConcentrationSelector
+        padding: '10px',
+        borderRadius: '8px',
+    },
+    courseOutput: (majorColor) => ({
+        border: `4px solid ${majorColor}`, // Border color based on selected major
+        padding: '10px',
+        borderRadius: '8px',
+        marginTop: '20px',
+        textAlign: 'left',
+    }),
 };
 
 export default LeftSideBar;

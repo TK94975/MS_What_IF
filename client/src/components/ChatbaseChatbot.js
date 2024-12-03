@@ -53,7 +53,7 @@ const ChatbaseChatbot = () => {
   }, []); 
   
   useEffect(() => {
-    // Chatbot config 
+    // Chatbot config
     window.embeddedChatbotConfig = {
       chatbotId: '75In3HL0Qo1lNM8bQCuyu',
       domain: 'www.chatbase.co',
@@ -75,15 +75,19 @@ const ChatbaseChatbot = () => {
   }, [[reloadKey]]);
 
   return (
-    <div>
-    <Row className="align-items-center" style={{ marginTop: '20px' }}>
-      <Col style={{ textAlign: 'left', display: 'flex', gap: '10px' }}>
-          <Button onClick={reloadChatbot} id="generate_schedule" data-testid="generate_schedule">
-          Reload Chatbot with Updated Coursework
-          </Button>
-      </Col>
-    </Row >
-    </div>
+      <div style={{ padding: '10px', textAlign: 'center' }}>
+          <div>
+              <Button
+                  onClick={reloadChatbot}
+                  id="generate_schedule"
+                  data-testid="generate_schedule"
+                  style={{margin: '5px', padding: '5px'}}
+              >
+                  Reload Chatbot with Updated Coursework
+              </Button>
+              <div style={{padding: "7px"}}></div>
+          </div>
+      </div>
   );
 };
 

@@ -103,10 +103,6 @@ const RightSideBar = props => {
     return (
         <div style={styles.parent}>
             <div style={styles.spacer}>
-
-            </div>
-            <div className="container" style={styles.title}>
-                <MajorConcentrationSelector/>
             </div>
             <div className="container" style={styles.title}>
                 <h3 >Class Lookup</h3>
@@ -125,9 +121,12 @@ const RightSideBar = props => {
                     </select>
                 </div>
             </div>
-            <div style={styles.sidebar}>
-                <div>{renderPreview()}</div>
-            </div>
+                <div
+                    style={{
+                    "borderRadius": "12px",
+                    "padding": "4px",
+                    "border": "5px solid",
+                    "borderColor": "purple",}}>{renderPreview()}</div>
         </div>
     );
 }
@@ -136,12 +135,12 @@ const styles = {
     "sidebar": {
         "display": "flex",
         "flexDirection": "column",
-        "padding": "10px",
+        "padding": "8px",
         "borderBottomRightRadius": "10px",
         "borderBottomLeftRadius": "10px",
         "backgroundColor": "lightGrey",
         "overflowY": "scroll",
-        "maxHeight": "60%"
+        "maxHeight": "100%"
     },
     "title": {
         "backgroundColor": "lightGrey",
@@ -151,11 +150,11 @@ const styles = {
         "paddingRight": "5px",
     },
     "spacer": {
-        "height": "10%"
+        "height": "3%"
     },
     "parent": {
         "maxHeight": "90%",
-        "justifyContent": "center"
+        "justifyContent": "center",
     }
 }
 
