@@ -5,8 +5,6 @@ import { Button} from 'react-bootstrap';
 const ChatbaseChatbot = () => {
   const [reloadKey, setReloadKey] = useState(0); // State to trigger reloads
 
-
-
     const updateChatbotSettingsInitial = async () => {
         const chatbotId = "75In3HL0Qo1lNM8bQCuyu"; // Your Chatbot ID
         const secretKey = "33777c78-c604-466b-a976-ca708abfd62b"; // Your API Secret Key

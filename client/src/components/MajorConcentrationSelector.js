@@ -129,7 +129,7 @@ const MajorConcentrationSelector = () => {
             <ColorByMajor major={selectedMajor}>
                 <h6>Starting Semester</h6>
                 <Form.Group as={Row} className="mb-3">
-                    <Col sm={7}>
+                    <Col sm={6}>
                         <Form.Select
                             value={userStartYear}
                             onChange={(e) => handleUserStartYear(e.target.value)}
@@ -143,7 +143,7 @@ const MajorConcentrationSelector = () => {
                             ))}
                         </Form.Select>
                     </Col>
-                    <Col sm={8} >
+                    <Col sm={6} >
                         <Form.Select
                             value={userStartSemester}
                             onChange={(e) => handleUserStartSemester(e.target.value)}
