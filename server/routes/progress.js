@@ -36,9 +36,13 @@ router.post('/concentration_requirements', (req, res) => {
     creditValues.set("Systems", {core: "7", concentration: "6", elective: "15", project: "3"})
     creditValues.set("Theoretical Computer Science", {core: "7", concentration: "6", elective: "15", project: "3"})
     creditValues.set("Old Computer Science", {core: "13", concentration: "0", elective: "15", project: "3"})
-    creditValues.set('Signal Processing and Communications', {depth: "12",breadth: "6",mathPhysics: "3",technicalElective: "3", thesis: "6"})
-    creditValues.set('Electronic Circuits and Systems', {depth: "12",breadth: "6",mathPhysics: "3",technicalElective: "3", thesis: "6"})
-    creditValues.set('Control and Computer Systems', {depth: "12",breadth: "6",mathPhysics: "3",technicalElective: "3", thesis: "6"})
+    let thesisPresent = req.body.thesisProject === 'Thesis'
+    console.log("\n---------------------------")
+    console.log(thesisPresent)
+    console.log("-----------------------------\n")
+    creditValues.set('Signal Processing and Communications', {depth: "12",breadth: "6",mathPhysics: "3",technicalElective: (thesisPresent ? "3" : '6'), thesis: (thesisPresent ? "6" : '3')})
+    creditValues.set('Electronic Circuits and Systems', {depth: "12",breadth: "6",mathPhysics: "3",technicalElective: (thesisPresent ? "3" : '6'), thesis: (thesisPresent ? "6" : '3')})
+    creditValues.set('Control and Computer Systems', {depth: "12",breadth: "6",mathPhysics: "3",technicalElective: (thesisPresent ? "3" : '6'), thesis: (thesisPresent ? "6" : '3')})
     try{
         const concentration = req.body.selectedConcentration;
         res.status(200).json(creditValues.get(concentration));
@@ -58,6 +62,7 @@ router.post('/completed_progress', async (req, res) => {
 
 // POST route to calculate user progress
 router.post('/completed_progress', async (req, res) => {
+    console.log("\n\n\completed_progress")
     let userCourses = req.body.user_courses; // Array of user's completed courses with grades
     const userConcentration = req.body.user_concentration; // String
     const calculationType = req.body.calculation_type; // 'current' or 'projected'

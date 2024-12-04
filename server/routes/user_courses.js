@@ -64,7 +64,7 @@ router.post('/update_user_courses', async (req, res) => {
 });
 
 router.post('/generate_schedule', async (req, res) =>{
-    
+    console.log("\n\ngenerate Schedule...")
     const userCourseDetails = req.body.courses;
     const userCourses = extractCourseIDs(userCourseDetails);
     const userProgress = req.body.user_progress;
@@ -75,7 +75,7 @@ router.post('/generate_schedule', async (req, res) =>{
     const userDME = req.body.dme;
     const thesis = req.body.thesis;
     const userCourseLimit = 3; // Default to 3 unless course per semester is implemented 
-    console.log("Progress", userProgress);
+    console.log("Current Progress: ", userProgress);
     
     const upcomingSemester = getUpcomingSemester();
     if(!isEarlierSemester(upcomingSemester.year, upcomingSemester.semester, userStartYear, userStartSemester)){

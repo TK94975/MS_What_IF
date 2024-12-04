@@ -32,7 +32,7 @@ const ProgressTable = () => {
         try {
             const response = await axios.post(
                 `${process.env.REACT_APP_SERVER_URL}/progress/concentration_requirements`,
-                { selectedConcentration }
+                { selectedConcentration, thesisProject }
             );
             // Log the entire response object
             console.log("Response from server:", response);

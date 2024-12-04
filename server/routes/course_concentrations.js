@@ -33,7 +33,7 @@ router.get('/:concentration', async (req, res) => {
            cc.isConcentrationCore
          FROM courses c
          JOIN course_concentrations cc ON c.id = cc.course_id
-         WHERE cc.concentration = ? AND cc.major = 'CSI'`,
+         WHERE cc.concentration = ? AND cc.major = 'CSI'`, // TODO: Replace CSI with variable
         [concentration]
       );
   
