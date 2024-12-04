@@ -27,6 +27,9 @@ const createFullECESchedule = async (userCourses, userProgress, concentration, c
     let newSchedule = schedule;
     let courses = userCourses;
     //get the required prereqs
+    if (userProgress?.requirementsMet?.depthCompleted && userProgress?.requirementsMet?.breadthCompleted && userProgress?.requirementsMet?.mathPhysicsCompleted && userProgress?.requirementsMet?.technicalElectiveCompleted && userProgress?.requirementsMet?.thesisProjectCompleted) {
+        return newSchedule
+    }
 
     console.log('\nGETTING DEPTH REQS:')
     const depth_courses = await getECEConcentrationReqs(concentration);
@@ -43,12 +46,13 @@ const createFullECESchedule = async (userCourses, userProgress, concentration, c
     const depthCredits = userProgress?.depth?.completed_credits || 0;
     console.log(`breadthCredits: ${breadthCredits}`)
     console.log(`depthCredits: ${depthCredits}`)
-    
-    let neededCourses = 6 - electiveCompleted ;
-
-    console.log('\nAdding depth core courses')
+    console.log(userProgress)
+    let neededCourses = 6 - (userProgress?.technicalElective?.courses?.length ?? 0);
+    console.log(neededCourses)
+    console.log(userProgress?.requirementsMet?.depthCompleted)
     if(!userProgress?.requirementsMet?.depthCompleted){
-        let credits = conCoreCredits;
+        console.log('\nAdding depth core courses')
+        let credits = userProgress?.depth?.completed_credits ?? 0;
         console.log("Init Credits", credits);
         let tries = 0
         while (credits < 12 && depth_courses.length > 3 && tries < 20){
@@ -121,6 +125,7 @@ const createFullECESchedule = async (userCourses, userProgress, concentration, c
     console.log(newSchedule)
 
     console.log('neededCourses')
+    console.log(neededCourses)
     while (neededCourses > 0){
         const randomCourse = ecePreferredElectives[Math.floor(Math.random() * preferredElectives.length)]
         if(!courses.includes(randomCourse)){

@@ -188,7 +188,7 @@ const MajorConcentrationSelector = () => {
                                 <Form.Check
                                     type="checkbox"
                                     label="Thesis?"
-                                    checked={thesisProject === 'Thesis'}
+                                    checked={(thesisProject === 'Thesis')}
                                     onChange={() => {
                                         const newValue = thesisProject === 'Thesis' ? 'Project' : 'Thesis';
                                         setThesisProject(newValue);
