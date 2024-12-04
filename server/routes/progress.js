@@ -58,6 +58,7 @@ router.post('/completed_progress', async (req, res) => {
 
 // POST route to calculate user progress
 router.post('/completed_progress', async (req, res) => {
+    console.log("\n\n\completed_progress")
     let userCourses = req.body.user_courses; // Array of user's completed courses with grades
     const userConcentration = req.body.user_concentration; // String
     const calculationType = req.body.calculation_type; // 'current' or 'projected'

@@ -27,15 +27,11 @@ const createFullECESchedule = async (userCourses, userProgress, concentration, c
     let newSchedule = schedule;
     let courses = userCourses;
     //get the required prereqs
-    console.log('\nGETTING CORE REQS:')
-    const coreCourses = await getECECoreReqs();
-    console.log('\nCORE REQS:')
-    console.log(coreCourses)
 
-    console.log('\nGETTING CONCENTRATION REQS:')
-    const conCourses = await getECEConcentrationReqs(concentration);
-    console.log('\nCONCENTRATION REQS:')
-    console.log(conCourses)
+    console.log('\nGETTING DEPTH REQS:')
+    const depth_courses = await getECEConcentrationReqs(concentration);
+    console.log('\DEPTH REQS:')
+    console.log(depth_courses)
     
     console.log('\nGETTING BREADTH REQS:')
     const breadthReqs = await getECEBreadthReqs(concentration);
@@ -43,46 +39,20 @@ const createFullECESchedule = async (userCourses, userProgress, concentration, c
     console.log(breadthReqs)
     
     // Check for completed electives
-    const electiveCompleted = userProgress?.elective?.completed_credits || 0;
-    const conCoreCredits = userProgress?.concentration?.completed_credits || 0;
-    console.log(`electiveCompleted: ${electiveCompleted}`)
-    console.log(`conCoreCredits: ${conCoreCredits}`)
+    const breadthCredits = userProgress?.breadth?.completed_credits || 0;
+    const depthCredits = userProgress?.depth?.completed_credits || 0;
+    console.log(`breadthCredits: ${breadthCredits}`)
+    console.log(`depthCredits: ${depthCredits}`)
     
-    // https://www.albany.edu/graduate-bulletin/electrical-computer-engineering-ms.php
-    // Technical electives 2 classes for non thesis 1 class for thesis
-    // Math and Science 1 course
-    // Depth (concentration) = 4
-    // breadth (breadth) = 2
     let neededCourses = 6 - electiveCompleted ;
-    
-    // Get the core courses for this class
-    console.log('\nuserProgress:\n')
-    console.log(userProgress)
-    console.log('\nAdding depth courses')
-    if(!userProgress?.requirementsMet?.coreCourses){
-        for(const course of coreCourses){
-            if(!courses.includes(course)){
-                const prereqs = await getPrereqs(course);
-                for (const prereq of prereqs){
-                    if(!courses.includes(prereq)){
-                        newSchedule = addCourseToSchedule(prereq, [], newSchedule, classesPerSemester);
-                        courses.push(prereq)
-                    }
-                }
-                newSchedule = addCourseToSchedule(course, prereqs, newSchedule, classesPerSemester);
-                courses.push(course);
-            }
-        }
-    }
-    console.log('new Schedule: ')
-    console.log(newSchedule)
-    console.log('\nAdding concentration core courses')
-    if(!userProgress?.requirementsMet?.concentrationCoreCourses){
+
+    console.log('\nAdding depth core courses')
+    if(!userProgress?.requirementsMet?.depthCompleted){
         let credits = conCoreCredits;
         console.log("Init Credits", credits);
         let tries = 0
-        while (credits < 12 && conCourses.length > 3 && tries < 20){
-            const randomCourse = conCourses[Math.floor(Math.random() * conCourses.length)];
+        while (credits < 12 && depth_courses.length > 3 && tries < 20){
+            const randomCourse = depth_courses[Math.floor(Math.random() * depth_courses.length)];
             if(!courses.includes(randomCourse)){
                 const prereqs = await getPrereqs(randomCourse);
                 for (const prereq of prereqs){
@@ -103,7 +73,7 @@ const createFullECESchedule = async (userCourses, userProgress, concentration, c
     console.log('new Schedule: ')
     console.log(newSchedule)
     console.log('\nGetting BreadthRequirements...')
-    if(!userProgress?.requirementsMet?.breadthRequirements){
+    if(!userProgress?.requirementsMet?.breadthCompleted){
         electiveOneFlag = false;
         electiveTwoFlag = false;
         let tries = 0
@@ -183,7 +153,7 @@ const createFullECESchedule = async (userCourses, userProgress, concentration, c
     else {
         console.log('Adding Additional TE')
         // Add technical Elective
-        var randomCourse = ecePreferredElectives[Math.floor(Math.random() * preferredElectives.length)]
+        var randomCourse = ecePreferredElectives[Math.floor(Math.random() * ecePreferredElectives.length)]
         if(!courses.includes(randomCourse)){
             let prereqs = await getPrereqs(randomCourse)
             for (const prereq of prereqs){
